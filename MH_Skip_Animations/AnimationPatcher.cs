@@ -22,7 +22,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       private static void LogRoutine ( IEnumerator routine ) {
          var name = routine.GetType().FullName;
-         if ( name.Contains( ".ColorTween" ) ) return;
+         if ( name.Contains( ".ColorTween" ) || name.Contains( "<StartCoroutineCO>" ) || name.Contains( "<DelayedSetDirty>" ) || name.Contains( "<LoadAssetAsync>" ) ) return;
          Fine( "Routine {0}", name );
       }
    }
