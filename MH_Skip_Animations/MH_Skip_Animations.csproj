@@ -55,7 +55,9 @@
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
+    <Compile Include="AnimationPatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CinematicPatcher.cs" />
     <Compile Include="SkipAnimations.cs" />
   </ItemGroup>
   <ItemGroup>

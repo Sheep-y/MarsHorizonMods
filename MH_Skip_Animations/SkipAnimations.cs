@@ -1,14 +1,9 @@
-﻿using Astronautica.View;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Rendering;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
@@ -28,6 +23,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          config.Load();
          new CinematicPatcher().Apply();
+         new AnimationPatcher().Apply();
       }
    }
 
@@ -68,61 +64,4 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       } catch ( Exception x ) { Err( x ); } }
    }
 
-   internal class CinematicPatcher : Patcher {
-
-      private static Config config => SkipAnimations.config;
-
-      internal void Apply () {
-         if ( config.skip_intro )
-            Patch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
-         IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
-         if ( IsSkippableField != null )
-            Patch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
-         if ( RootMod.Log.LogLevel == System.Diagnostics.TraceLevel.Verbose )
-            Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
-      }
-
-      private static FieldInfo IsSkippableField;
-      private static HashSet< string > NonSkippable = new HashSet< string >();
-
-      private static void LogRoutine ( IEnumerator routine ) {
-         var name = routine.GetType().FullName;
-         if ( name.EndsWith( ".ColorTween]" ) ) return;
-         Fine( "Routine {0}", name );
-      }
-
-      private static void SkipSplash ( ref IEnumerator __result ) {
-         Fine( "Waiting for splash screen." );
-         Task.Run( async () => { try {
-            int delay = 8, wait_count = 15_000 / delay;
-            while ( SplashScreen.isFinished && wait_count-- > 0 ) await Task.Delay( delay );
-            Info( SplashScreen.isFinished ? "Splash screen skip timeout" : "Skipping splash screen." );
-            SplashScreen.Stop( SplashScreen.StopBehavior.StopImmediate );
-         } catch ( Exception x ) { Err( x ); } } );
-      }
-
-      private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance ) { try {
-         if ( __result ) return;
-         var id = __instance.CurrentCinematicBindingType.ToString();
-
-         var isSkippable = (bool) IsSkippableField.GetValue( __instance );
-         if ( ! isSkippable ) {
-            if ( ! NonSkippable.Contains( id ) ) {
-               Fine( "Non-skippable cinematic: {0}", id );
-               NonSkippable.Add( id );
-            }
-            return;
-         }
-
-         if ( config.skip_all_cinematics || config.SkipCinematics.Contains( id ) )
-            __result = true;
-         else if ( config.skip_seen_cinematics ) {
-            Info( "Adding {0} to seen cinematics.", id );
-            config.AddCinematic( id );
-         }
-
-         if ( __result ) Info( "Skipping cinematic {0}", id );
-
-      } catch ( Exception x ) { Err( x ); } }
-   }
 }
