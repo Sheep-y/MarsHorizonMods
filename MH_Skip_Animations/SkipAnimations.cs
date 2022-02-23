@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Rendering;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
@@ -31,12 +33,17 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
    public class Config : IniConfig {
 
-      [ Config( "[Cinematic]\r\n; Force skip all cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
+      [ Config( "[Cinematic]\r\n; Skip intro.  Default True." ) ]
+      public bool skip_intro = true;
+      [ Config( "Force skip all non-intro cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
       public bool skip_all_cinematics = false;
       [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default True." ) ]
       public bool skip_seen_cinematics = true;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
+
+      [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
+      public int config_version = 20200223;
 
       internal HashSet< string > SkipCinematics { get; } = new HashSet< string >();
 
@@ -66,19 +73,33 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static Config config => SkipAnimations.config;
 
       internal void Apply () {
+         if ( config.skip_intro )
+            Patch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
          IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
          if ( IsSkippableField != null )
             Patch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
-         Patch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
+         if ( RootMod.Log.LogLevel == System.Diagnostics.TraceLevel.Verbose )
+            Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
       }
 
       private static FieldInfo IsSkippableField;
       private static HashSet< string > NonSkippable = new HashSet< string >();
 
-      private static bool SkipSplash ( ref IEnumerator __result, SplashDelayScene __instance ) { try {
-         Info( "Splash!" );
-         return true;
-      } catch ( Exception x ) { return Err( x, true ); } }
+      private static void LogRoutine ( IEnumerator routine ) {
+         var name = routine.GetType().FullName;
+         if ( name.EndsWith( ".ColorTween]" ) ) return;
+         Fine( "Routine {0}", name );
+      }
+
+      private static void SkipSplash ( ref IEnumerator __result ) {
+         Fine( "Waiting for splash screen." );
+         Task.Run( async () => { try {
+            int delay = 8, wait_count = 15_000 / delay;
+            while ( SplashScreen.isFinished && wait_count-- > 0 ) await Task.Delay( delay );
+            Info( SplashScreen.isFinished ? "Splash screen skip timeout" : "Skipping splash screen." );
+            SplashScreen.Stop( SplashScreen.StopBehavior.StopImmediate );
+         } catch ( Exception x ) { Err( x ); } } );
+      }
 
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance ) { try {
          if ( __result ) return;
