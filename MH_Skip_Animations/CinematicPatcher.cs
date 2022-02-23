@@ -17,9 +17,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       internal void Apply () {
          if ( config.skip_intro )
             Patch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
-         IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
-         if ( IsSkippableField != null )
-            Patch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
+         if ( config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 ) {
+            IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
+            if ( IsSkippableField != null )
+               Patch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
+            Patch( typeof( LaunchCinematicCountdown ), "Begin", null, nameof( SkipLaunchCountdown ) );
+         }
       }
 
       private static FieldInfo IsSkippableField;
@@ -38,25 +41,28 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance ) { try {
          if ( __result ) return;
          var id = __instance.CurrentCinematicBindingType.ToString();
-
-         var isSkippable = (bool) IsSkippableField.GetValue( __instance );
-         if ( ! isSkippable ) {
+         if ( ! (bool) IsSkippableField.GetValue( __instance ) ) {
             if ( ! NonSkippable.Contains( id ) ) {
                Fine( "Non-skippable cinematic: {0}", id );
                NonSkippable.Add( id );
             }
             return;
          }
-
-         if ( config.skip_all_cinematics || config.SkipCinematics.Contains( id ) )
-            __result = true;
-         else if ( config.skip_seen_cinematics ) {
-            Info( "Adding {0} to seen cinematics.", id );
-            config.AddCinematic( id );
-         }
-
+         __result = ShouldSkip( id );
          if ( __result ) Info( "Skipping cinematic {0}", id );
-
       } catch ( Exception x ) { Err( x ); } }
+
+      private static bool ShouldSkip ( string id ) {
+         if ( config.skip_all_cinematics || config.SkipCinematics.Contains( id ) ) return true;
+         if ( ! config.skip_seen_cinematics ) return false;
+         Info( "Adding {0} to seen cinematics.", id );
+         config.AddCinematic( id );
+         return true;
+      }
+
+      private static void SkipLaunchCountdown ( LaunchCinematicCountdown __instance ) {
+         if ( ShouldSkip( "$Launch_Countdown" ) ) __instance.End();
+      }
+
    }
 }
