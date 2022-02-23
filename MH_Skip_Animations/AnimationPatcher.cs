@@ -16,14 +16,44 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static Config config => SkipAnimations.config;
 
       internal void Apply () {
-         if ( RootMod.Log.LogLevel == System.Diagnostics.TraceLevel.Verbose )
-            Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
+         //Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
+         if ( config.remove_delay )
+            TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), nameof( SkipMonoTimeDelays ) );
+
+         if ( LaunchSpeed != null )
+            TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
+         TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
+
+         if ( MissionSpeed != null )
+            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", null, nameof( SetMissionSpeed ) );
+         TryPatch( typeof( MissionGameplayScene ), "SkipPressed", null, nameof( SkipMissionAnimation ) );
       }
 
-      private static void LogRoutine ( IEnumerator routine ) {
-         var name = routine.GetType().FullName;
-         if ( name.Contains( ".ColorTween" ) || name.Contains( "<StartCoroutineCO>" ) || name.Contains( "<DelayedSetDirty>" ) || name.Contains( "<LoadAssetAsync>" ) ) return;
-         Fine( "Routine {0}", name );
+      private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
+         if ( duration <= 0.1f ) return;
+         Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour.GetType().Name, behaviour.name );
+         duration = 0f;
       }
+
+      private static FieldInfo LaunchSpeed = typeof( MissionGameplayScene ).Field( "skipSpeedUp" );
+      private static void SetLaunchSpeed ( object __instance ) {
+         Info( "Increasing launch screen animation speed" );
+         LaunchSpeed?.SetValue( __instance, 100 );
+      }
+
+      private static void SkipLaunchAnimation ( object __instance, ref bool __result ) {
+         __result = true;
+      }
+
+      private static FieldInfo MissionSpeed = typeof( MissionGameplayScene ).Field( "timelineSkipSpeedup" );
+      private static void SetMissionSpeed ( object __instance ) {
+         Info( "Increasing puzzle screen animation speed" );
+         MissionSpeed?.SetValue( __instance, 100 );
+      }
+
+      private static void SkipMissionAnimation ( ref bool __result ) {
+         __result = true;
+      }
+
    }
 }

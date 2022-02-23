@@ -37,7 +37,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default True." ) ]
       public bool skip_seen_cinematics = true;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
-      public string skip_cinematics = "$LaunchEventsScreen,Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
+      public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
+
+      [ Config( "[Animation]\r\n; Remove delays between mini-game screens.  Default true." ) ]
+      public bool remove_delay = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;
@@ -52,6 +55,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
                foreach ( var e in new StringReader( skip_cinematics ).ReadCsvRow() )
                   if ( ! string.IsNullOrWhiteSpace( e ) )
                      SkipCinematics.Add( e.Trim() );
+            Info( "{0} cinematic(s) has been seen and will be skipped.", SkipCinematics.Count );
          }
       } catch ( Exception x ) { Err( x ); } }
 

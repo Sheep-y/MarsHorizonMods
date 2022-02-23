@@ -16,12 +16,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal void Apply () {
          if ( config.skip_intro )
-            Patch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
+            TryPatch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
          if ( config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 ) {
             IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
             if ( IsSkippableField != null )
-               Patch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
-            Patch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchCountdown ) );
+               TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
          }
       }
 
@@ -63,10 +62,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          }
          __result = ShouldSkip( id );
       } catch ( Exception x ) { Err( x ); } }
-
-      private static void SkipLaunchCountdown ( object __instance, ref bool __result ) {
-         __result = ShouldSkip( "$" + __instance.GetType().Name );
-      }
 
    }
 }
