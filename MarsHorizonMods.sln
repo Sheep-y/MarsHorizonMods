@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MH_Skip_Animations", "MH_Skip_Animations\MH_Skip_Animations.csproj", "{991C96F1-6E08-41F4-970C-5BC85A31E180}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{CC3F2D84-7515-4FE6-85B2-72713933DD4D}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{cc3f2d84-7515-4fe6-85b2-72713933dd4d}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D748A173-2277-4EBD-A493-CEBE37BE1BE7}
+	EndGlobalSection
+EndGlobal
