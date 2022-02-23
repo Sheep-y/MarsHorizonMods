@@ -130,7 +130,10 @@ namespace ZyMod {
 
       #if ! NoCsv
       /** Write data as a csv row, and then start a new line.  Null will be written as "null". */
-      public static void WriteCsvLine ( this TextWriter tw, params object[] values ) => tw.Write( new StringBuilder().AppendCsvLine( values ).Append( "\r\n" ) );
+      public static TextWriter WriteCsvLine ( this TextWriter tw, params object[] values ) {
+         tw.Write( new StringBuilder().AppendCsvLine( values ).Append( "\r\n" ) );
+         return tw;
+      }
 
       /** Append data as a csv row, on a new line if builder is non-empty.  Null will be written as "null". */
       public static StringBuilder AppendCsvLine ( this StringBuilder buf, params object[] values ) {
