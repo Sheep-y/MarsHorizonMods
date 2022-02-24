@@ -17,32 +17,33 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static Config config => SkipAnimations.config;
 
       internal void Apply () {
-         //Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
-         if ( config.remove_delay ) {
+         if ( config.remove_delays ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), nameof( SkipMonoTimeDelays ) );
-            RemoveWaitForSeconds();
-            TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
-            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", null, nameof( SetMissionSpeed ) );
+            TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
+            TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
+            TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
+            TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
+            TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
+            TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
+            TryPatch( typeof( MissionGameplayScene ), "WaitForSecondsSkippable", null, nameof( RemoveWait_WaitForSecondsSkippable ) );
          }
-         TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
-         TryPatch( typeof( MissionGameplayScene ), "SkipPressed", null, nameof( SkipMissionAnimation ) );
+         if ( config.skip_screen_fades )
+            foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
+               TryPatch( m, nameof( RemoveWait_Blackout ) );
+         if ( config.fast_launch ) {
+            TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
+            TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
+         }
+         if ( config.fast_mission ) {
+            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", null, nameof( SetMissionSpeed ) );
+            TryPatch( typeof( MissionGameplayScene ), "SkipPressed", null, nameof( SkipMissionAnimation ) );
+         }
       }
 
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
          Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour.GetType().Name, behaviour.name );
          duration = 0f;
-      }
-
-      private void RemoveWaitForSeconds () {
-         TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
-         TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
-         TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
-         TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
-         TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
-         TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
-         foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
-            TryPatch( m, nameof( RemoveWait_Blackout ) );
       }
 
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
@@ -57,11 +58,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void RemoveWait_Animator ( AnimatorDelay __instance ) => __instance.maxDelay = 0;
       private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0f;
       private static void RemoveWait_Blackout ( Blackout __instance ) => __instance.tweenTime = __instance.waitTime = 0f;
+      private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
 
-      private static void SetLaunchSpeed ( float ___skipSpeedUp, bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
+      private static void SetLaunchSpeed ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
       private static void SkipLaunchAnimation ( ref bool __result ) => __result = true;
 
-      private static void SetMissionSpeed ( float ___timelineSkipSpeedup ) => ___timelineSkipSpeedup = 100f;
+      private static void SetMissionSpeed ( ref float ___timelineSkipSpeedup ) => ___timelineSkipSpeedup = 100f;
       private static void SkipMissionAnimation ( ref bool __result ) => __result = true;
 
       #region OpCode Replacement

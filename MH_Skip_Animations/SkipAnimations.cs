@@ -24,7 +24,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          config.Load();
          if ( config.skip_intro || config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 )
             new CinematicPatcher().Apply();
-         new AnimationPatcher().Apply();
+         if ( config.remove_delays || config.skip_screen_fades || config.fast_launch || config.fast_mission )
+            new AnimationPatcher().Apply();
       }
    }
 
@@ -34,13 +35,19 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool skip_intro = true;
       [ Config( "Force skip all non-intro cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
       public bool skip_all_cinematics = false;
-      [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default True." ) ]
+      [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default true." ) ]
       public bool skip_seen_cinematics = true;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
 
       [ Config( "[Animation]\r\n; Remove or reduce assorted delays between screens and actions.  Default true." ) ]
-      public bool remove_delay = true;
+      public bool remove_delays = true;
+      [ Config( "Skip screen fadings.  Default true." ) ]
+      public bool skip_screen_fades = true;
+      [ Config( "Skip launch countdown and speed up launch animations.  Default true." ) ]
+      public bool fast_launch = true;
+      [ Config( "Skip connect animation and speed up mini-game animations.  Default true." ) ]
+      public bool fast_mission = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;
