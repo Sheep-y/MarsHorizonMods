@@ -430,7 +430,7 @@ namespace ZyMod {
 
       protected HarmonyMethod ToHarmony ( string name ) {
          if ( ModHelpers.IsBlank( name ) ) return null;
-         return new HarmonyMethod( GetType().GetMethod( name, Public | NonPublic | Static ) ?? throw new NullReferenceException( name + " not found" ) );
+         return new HarmonyMethod( GetType().GetMethod( name, Public | NonPublic | Static ) ?? throw new NullReferenceException( $"static method {name} not found" ) );
       }
    }
 
