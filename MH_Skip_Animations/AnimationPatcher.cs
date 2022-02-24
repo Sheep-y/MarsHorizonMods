@@ -28,11 +28,13 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
             TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
 
-            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", null, nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( LaunchDayScreen ), "Wait", null, nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", null, nameof( RemoveWait_WaitForSecondsSkippable ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", null, nameof( RemoveWait_Tween ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", null, nameof( RemoveWait_Tween ) );
+            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( LaunchDayScreen ), "Wait", nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", nameof( RemoveWait_WaitForSecondsSkippable ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", nameof( RemoveWait_Tween ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", nameof( RemoveWait_Tween ) );
+            foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
+               TryPatch( m, nameof( RemoveWait_TweenDo ) );
          }
          if ( config.skip_screen_fades )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
@@ -45,9 +47,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          if ( config.fast_mission ) {
             TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", nameof( SkipPayloadDeploy ) );
             TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", null, nameof( SpeedUpMission ) );
+            TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", nameof( SkipReliabilityFill ) );
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
+            TryPatch( typeof( MissionGameplayActionResourceElement ), "Show", nameof( SkipResourceTween ) );
          }
       }
 
@@ -77,6 +81,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       }
       private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
       private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
+      private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0;
       private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
 
       private static void SpeedUpLaunch ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
@@ -90,15 +95,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          __instance.baseReliabilityRollSpeed = 100f;
          __instance.skippedReliabilityRollSpeed = 100f;
       }
-      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) {
-         typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 100f );
-      }
-      private static void SpeedUpMissionSwoosh () {
-         MissionGameplaySwooshEffect.swooshModifier = 100f;
-      }
-      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) {
-         effect.PlaybackSpeed = 100f;
-      }
+      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 100f );
+      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 5f;
+      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 10f;
+      private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
+      private static void SkipResourceTween ( ref bool tween ) => tween = false;
 
       private static bool SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
          typeof( MissionGameplayScreen ).Method( "ContinueToGameplayKBAM" ).Run( __instance );
