@@ -1,5 +1,6 @@
 ﻿using Astronautica;
 using Astronautica.View;
+using Astronautica.View.MissionNotifications;
 using DG.Tweening;
 using HarmonyLib;
 using System;
@@ -56,8 +57,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
             TryPatch( typeof( MissionGameplayActionResourceElement ), "Show", nameof( SkipResourceTween ) );
          }
-         if ( config.auto_pass_normal_action )
-            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( AutoClickNormalAction ) );
+         if ( config.auto_pass_normal_actions )
+            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
+         if ( config.bypass_fullscreen_notices )
+            TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), nameof( BypassFullScreenNotices ) );
       }
 
       #region Remove delays
@@ -116,12 +119,17 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipResourceTween ( ref bool tween ) => tween = false;
       #endregion
 
-      private static void AutoClickNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
+      private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
          if ( @event != null ) return;
          Task.Run( async () => {
             await Task.Delay( 50 );
             ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
          } );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void BypassFullScreenNotices ( NotificationCache missionNotifications ) { try {
+         if ( missionNotifications == null ) return;
+         while ( missionNotifications.GetNext( out _ ) != null ) ;
       } catch ( Exception x ) { Err( x ); } }
 
       #region OpCode Replacement

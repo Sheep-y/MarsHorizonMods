@@ -36,24 +36,26 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool skip_intro = true;
       [ Config( "Force skip all non-intro cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
       public bool skip_all_cinematics = false;
-      [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default true." ) ]
-      public bool skip_seen_cinematics = true;
+      [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default False." ) ]
+      public bool skip_seen_cinematics = false;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
 
-      [ Config( "[Animation]\r\n; Remove or reduce assorted delays between screens and actions.  Default true." ) ]
+      [ Config( "[Animation]\r\n; Remove or reduce assorted screen and action delays.  Default True." ) ]
       public bool remove_delays = true;
-      [ Config( "Skip screen fadings.  Default true." ) ]
+      [ Config( "Skip screen fadings.  Default True." ) ]
       public bool skip_screen_fades = true;
-      [ Config( "Deploy payload in background, skip payload connection, and skip task popup." ) ]
+      [ Config( "Deploy payload in background, skip payload connection, and skip task popup.  Default True." ) ]
       public bool skip_mission_intro = true;
-      [ Config( "Skip launch countdown and speed up launch animations.  Default true." ) ]
+      [ Config( "Skip launch countdown and speed up launch animations.  Default True." ) ]
       public bool fast_launch = true;
-      [ Config( "Speed up mini-game animations such as reliablilty bar.  Default true." ) ]
+      [ Config( "Speed up mini-game animations such as reliablilty bar.  Default True." ) ]
       public bool fast_mission = true;
 
-      [ Config( "[Bypass]\r\n; Automatically continue uneventful mission actions." ) ]
-      public bool auto_pass_normal_action = true;
+      [ Config( "[Bypass]\r\n; Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
+      public bool bypass_fullscreen_notices = true;
+      [ Config( "Automatically continue uneventful mission actions.  Default True." ) ]
+      public bool auto_pass_normal_actions = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;
