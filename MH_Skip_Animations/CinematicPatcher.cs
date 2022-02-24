@@ -37,13 +37,15 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static string lastCinematic;
 
       private static bool ShouldSkip ( string id ) {
-         if ( config.skip_all_cinematics || config.SkipCinematics.Contains( id ) ) {
-            if ( lastCinematic != id ) Info( "Skipping cinematic {0}", lastCinematic = id );
+         if ( lastCinematic == id ) return false;
+         lastCinematic = id;
+         if ( config.SkipCinematics.Contains( id ) || config.skip_all_cinematics ) {
+            Info( "Skipping cinematic {0}", id );
             return true;
          }
          if ( ! config.skip_seen_cinematics ) {
-            if ( lastCinematic != id ) Info( "Allowing cinematic {0}", lastCinematic = id );
-            return true;
+            Info( "Allowing cinematic {0}", id );
+            return false;
          }
          Info( "Adding {0} to seen cinematics.", id );
          config.AddCinematic( id );
