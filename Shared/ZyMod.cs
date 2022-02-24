@@ -93,8 +93,10 @@ namespace ZyMod {
       public static MethodInfo Method ( this Type type, string name, params Type[] types ) => type?.GetMethod( name, Public | NonPublic | Instance | Static, null, types ?? Type.EmptyTypes, null );
       public static MethodInfo TryMethod ( this Type type, string name ) { try { return Method( type, name ); } catch ( Exception ) { return null; } }
       public static MethodInfo TryMethod ( this Type type, string name, params Type[] types ) { try { return Method( type, name, types ); } catch ( Exception ) { return null; } }
-      public static object MethodInvoke ( this object target, string name, params object[] args ) => Method( target as Type ?? target.GetType(), name ).Invoke( target, args );
-      public static object TryInvoke ( this object target, string name, params object[] args ) { try {  return MethodInvoke( target, name, args ); } catch ( Exception x ) { return x; } }
+      public static object Run ( this MethodInfo func, object self, params object[] args ) => func.Invoke( self, args );
+      public static object RunStatic ( this MethodInfo func, params object[] args ) => func.Invoke( null, args );
+      public static object TryRun ( this MethodInfo func, object self, params object[] args ) { try { return Run( func, self, args ); } catch ( Exception x ) { return x; } }
+      public static object TryRunStatic ( this MethodInfo func, params object[] args ) { try { return RunStatic( func, args ); } catch ( Exception x ) { return x; } }
       public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static );
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static );
 
@@ -103,19 +105,21 @@ namespace ZyMod {
       public static IEnumerable< CodeInstruction > GetCodes ( this MethodBase subject ) {
          if ( subject == null ) return null;
          if ( GetILs == null ) GetILs = typeof( Harmony ).Assembly.GetType( "HarmonyLib.MethodBodyReader" )?.Method( "GetInstructions", typeof( ILGenerator ), typeof( MethodBase ) );
-         var list = GetILs?.Invoke( null, new object[]{ null, subject } ) as IList;
-         if ( list == null || list.Count == 0 || list.GetType().GenericTypeArguments.Length == 0 ) return null;
-         var code = list.GetType().GenericTypeArguments[ 0 ].Method( "GetCodeInstruction", new Type[0] );
+         var list = GetILs?.TryRunStatic( null, subject ) as IList;
+         var args = list?.GetType().GenericTypeArguments;
+         if ( list == null || list.Count == 0 || args.Length == 0 ) return null;
+         var code = args[ 0 ].Method( "GetCodeInstruction", new Type[0] );
          return list.Cast<object>().Select( e => code?.Invoke( e, null ) as CodeInstruction );
       }
       // Find the MoveNext method of an iterator method.
       public static MethodInfo MoveNext ( this MethodBase subject ) {
-         if ( EnumMoveNext != null ) return EnumMoveNext.Invoke( null, new object[]{ subject } ) as MethodInfo;
+         if ( subject == null ) return null;
+         if ( EnumMoveNext != null ) return EnumMoveNext.RunStatic( subject ) as MethodInfo;
          else if ( GetILs == null ) {
             EnumMoveNext = typeof( AccessTools ).Method( "EnumeratorMoveNext", typeof( MethodBase ) );
             if ( EnumMoveNext != null ) return MoveNext( subject );
          }
-         var op = subject.GetCodes().FirstOrDefault( e => e?.opcode.Name == "newobj" );
+         var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
          return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", new Type[0] );
       }
 
@@ -415,7 +419,7 @@ namespace ZyMod {
       protected void UnpatchAll () {
          var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
          lock ( sync ) if ( harmony == null ) return;
-         m?.Invoke( harmony, new object[]{ harmony.Id } );
+         m?.Run( harmony, harmony.Id );
       }
       protected MethodInfo UnpatchAll ( MethodInfo orig ) {
          if ( orig == null ) return null;
