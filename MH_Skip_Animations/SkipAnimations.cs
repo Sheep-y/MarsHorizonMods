@@ -39,7 +39,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
 
-      [ Config( "[Animation]\r\n; Remove delays between mini-game screens.  Default true." ) ]
+      [ Config( "[Animation]\r\n; Remove or reduce assorted delays between screens and actions.  Default true." ) ]
       public bool remove_delay = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]

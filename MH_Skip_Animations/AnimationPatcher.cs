@@ -21,14 +21,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          if ( config.remove_delay ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), nameof( SkipMonoTimeDelays ) );
             RemoveWaitForSeconds();
-         }
-
-         if ( LaunchSpeed != null )
             TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
-         TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
-
-         if ( MissionSpeed != null )
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", null, nameof( SetMissionSpeed ) );
+         }
+         TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
          TryPatch( typeof( MissionGameplayScene ), "SkipPressed", null, nameof( SkipMissionAnimation ) );
       }
 
@@ -62,25 +58,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0f;
       private static void RemoveWait_Blackout ( Blackout __instance ) => __instance.tweenTime = __instance.waitTime = 0f;
 
-      private static FieldInfo LaunchSpeed = typeof( MissionGameplayScene ).Field( "skipSpeedUp" );
-      private static void SetLaunchSpeed ( object __instance ) {
-         Info( "Increasing launch screen skip speed" );
-         LaunchSpeed?.SetValue( __instance, 100 );
-      }
+      private static void SetLaunchSpeed ( float ___skipSpeedUp, bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
+      private static void SkipLaunchAnimation ( ref bool __result ) => __result = true;
 
-      private static void SkipLaunchAnimation ( object __instance, ref bool __result ) {
-         __result = true;
-      }
-
-      private static FieldInfo MissionSpeed = typeof( MissionGameplayScene ).Field( "timelineSkipSpeedup" );
-      private static void SetMissionSpeed ( object __instance ) {
-         Info( "Increasing puzzle screen skip speed" );
-         MissionSpeed?.SetValue( __instance, 100 );
-      }
-
-      private static void SkipMissionAnimation ( ref bool __result ) {
-         __result = true;
-      }
+      private static void SetMissionSpeed ( float ___timelineSkipSpeedup ) => ___timelineSkipSpeedup = 100f;
+      private static void SkipMissionAnimation ( ref bool __result ) => __result = true;
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
