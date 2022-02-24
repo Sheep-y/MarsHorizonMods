@@ -25,7 +25,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          config.Load();
          if ( config.skip_intro || config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 )
             new CinematicPatcher().Apply();
-         if ( config.remove_delays || config.skip_screen_fades || config.fast_launch || config.fast_mission )
+         if ( config.remove_delays || config.skip_screen_fades || config.skip_mission_intro || config.fast_launch || config.fast_mission )
             new AnimationPatcher().Apply();
       }
    }
@@ -45,10 +45,15 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool remove_delays = true;
       [ Config( "Skip screen fadings.  Default true." ) ]
       public bool skip_screen_fades = true;
+      [ Config( "Deploy payload in background, skip payload connection, and skip task popup." ) ]
+      public bool skip_mission_intro = true;
       [ Config( "Skip launch countdown and speed up launch animations.  Default true." ) ]
       public bool fast_launch = true;
-      [ Config( "Deploy payload in background, skip payload connection, skip task popup, and speed up mini-game animations.  Default true." ) ]
+      [ Config( "Speed up mini-game animations such as reliablilty bar.  Default true." ) ]
       public bool fast_mission = true;
+
+      [ Config( "[Bypass]\r\n; Automatically continue uneventful mission actions." ) ]
+      public bool auto_pass_normal_action = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;

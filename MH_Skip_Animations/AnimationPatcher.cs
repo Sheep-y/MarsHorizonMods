@@ -1,14 +1,16 @@
-﻿using Astronautica.View;
+﻿using Astronautica;
+using Astronautica.View;
 using DG.Tweening;
 using HarmonyLib;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
@@ -41,20 +43,24 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
                TryPatch( m, nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {
             foreach ( var m in new string[] { "AstroInitialise", "InSequence", "LaunchReportSequence", "PartLevellingSequence" } )
-               TryPatch( typeof( LaunchEventsScreen ), m, null, nameof( SpeedUpLaunch ) );
-            TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
+               TryPatch( typeof( LaunchEventsScreen ), m, nameof( SpeedUpLaunch ) );
+            TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", postfix: nameof( SkipLaunchAnimation ) );
          }
-         if ( config.fast_mission ) {
+         if ( config.skip_mission_intro )
             TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", nameof( SkipPayloadDeploy ) );
-            TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", null, nameof( SpeedUpMission ) );
+         if ( config.fast_mission ) {
+            TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", postfix: nameof( SpeedUpMission ) );
             TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", nameof( SkipReliabilityFill ) );
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
             TryPatch( typeof( MissionGameplayActionResourceElement ), "Show", nameof( SkipResourceTween ) );
          }
+         if ( config.auto_pass_normal_action )
+            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( AutoClickNormalAction ) );
       }
 
+      #region Remove delays
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
          Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour?.GetType().Name, behaviour?.name );
@@ -79,14 +85,22 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          if ( ___waitTime > 0 ) Fine( "Removing {0}s screen fade.", ___waitTime );
          ___tweenTime = ___waitTime = 0;
       }
+      private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
       private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
       private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
       private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0;
-      private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
+      #endregion
 
       private static void SpeedUpLaunch ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
       private static void SkipLaunchAnimation ( ref bool __result ) => __result = true;
 
+      private static bool SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
+         typeof( MissionGameplayScreen ).Method( "ContinueToGameplayKBAM" ).Run( __instance );
+         typeof( MissionGameplayScreen ).Method( "OnTaskOutroCompleted" ).Invoke( __instance, new object[]{ null } );
+         return false;
+      } catch ( Exception x ) { return Err( x, true ); } }
+
+      #region Fast Mission
       private static void SpeedUpMission ( MissionGameplayScreen __instance, ref float ___timelineSkipSpeedup, ref bool ___isSkippable, ref bool ___initialWait ) {
          Fine( "Mission screen initiated." );
          ___timelineSkipSpeedup = 100f;
@@ -100,12 +114,15 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 10f;
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
       private static void SkipResourceTween ( ref bool tween ) => tween = false;
+      #endregion
 
-      private static bool SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
-         typeof( MissionGameplayScreen ).Method( "ContinueToGameplayKBAM" ).Run( __instance );
-         typeof( MissionGameplayScreen ).Method( "OnTaskOutroCompleted" ).Invoke( __instance, new object[]{ null } );
-         return false;
-      } catch ( Exception x ) { return Err( x, true ); } }
+      private static void AutoClickNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
+         if ( @event != null ) return;
+         Task.Run( async () => {
+            await Task.Delay( 50 );
+            ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
+         } );
+      } catch ( Exception x ) { Err( x ); } }
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
