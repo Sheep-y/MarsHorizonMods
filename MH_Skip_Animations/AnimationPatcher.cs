@@ -1,17 +1,12 @@
-﻿using Astronautica;
-using Astronautica.View;
-using Astronautica.View.MissionNotifications;
+﻿using Astronautica.View;
 using DG.Tweening;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
@@ -55,12 +50,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
-            TryPatch( typeof( MissionGameplayActionResourceElement ), "Show", nameof( SkipResourceTween ) );
+            TryPatch( typeof( MissionGameplayActionResourceElement ).Method( "Show", typeof( bool ) ), nameof( SkipResourceTween ) );
          }
-         if ( config.auto_pass_normal_actions )
-            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
-         if ( config.bypass_fullscreen_notices )
-            TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), nameof( BypassFullScreenNotices ) );
       }
 
       #region Remove delays
@@ -118,19 +109,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
       private static void SkipResourceTween ( ref bool tween ) => tween = false;
       #endregion
-
-      private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
-         if ( @event != null ) return;
-         Task.Run( async () => {
-            await Task.Delay( 50 );
-            ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
-         } );
-      } catch ( Exception x ) { Err( x ); } }
-
-      private static void BypassFullScreenNotices ( NotificationCache missionNotifications ) { try {
-         if ( missionNotifications == null ) return;
-         while ( missionNotifications.GetNext( out _ ) != null ) ;
-      } catch ( Exception x ) { Err( x ); } }
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )

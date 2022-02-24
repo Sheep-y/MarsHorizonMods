@@ -27,6 +27,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             new CinematicPatcher().Apply();
          if ( config.remove_delays || config.skip_screen_fades || config.skip_mission_intro || config.fast_launch || config.fast_mission )
             new AnimationPatcher().Apply();
+         if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_actions )
+            new BypassPatcher().Apply();
       }
    }
 
@@ -54,6 +56,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       [ Config( "[Bypass]\r\n; Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
       public bool bypass_fullscreen_notices = true;
+      [ Config( "Bypass run of the mill popups such as research complete or mission phase.  Default True." ) ]
+      public bool bypass_popups_notices = true;
       [ Config( "Automatically continue uneventful mission actions.  Default True." ) ]
       public bool auto_pass_normal_actions = true;
 
