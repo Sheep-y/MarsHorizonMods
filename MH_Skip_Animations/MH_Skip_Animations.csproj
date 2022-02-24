@@ -58,10 +58,6 @@
       <HintPath>C:\Program Files (x86)\GOG Galaxy\Games\Mars Horizon\Mars Horizon_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.DirectorModule">
-      <HintPath>C:\Program Files (x86)\GOG Galaxy\Games\Mars Horizon\Mars Horizon_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Shared\ZyMod.cs">

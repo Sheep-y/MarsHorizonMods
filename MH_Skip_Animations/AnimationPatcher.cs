@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Playables;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
@@ -45,24 +44,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          }
          if ( config.fast_mission ) {
             TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", nameof( SkipPayloadDeploy ) );
-            TryPatch( typeof( MissionGameplayScreen ), "OnTaskIntroCompleted", null, nameof( SkipMissionIntro ) );
             TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", null, nameof( SpeedUpMission ) );
-            TryPatch( typeof( MissionGameplayScreen ), "OnPhaseIntroCompleted", null, nameof( Log1 ) );
-            TryPatch( typeof( MissionGameplayScreen ), "OnTaskIntroCompleted", null, nameof( Log2 ) );
-            TryPatch( typeof( MissionGameplayScreen ), "OnTaskOutroCompleted", null, nameof( Log3 ) );
-            TryPatch( typeof( MissionGameplayScreen ), "SkipCurrentTimeline", null, nameof( Log4 ) );
-            TryPatch( typeof( MissionGameplayScreen ), "ContinueToGameplayKBAM", null, nameof( Log5 ) );
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
          }
       }
-
-      private static void Log1 ( MissionGameplayScreen __instance ) => Info( "OnPhaseIntroCompleted {0}", __instance.GetMode<MissionGameplayScreen.Mode>() );
-      private static void Log2 ( MissionGameplayScreen __instance ) => Info( "OnTaskIntroCompleted {0}", __instance.GetMode<MissionGameplayScreen.Mode>() );
-      private static void Log3 ( MissionGameplayScreen __instance ) => Info( "OnTaskOutroCompleted {0}", __instance.GetMode<MissionGameplayScreen.Mode>() );
-      private static void Log4 ( MissionGameplayScreen __instance ) => Info( "SkipCurrentTimeline {0}", __instance.GetMode<MissionGameplayScreen.Mode>() );
-      private static void Log5 ( MissionGameplayScreen __instance ) => Info( "ContinueToGameplayKBAM {0}", __instance.GetMode<MissionGameplayScreen.Mode>() );
 
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
@@ -113,17 +100,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          effect.PlaybackSpeed = 100f;
       }
 
-      private static void SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
-         Info( "Skipping mission intro." );
-         var type = typeof( MissionGameplayScreen );
-         var active = type.Field( "activePlayable" );
-         PlayableDirector Playable () => active.GetValue( __instance ) as PlayableDirector;
-         __instance.DelayWhile( () => Playable()?.state != PlayState.Playing, () => type.Method( "SkipCurrentTimeline" ).Run( __instance ) );
-      } catch ( Exception x ) { Err( x ); } }
-
-      private static void SkipMissionIntro ( MissionGameplayScreen __instance ) { try {
+      private static bool SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
          typeof( MissionGameplayScreen ).Method( "ContinueToGameplayKBAM" ).Run( __instance );
-      } catch ( Exception x ) { Err( x ); } }
+         typeof( MissionGameplayScreen ).Method( "OnTaskOutroCompleted" ).Invoke( __instance, new object[]{ null } );
+         return false;
+      } catch ( Exception x ) { return Err( x, true ); } }
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
