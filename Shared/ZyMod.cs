@@ -470,18 +470,22 @@ namespace ZyMod {
          buffer.Add( $"Logging controlled by {conf}.  First line is log level (Off/Error/Warn/Info/Verbose).  Second line is write interval in seconds, 0 to 60, default 2." );
          if ( ! File.Exists( conf ) ) return;
          using ( var r = new StreamReader( conf ) ) {
-            var line = r.ReadLine();
-            if ( line == null ) return;
-            switch ( ( line.ToUpperInvariant() + "?" )[0] ) {
-               case 'O' : LogLevel = TraceLevel.Off; break;
-               case 'E' : LogLevel = TraceLevel.Error; break;
-               case 'W' : LogLevel = TraceLevel.Warning; break;
-               case 'I' : LogLevel = TraceLevel.Info; break;
-               case 'V' : case 'F' : LogLevel = TraceLevel.Verbose; break;
-            }
-            uint i = 0;
-            if ( uint.TryParse( r.ReadLine(), out i ) ) flushInterval = i;
+            if ( TryParseLogLevel( r.ReadLine(), out var level ) ) LogLevel = level;
+            if ( uint.TryParse( r.ReadLine(), out var i ) ) flushInterval = i;
          }
+      }
+
+      public static bool TryParseLogLevel ( string line, out TraceLevel level ) {
+         level = TraceLevel.Off;
+         if ( ! string.IsNullOrEmpty( line ) )
+            switch ( line.ToUpperInvariant()[0] ) {
+               case 'O' : return true;
+               case 'E' : level = TraceLevel.Error; return true;
+               case 'W' : level = TraceLevel.Warning; return true;
+               case 'I' : level = TraceLevel.Info; return true;
+               case 'V' : case 'F' : level = TraceLevel.Verbose; return true;
+            }
+         return false;
       }
 
       public void Error ( object msg, params object[] arg ) => Write( TraceLevel.Error, msg, arg );
