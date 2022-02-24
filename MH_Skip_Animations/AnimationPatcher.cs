@@ -1,4 +1,5 @@
 ﻿using Astronautica.View;
+using DG.Tweening;
 using HarmonyLib;
 using System;
 using System.Collections;
@@ -22,27 +23,34 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
             TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
             TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
+
             TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
             TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
             TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
-            TryPatch( typeof( MissionGameplayScene ), "WaitForSecondsSkippable", null, nameof( RemoveWait_WaitForSecondsSkippable ) );
+
+            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", null, nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( LaunchDayScreen ), "Wait", null, nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", null, nameof( RemoveWait_WaitForSecondsSkippable ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", null, nameof( RemoveWait_Tween ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", null, nameof( RemoveWait_Tween ) );
          }
          if ( config.skip_screen_fades )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
                TryPatch( m, nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {
-            TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
+            foreach ( var m in new string[] { "AstroInitialise", "InSequence", "LaunchReportSequence", "PartLevellingSequence" } )
+               TryPatch( typeof( LaunchEventsScreen ), m, null, nameof( SpeedUpLaunch ) );
             TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", null, nameof( SkipLaunchAnimation ) );
          }
          if ( config.fast_mission ) {
-            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", null, nameof( SetMissionSpeed ) );
-            TryPatch( typeof( MissionGameplayScene ), "SkipPressed", null, nameof( SkipMissionAnimation ) );
+            TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", nameof( SkipPayloadDeploy ) );
+            TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", null, nameof( SpeedUpMission ) );
          }
       }
 
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
-         Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour.GetType().Name, behaviour.name );
+         Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour?.GetType().Name, behaviour?.name );
          duration = 0f;
       }
 
@@ -55,16 +63,33 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 0.5f, 0f, 1 );
 
-      private static void RemoveWait_Animator ( AnimatorDelay __instance ) => __instance.maxDelay = 0;
-      private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0f;
-      private static void RemoveWait_Blackout ( Blackout __instance ) => __instance.tweenTime = __instance.waitTime = 0f;
+      private static void RemoveWait_Animator ( AnimatorDelay __instance ) {
+         if ( __instance.maxDelay > 0 ) Fine( "Removing {0}s delay from animator {1}", __instance.maxDelay, __instance.name );
+         __instance.maxDelay = 0;
+      }
+      private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0;
+      private static void RemoveWait_Blackout ( ref float ___tweenTime, ref float ___waitTime ) {
+         if ( ___waitTime > 0 ) Fine( "Removing {0}s screen fade.", ___waitTime );
+         ___tweenTime = ___waitTime = 0;
+      }
       private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
+      private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
+      private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
 
-      private static void SetLaunchSpeed ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
+      private static void SpeedUpLaunch ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
       private static void SkipLaunchAnimation ( ref bool __result ) => __result = true;
 
-      private static void SetMissionSpeed ( ref float ___timelineSkipSpeedup ) => ___timelineSkipSpeedup = 100f;
-      private static void SkipMissionAnimation ( ref bool __result ) => __result = true;
+      private static void SpeedUpMission ( ref float ___timelineSkipSpeedup, ref bool ___isSkippable, ref bool ___initialWait ) {
+         Fine( "Mission screen initiated." );
+         ___timelineSkipSpeedup = 50f;
+         ___isSkippable = true;
+         ___initialWait = false;
+      }
+
+      private static bool SkipPayloadDeploy ( MissionGameplayScreen __instance ) { try {
+         typeof( MissionGameplayScreen ).Method( "OnTaskOutroCompleted" ).Invoke( __instance, new object[]{ null } );
+         return false;
+      } catch ( Exception x ) { return Err( x, true ); } }
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )

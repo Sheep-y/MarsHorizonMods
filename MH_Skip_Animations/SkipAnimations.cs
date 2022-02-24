@@ -47,7 +47,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool skip_screen_fades = true;
       [ Config( "Skip launch countdown and speed up launch animations.  Default true." ) ]
       public bool fast_launch = true;
-      [ Config( "Skip connect animation and speed up mini-game animations.  Default true." ) ]
+      [ Config( "Deploy payload in background, skip payload connection, skip task popup, and speed up mini-game animations.  Default true." ) ]
       public bool fast_mission = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
