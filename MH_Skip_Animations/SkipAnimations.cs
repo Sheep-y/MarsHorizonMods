@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using static ZyMod.ModHelpers;
 
@@ -70,7 +71,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          lock ( SkipCinematics ) {
             if ( SkipCinematics.Contains( name ) ) return;
             SkipCinematics.Add( name );
-            skip_cinematics = new StringWriter().WriteCsvLine( SkipCinematics.OrderBy( e => e ).ToArray< object >() ).ToString();
+            object[] cinematic = SkipCinematics.OrderBy( e => e ).ToArray();
+            skip_cinematics = new StringBuilder().AppendCsvLine( cinematic ).ToString();
          }
          Task.Run( () => { lock ( SkipCinematics ) Save(); } );
       } catch ( Exception x ) { Err( x ); } }
