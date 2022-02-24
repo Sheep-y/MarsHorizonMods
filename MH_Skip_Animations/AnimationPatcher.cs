@@ -1,4 +1,5 @@
 ﻿using Astronautica.View;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,8 +18,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal void Apply () {
          //Patch( typeof( MonoBehaviour ).Method( "StartCoroutine", typeof( IEnumerator ) ), nameof( LogRoutine ) );
-         if ( config.remove_delay )
+         if ( config.remove_delay ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), nameof( SkipMonoTimeDelays ) );
+            RemoveWaitForSeconds();
+         }
 
          if ( LaunchSpeed != null )
             TryPatch( typeof( LaunchEventsScreen ), "AstroInitialise", null, nameof( SetLaunchSpeed ) );
@@ -35,9 +38,32 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          duration = 0f;
       }
 
+      private void RemoveWaitForSeconds () {
+         TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
+         TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
+         TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
+         TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
+         TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
+      }
+
+      private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.5f, 0f, 2 );
+      private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCoroutine ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.5f, 0f, 2 );
+      private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( ReplaceFloat( codes, 2f, 0f, 1 ), 0.5f, 0f, 1 );
+      private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.5f, 0f, 1 );
+
+      private static void RemoveWait_ObjectiveList ( HUDObjectiveList __instance ) {
+         __instance.GetType().Field( "listAnimWait" )?.SetValue( __instance, 0f );
+         __instance.GetType().Field( "listHideExtendedTime" )?.SetValue( __instance, 0f );
+      }
+
+
       private static FieldInfo LaunchSpeed = typeof( MissionGameplayScene ).Field( "skipSpeedUp" );
       private static void SetLaunchSpeed ( object __instance ) {
-         Info( "Increasing launch screen animation speed" );
+         Info( "Increasing launch screen skip speed" );
          LaunchSpeed?.SetValue( __instance, 100 );
       }
 
@@ -47,7 +73,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       private static FieldInfo MissionSpeed = typeof( MissionGameplayScene ).Field( "timelineSkipSpeedup" );
       private static void SetMissionSpeed ( object __instance ) {
-         Info( "Increasing puzzle screen animation speed" );
+         Info( "Increasing puzzle screen skip speed" );
          MissionSpeed?.SetValue( __instance, 100 );
       }
 
@@ -55,5 +81,23 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          __result = true;
       }
 
+      #region OpCode Replacement
+      private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
+         => ReplaceOperand( codes, "ldc.r4", from, to, expected_count );
+
+      private static IEnumerable< CodeInstruction > ReplaceOperand < T > ( IEnumerable< CodeInstruction > codes, string opcode, object from, T to, int expected_count ) {
+         bool IsTarget ( CodeInstruction code ) => code.opcode.Name == opcode && Equals( code.operand, from );
+         var list = codes.ToArray();
+         var actual_count = list.Count( IsTarget );
+         if ( actual_count != expected_count ) {
+            Warn( "Mismatch when replacing {0} from {1} to {2}: Expected {3} matches, Found {4}", opcode, from, to, expected_count, actual_count );
+         } else {
+            foreach ( var code in list )
+               if ( IsTarget( code ) ) code.operand = to;
+            Fine( "Replaced {0} from {1} to {2} ({3} matches)", opcode, from, to, actual_count );
+         }
+         return list;
+      }
+      #endregion
    }
 }
