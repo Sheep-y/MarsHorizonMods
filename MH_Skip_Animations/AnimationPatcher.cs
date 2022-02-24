@@ -43,7 +43,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
          TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
          TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
+         TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
          TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
+         foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
+            TryPatch( m, nameof( RemoveWait_Blackout ) );
       }
 
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
@@ -55,11 +58,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 0.5f, 0f, 1 );
 
-      private static void RemoveWait_ObjectiveList ( HUDObjectiveList __instance ) {
-         __instance.GetType().Field( "listAnimWait" )?.SetValue( __instance, 0f );
-         __instance.GetType().Field( "listHideExtendedTime" )?.SetValue( __instance, 0f );
-      }
-
+      private static void RemoveWait_Animator ( AnimatorDelay __instance ) => __instance.maxDelay = 0;
+      private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0f;
+      private static void RemoveWait_Blackout ( Blackout __instance ) => __instance.tweenTime = __instance.waitTime = 0f;
 
       private static FieldInfo LaunchSpeed = typeof( MissionGameplayScene ).Field( "skipSpeedUp" );
       private static void SetLaunchSpeed ( object __instance ) {
