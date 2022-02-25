@@ -17,11 +17,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       internal void Apply () {
          if ( config.skip_intro )
             TryPatch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
-         if ( config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 ) {
-            IsSkippableField = typeof( CinematicSceneController ).Field( "isSkippable" );
-            if ( IsSkippableField != null )
-               TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
-         }
+         if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
+            TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
       }
 
       private static void SkipSplash () {
@@ -39,11 +36,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static bool ShouldSkip ( string id ) {
          if ( lastCinematic == id ) return false;
          lastCinematic = id;
-         if ( config.SkipCinematics.Contains( id ) || config.skip_all_cinematics ) {
+         if ( config.SkipCinematics.Contains( id ) || config.skip_all_cinematic ) {
             Info( "Skipping cinematic {0}", id );
             return true;
          }
-         if ( ! config.skip_seen_cinematics ) {
+         if ( ! config.skip_seen_cinematic ) {
             Info( "Allowing cinematic {0}", id );
             return false;
          }
@@ -52,13 +49,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          return false;
       }
 
-      private static FieldInfo IsSkippableField;
       private static HashSet< string > NonSkippable = new HashSet< string >();
 
-      private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance ) { try {
+      private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance, bool ___isSkippable ) { try {
          if ( __result ) return;
          var id = __instance.CurrentCinematicBindingType.ToString();
-         if ( ! (bool) IsSkippableField.GetValue( __instance ) ) {
+         if ( ! ___isSkippable ) {
             if ( ! NonSkippable.Contains( id ) ) {
                Fine( "Non-skippable cinematic: {0}", id );
                NonSkippable.Add( id );

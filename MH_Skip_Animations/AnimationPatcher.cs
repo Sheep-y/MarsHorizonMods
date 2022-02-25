@@ -34,7 +34,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
                TryPatch( m, nameof( RemoveWait_TweenDo ) );
          }
-         if ( config.skip_screen_fades )
+         if ( config.skip_screen_fade )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
                TryPatch( m, nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {

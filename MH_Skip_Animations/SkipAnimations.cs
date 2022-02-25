@@ -23,11 +23,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          config.Load();
-         if ( config.skip_intro || config.skip_all_cinematics || config.skip_seen_cinematics || config.SkipCinematics.Count > 0 )
+         if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
             new CinematicPatcher().Apply();
-         if ( config.remove_delays || config.skip_screen_fades || config.skip_mission_intro || config.fast_launch || config.fast_mission )
+         if ( config.remove_delays || config.skip_screen_fade || config.skip_mission_intro || config.fast_launch || config.fast_mission )
             new AnimationPatcher().Apply();
-         if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_actions )
+         if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
             new BypassPatcher().Apply();
       }
    }
@@ -37,16 +37,16 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "[Cinematic]\r\n; Skip intro.  Default True." ) ]
       public bool skip_intro = true;
       [ Config( "Force skip all non-intro cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
-      public bool skip_all_cinematics = false;
+      public bool skip_all_cinematic = false;
       [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default False." ) ]
-      public bool skip_seen_cinematics = false;
+      public bool skip_seen_cinematic = false;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, and earth flybys." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone";
 
       [ Config( "[Animation]\r\n; Remove or reduce assorted screen and action delays.  Default True." ) ]
       public bool remove_delays = true;
       [ Config( "Skip screen fadings.  Default True." ) ]
-      public bool skip_screen_fades = true;
+      public bool skip_screen_fade = true;
       [ Config( "Deploy payload in background, skip payload connection, and skip task popup.  Default True." ) ]
       public bool skip_mission_intro = true;
       [ Config( "Skip launch countdown and speed up launch animations.  Default True." ) ]
@@ -58,8 +58,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool bypass_fullscreen_notices = true;
       [ Config( "Bypass run of the mill popups such as research complete or mission phase.  Default True." ) ]
       public bool bypass_popups_notices = true;
+      [ Config( "Automatically continue uneventful launches.  Default True." ) ]
+      public bool auto_pass_normal_launch = true;
+      [ Config( "Automatically continue empty rocket parts level up report.  Default True." ) ]
+      public bool auto_pass_empty_levelup = true;
       [ Config( "Automatically continue uneventful mission actions.  Default True." ) ]
-      public bool auto_pass_normal_actions = true;
+      public bool auto_pass_normal_action = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;

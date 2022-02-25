@@ -30,7 +30,7 @@ namespace ZyMod {
             Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
             AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => Log?.Error( evt.ExceptionObject );
             AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { Log?.Fine( "Resolving {0}", evt.Name ); return null; };
-            AppDomain.CurrentDomain.AssemblyLoad += ( _, evt ) => AsmLoaded( evt.LoadedAssembly );;
+            AppDomain.CurrentDomain.AssemblyLoad += ( _, evt ) => AsmLoaded( evt.LoadedAssembly );
             foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().ToArray() ) AsmLoaded( asm );
             Log.Info( "Mod Initiated" );
          } catch ( Exception ex ) {
