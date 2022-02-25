@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MH_Skip_Animations", "MH_Sk
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{CC3F2D84-7515-4FE6-85B2-72713933DD4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MH_Informed", "MH_Informed\MH_Informed.csproj", "{325F863C-F8C4-4D65-ABBD-5E50A76A6E56}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\Shared.projitems*{cc3f2d84-7515-4fe6-85b2-72713933dd4d}*SharedItemsImports = 13
@@ -20,6 +22,10 @@ Global
 		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{991C96F1-6E08-41F4-970C-5BC85A31E180}.Release|Any CPU.Build.0 = Release|Any CPU
+		{325F863C-F8C4-4D65-ABBD-5E50A76A6E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{325F863C-F8C4-4D65-ABBD-5E50A76A6E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{325F863C-F8C4-4D65-ABBD-5E50A76A6E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{325F863C-F8C4-4D65-ABBD-5E50A76A6E56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

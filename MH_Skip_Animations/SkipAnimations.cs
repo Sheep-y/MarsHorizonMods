@@ -10,7 +10,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    public class SkipAnimations : MarsHorizonMod {
-
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
