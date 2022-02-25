@@ -11,9 +11,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
    public class SkipAnimations : MarsHorizonMod {
 
-      public static Config config = new Config();
-
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
+         var config = ModPatcher.config;
          config.Load();
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
             new CinematicPatcher().Apply();
@@ -22,6 +21,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
             new BypassPatcher().Apply();
       }
+   }
+
+   internal class ModPatcher : Patcher {
+      internal static Config config = new Config();
    }
 
    public class Config : IniConfig {

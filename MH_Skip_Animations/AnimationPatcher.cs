@@ -11,9 +11,7 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   internal class AnimationPatcher : Patcher {
-
-      private static Config config => SkipAnimations.config;
+   internal class AnimationPatcher : ModPatcher {
 
       internal void Apply () {
          if ( config.remove_delays ) {

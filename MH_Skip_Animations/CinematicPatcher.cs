@@ -10,9 +10,7 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   internal class CinematicPatcher : Patcher {
-
-      private static Config config => SkipAnimations.config;
+   internal class CinematicPatcher : ModPatcher {
 
       internal void Apply () {
          if ( config.skip_intro )
