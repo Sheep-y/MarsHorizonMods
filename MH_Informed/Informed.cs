@@ -12,6 +12,8 @@ namespace ZyMod.MarsHorizon.Informed {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
+         if ( config.show_base_bonus )
+            new BaseScreenPatcher().Apply();
       }
    }
 
