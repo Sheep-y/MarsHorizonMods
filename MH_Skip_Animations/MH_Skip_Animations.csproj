@@ -64,6 +64,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\MHMod.cs">
+      <Link>MHMod.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>

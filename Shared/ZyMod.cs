@@ -109,7 +109,7 @@ namespace ZyMod {
          var args = list?.GetType().GenericTypeArguments;
          if ( list == null || list.Count == 0 || args.Length == 0 ) return null;
          var code = args[ 0 ].Method( "GetCodeInstruction", new Type[0] );
-         return list.Cast<object>().Select( e => code?.Invoke( e, null ) as CodeInstruction );
+         return list.Cast<object>().Select( e => code?.Run( e ) as CodeInstruction );
       }
       // Find the MoveNext method of an iterator method.
       public static MethodInfo MoveNext ( this MethodBase subject ) {

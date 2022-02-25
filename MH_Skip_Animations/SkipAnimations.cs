@@ -9,17 +9,9 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   public class SkipAnimations : RootMod {
+   public class SkipAnimations : MarsHorizonMod {
 
       public static Config config = new Config();
-
-      public static void Main () => new SkipAnimations().Initialize();
-
-      protected override string GetAppDataDir () {
-         var path = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
-         if ( string.IsNullOrEmpty( path ) ) return null;
-         return Path.Combine( Directory.GetParent( path ).FullName, "LocalLow", "Auroch Digital", "Mars Horizon" );
-      }
 
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          config.Load();
