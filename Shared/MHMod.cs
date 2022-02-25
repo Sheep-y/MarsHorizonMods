@@ -56,7 +56,7 @@ namespace ZyMod.MarsHorizon {
             if ( main == null ) continue;
             Fine( "Calling {0} of {1}", main, main.DeclaringType.FullName );
             main.RunStatic();
-            break;
+            return;
          }
          Warn( "Cannot find public static Main() from {0}", asm.CodeBase );
       }

@@ -48,8 +48,7 @@ namespace ZyMod {
          Log.Info( "Target assembly loaded." );
          OnGameAssemblyLoaded( asm );
          var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
-         Log.Info( "Bootstrap complete." + ( patches.Any() ? "  Patched {0} methods with {1} patches." : "" ),
-            patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+         Log.Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
       } catch ( Exception ex ) { Log.Error( ex ); } }
 
       private static string _AppDataDir;
