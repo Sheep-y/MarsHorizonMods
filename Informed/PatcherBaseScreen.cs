@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
@@ -70,7 +69,7 @@ namespace ZyMod.MarsHorizon.Informed {
             refresh.Run( tooltip, link, modifierList.Get() );
          }
          tooltip.gameObject.SetActive( true );
-         ( type.Field( "objectName" )?.GetValue( tooltip ) as TextSetter ).text = "Base";
+         ( type.Field( "objectName" )?.GetValue( tooltip ) as TextSetter ).text = ScriptableObjectSingleton<Localisation>.instance.Localise( "Base" );
          ( type.Field( "clearCost" )?.GetValue( tooltip ) as TextSetter ).gameObject.SetActive( false );
          //( type.Field( "modifierListTitle" )?.GetValue( tooltip ) as Transform )?.gameObject.SetActive( false );
          //( type.Field( "modifierListParent" )?.GetValue( tooltip ) as Transform )?.gameObject.SetActive( true );
