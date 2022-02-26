@@ -56,9 +56,9 @@
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
-    <Compile Include="BaseScreenPatcher.cs" />
+    <Compile Include="PatcherBaseScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Informed.cs" />
+    <Compile Include="Mod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -13,7 +13,7 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   internal class BypassPatcher : ModPatcher {
+   internal class PatcherBypass : ModPatcher {
 
       internal void Apply () {
          if ( config.bypass_fullscreen_notices )

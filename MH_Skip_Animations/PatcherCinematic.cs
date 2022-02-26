@@ -10,13 +10,13 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   internal class CinematicPatcher : ModPatcher {
+   internal class PatcherCinematic : ModPatcher {
 
       internal void Apply () {
          if ( config.skip_intro )
             TryPatch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
          if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
-            TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", null, nameof( SkipCinmatic ) );
+            TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
       }
 
       private static void SkipSplash () {

@@ -9,16 +9,16 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
-   public class SkipAnimations : MarsHorizonMod {
+   public class Mod : MarsHorizonMod {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
-            new CinematicPatcher().Apply();
+            new PatcherCinematic().Apply();
          if ( config.remove_delays || config.skip_screen_fade || config.skip_mission_intro || config.fast_launch || config.fast_mission )
-            new AnimationPatcher().Apply();
+            new PatcherAnimation().Apply();
          if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
-            new BypassPatcher().Apply();
+            new PatcherBypass().Apply();
       }
    }
 

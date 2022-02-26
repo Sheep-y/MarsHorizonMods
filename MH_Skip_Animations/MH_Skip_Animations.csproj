@@ -70,11 +70,11 @@
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
-    <Compile Include="BypassPatcher.cs" />
-    <Compile Include="AnimationPatcher.cs" />
+    <Compile Include="PatcherBypass.cs" />
+    <Compile Include="PatcherAnimation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CinematicPatcher.cs" />
-    <Compile Include="SkipAnimations.cs" />
+    <Compile Include="PatcherCinematic.cs" />
+    <Compile Include="Mod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
