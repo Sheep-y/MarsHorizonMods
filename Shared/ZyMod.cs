@@ -25,31 +25,31 @@ namespace ZyMod {
       protected virtual bool IsTargetAssembly ( Assembly asm ) => asm.GetName().Name == "Assembly-CSharp"; // If overrode, OnGameAssemblyLoaded may be called mutliple times
 
       public void Initialize () {
-         lock ( sync ) { if ( instance != null ) { Log?.Warn( "Mod already initialized" ); return; } instance = this; }
+         lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
          try {
             Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
-            AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => Log?.Error( evt.ExceptionObject );
-            AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { Log?.Fine( "Resolving {0}", evt.Name ); return null; };
+            AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
+            AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
             AppDomain.CurrentDomain.AssemblyLoad += ( _, evt ) => AsmLoaded( evt.LoadedAssembly );
             foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().ToArray() ) AsmLoaded( asm );
-            Log.Info( "Mod Initiated" );
+            ModHelpers.Info( "Mod Initiated" );
          } catch ( Exception ex ) {
-            Log.Error( ex.ToString() );
+            ModHelpers.Error( ex.ToString() );
          }
       }
 
       private void AsmLoaded ( Assembly asm ) {
          if ( IgnoreAssembly( asm ) ) return;
-         Log.Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
+         ModHelpers.Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
          if ( IsTargetAssembly( asm ) ) GameLoaded( asm );
       }
 
       private void GameLoaded ( Assembly asm ) { try {
-         Log.Info( "Target assembly loaded." );
+         ModHelpers.Info( "Target assembly loaded." );
          OnGameAssemblyLoaded( asm );
          var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
-         Log.Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
-      } catch ( Exception ex ) { Log.Error( ex ); } }
+         ModHelpers.Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+      } catch ( Exception ex ) { ModHelpers.Error( ex ); } }
 
       private static string _AppDataDir;
       public static string AppDataDir { get {
@@ -74,10 +74,10 @@ namespace ZyMod {
    public static class ModHelpers { // Assorted helpers
       public static void Err ( object msg ) => Error( msg );
       public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
-      public static void Error ( object msg, params object[] arg ) => RootMod.Log?.Error( msg, arg );
-      public static void Warn  ( object msg, params object[] arg ) => RootMod.Log?.Warn ( msg, arg );
-      public static void Info  ( object msg, params object[] arg ) => RootMod.Log?.Info ( msg, arg );
-      public static void Fine  ( object msg, params object[] arg ) => RootMod.Log?.Fine ( msg, arg );
+      public static void Error ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Error, msg, arg );
+      public static void Warn  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Warning, msg, arg );
+      public static void Info  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Info, msg, arg );
+      public static void Fine  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Verbose, msg, arg );
       public static bool Non0 ( float val ) => val != 0 && ! float.IsNaN( val ) && ! float.IsInfinity( val );
       public static bool IsFound ( string path ) { if ( File.Exists( path ) ) return true; Warn( "Not Found: {0}", path ); return false; }
       public static bool IsFound ( string path, out string found ) { found = path; return IsFound( path ); }
@@ -487,11 +487,6 @@ namespace ZyMod {
          return false;
       }
 
-      public void Error ( object msg, params object[] arg ) => Write( TraceLevel.Error, msg, arg );
-      public void Warn  ( object msg, params object[] arg ) => Write( TraceLevel.Warning, msg, arg );
-      public void Info  ( object msg, params object[] arg ) => Write( TraceLevel.Info, msg, arg );
-      public void Fine  ( object msg, params object[] arg ) => Write( TraceLevel.Verbose, msg, arg );
-
       public void Flush () { try {
          string[] buf;
          lock ( buffer ) { if ( buffer.Count == 0 || _LogLevel == Off ) return; buf = buffer.ToArray(); buffer.Clear(); }
@@ -509,7 +504,7 @@ namespace ZyMod {
             if ( ( line = Format( level, line, msg, arg ) ) == null ) return;
          } catch ( Exception e ) { // ToString error, time format error, stacktrace error...
             if ( msg is Exception ex ) line = ex.GetType() + ": " + ex.Message;
-            else { Warn( e ); if ( msg is string txt ) line = txt; else return; }
+            else { Write( TraceLevel.Warning, e ); if ( msg is string txt ) line = txt; else return; }
          }
          lock ( buffer ) buffer.Add( line );
          if ( level == TraceLevel.Error || FlushInterval == 0 ) Flush();
