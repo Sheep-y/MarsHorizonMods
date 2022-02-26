@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZyMod.MarsHorizon.SkipAnimations</RootNamespace>
-    <AssemblyName>MH_Skip_Animations</AssemblyName>
+    <AssemblyName>MH_SkipAnimations</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
