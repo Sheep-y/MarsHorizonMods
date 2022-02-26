@@ -18,7 +18,9 @@ namespace ZyMod.MarsHorizon {
          foreach ( var t in GetTypes( Assembly.GetExecutingAssembly() ) ) {
             if ( t.IsNotPublic || t.IsAbstract ) continue;
             if ( t.IsSubclassOf( typeof( MarsHorizonMod ) ) ) {
-               ( Activator.CreateInstance( t ) as MarsHorizonMod ).Initialize();
+               var mod = Activator.CreateInstance( t ) as MarsHorizonMod;
+               mod.shouldLogAssembly = first;
+               mod.Initialize();
                break;
             }
          }

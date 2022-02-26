@@ -23,14 +23,15 @@ namespace ZyMod {
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
       protected virtual bool IsTargetAssembly ( Assembly asm ) => asm.GetName().Name == "Assembly-CSharp"; // If overrode, OnGameAssemblyLoaded may be called mutliple times
+      protected bool shouldLogAssembly = true;
 
       public void Initialize () {
          lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
          try {
             Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
             AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
-            AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
-            AppDomain.CurrentDomain.AssemblyLoad += ( _, evt ) => AsmLoaded( evt.LoadedAssembly );
+            AppDomain.CurrentDomain.AssemblyLoad += AsmLoaded;
+            if ( shouldLogAssembly ) AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
             foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().ToArray() ) AsmLoaded( asm );
             ModHelpers.Info( "Mod Initiated" );
          } catch ( Exception ex ) {
@@ -38,10 +39,13 @@ namespace ZyMod {
          }
       }
 
+      private void AsmLoaded ( object sender, AssemblyLoadEventArgs evt ) => AsmLoaded( evt.LoadedAssembly );
       private void AsmLoaded ( Assembly asm ) {
          if ( IgnoreAssembly( asm ) ) return;
-         ModHelpers.Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
-         if ( IsTargetAssembly( asm ) ) GameLoaded( asm );
+         if ( shouldLogAssembly ) ModHelpers.Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
+         if ( ! IsTargetAssembly( asm ) ) return;
+         GameLoaded( asm );
+         if ( ! shouldLogAssembly ) AppDomain.CurrentDomain.AssemblyLoad -= AsmLoaded;
       }
 
       private void GameLoaded ( Assembly asm ) { try {
