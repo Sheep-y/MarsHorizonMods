@@ -13,8 +13,8 @@ namespace ZyMod.MarsHorizon.DumpData {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
-         if ( config.dump_localization )
-            new LocalizationDumper().Apply();
+         if ( config.dump_building_link )
+            new BuildingDumper().Apply();
       }
    }
 
@@ -23,26 +23,21 @@ namespace ZyMod.MarsHorizon.DumpData {
    }
 
    public class Config : IniConfig {
-      [ Config( "Dump localisation data to {language_code}_{hash}.csv" ) ]
-      public bool dump_localization = true;
+      [ Config( "Dump building associations to building_link.csv" ) ]
+      public bool dump_building_link = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200226;
    }
 
-   internal class LocalizationDumper : ModPatcher {
+   internal class BuildingDumper : ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( Localisation ), "ReadCSV", postfix: nameof( DumpLangCSV ) );
-         TryPatch( typeof( Localisation ), "ReadCSVCO", postfix: nameof( DumpLangCSV ) );
       }
 
-      private static void DumpLangCSV ( string csv ) {
-         Fine( "Captured localisation data ({0} char), queuing background write.", csv.Length );
-         Task.Run( () => { try {
-            var file = Path.Combine( Mod.AppDataDir, "lang-" + csv.GetHashCode() + ".csv" );
-            Info( "Writing {1} characters to {0}", file, csv.Length );
-            File.WriteAllText( file, csv );
-         } catch ( Exception x ) { Err( x ); } } );
+      private static void DumpLinks () {
+      }
+
+      private static void DumpBuildings () {
       }
    }
 
