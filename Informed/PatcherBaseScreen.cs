@@ -54,6 +54,7 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void ShowModifiers ( BaseHighlightToolTipElement tooltip, Data.Effect[] effects ) {
          if ( effects.Length == 0 ) return;
+         Fine( "Refreshing total building modifiers." );
          var type = typeof( BaseHighlightToolTipElement );
          var refresh = type.Method( "RefreshModifierListElement" );
          var modifierList = GetModifierList( tooltip );
