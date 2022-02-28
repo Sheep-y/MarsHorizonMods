@@ -16,8 +16,6 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherVehicleDesigner : ModPatcher {
 
       internal void Apply () {
-         TryPatch( typeof( VehicleDesignerTooltipManager ), "SetState", postfix: nameof( LogState ) );
-
          if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null ) {
             TryPatch( typeof( VehicleDesignerScreen ), "Setup", postfix: nameof( TrackMission ) );
             TryPatch( typeof( VehicleDesignerState ), "GetVehicleBuildOrRefitTime", postfix: nameof( TrackBuildTime ) );
@@ -30,6 +28,7 @@ namespace ZyMod.MarsHorizon.Informed {
       private static Mission mission;
       private static IEnumerable< string > cachedPre, cachedPost;
       private static VehicleDesignerTooltipManager manager;
+      private static AutoLocalise tooltipHeader;
       private static SimplePooler< VehicleDesignerTooltip > tooltipPooler;
       private static SimplePooler< VehicleDesignerTooltip > warningTooltipPooler;
       private static MethodInfo Display = typeof( VehicleDesignerTooltipManager ).Method( "Display", typeof( bool ), typeof( bool ) );
@@ -42,6 +41,7 @@ namespace ZyMod.MarsHorizon.Informed {
          manager = type.Field( "instance" )?.GetValue( null ) as VehicleDesignerTooltipManager;
          if ( manager == null ) { Error( "Vehicle tooltip not found." ); return; }
          Fine( "Vehicle tooltip acquired" );
+         tooltipHeader = type.Field( "tooltipHeader" ).GetValue( manager ) as AutoLocalise;
          tooltipPooler = type.Field( "tooltipPooler" ).GetValue( manager ) as SimplePooler< VehicleDesignerTooltip >;
          warningTooltipPooler = type.Field( "warningTooltipPooler" ).GetValue( manager ) as SimplePooler< VehicleDesignerTooltip >;
          if ( tooltipPooler == null || warningTooltipPooler == null || Display == null || FreeAll == null || Get == null || Tooltip == null ) {
@@ -51,35 +51,39 @@ namespace ZyMod.MarsHorizon.Informed {
       } catch ( Exception x ) { Err( x ); manager = null; } }
 
       private static void TrackMission ( VehicleDesignerScreen __instance, Mission mission ) {
-         if ( PatcherVehicleDesigner.mission == mission ) return;
+         if ( manager == null || PatcherVehicleDesigner.mission == mission ) return;
          Fine( "Set vehicle calendar destination {0}", mission?.template?.planetaryBody );
          PatcherVehicleDesigner.mission = mission;
          client = __instance.client;
          cachedPre = cachedPost = null;
+         ShowLaunchCalendar();
       }
 
       private static void TrackBuildTime ( int __result ) {
-         if ( manager == null || buildTime == __result ) return;
-         Fine( "Update vehicle bulid time to {0}", __result );
+         if ( manager == null || buildTime <= 0 || buildTime == __result ) return;
+         Fine( "Update vehicle build time to {0}", __result );
          buildTime = __result;
          cachedPre = cachedPost = null;
          ShowLaunchCalendar();
       }
 
       private static void ShowLaunchCalendar () { try {
-         if ( manager == null || buildTime < 0 || client == null || mission == null ) return;
-         Fine( "Refreshing vehicle designer tooltips." );
-         FreeAll.Run( tooltipPooler );
-         FreeAll.Run( warningTooltipPooler );
-         if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
+            if ( manager == null || buildTime < 0 || client == null || mission == null ) return;
+            Fine( "Refreshing vehicle designer tooltips." );
+            tooltipHeader?.gameObject.SetActive( false );
+            FreeAll.Run( tooltipPooler );
+            FreeAll.Run( warningTooltipPooler );
+            if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
+            if ( cachedPre.Any() ) NewTooltip( "Building_Filter_UnderConstruction", "Title_Vehicle_Construction_Warning", string.Join( "\n", cachedPre ) );
+            if ( cachedPost.Any() ) NewTooltip( "Calendar_LaunchWindow_Title", "TP_Calendar_1_Content", string.Join( "\n", cachedPost ) );
+            Display.Run( manager, true, false );
+         } catch ( Exception x ) { Err( x ); } }
+
+      private static void NewTooltip ( string header, string placeholder, string content ) {
          var tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
-         tooltip?.Set( "Building_Filter_UnderConstruction", "Title_Vehicle_Construction_Warning", true );
-         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = string.Join( "\n", cachedPre );
-         tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
-         tooltip?.Set( "Calendar_LaunchWindow_Title", "TP_Calendar_1_Content", true );
-         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = string.Join( "\n", cachedPost );
-         Display.Run( manager, true, false );
-      } catch ( Exception x ) { Err( x ); } }
+         tooltip?.Set( header, placeholder, true );
+         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = content;
+      }
 
       private static void GetLaunchCalendar ( out IEnumerable< string > pre, out IEnumerable< string > post ) {
          List< string > preList = new List< string >(), postList = new List< string >();
@@ -88,22 +92,17 @@ namespace ZyMod.MarsHorizon.Informed {
          var agency = client.agency;
          var destination = mission.template.planetaryBody;
          int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime;
-         int fromTurn = doneTurn - config.launch_window_hint_before_ready + 1, toTurn = doneTurn + config.launch_window_hint_after_ready;
+         int fromTurn = Math.Max( doneTurn - config.launch_window_hint_before_ready + 1, nowTurn + 1 ), toTurn = doneTurn + config.launch_window_hint_after_ready;
          Info( "Current turn {0}, build time {1}.  Calculating launch window for {4} from {2} to {3}", nowTurn, buildTime, fromTurn, toTurn, destination );
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
             Data.Date date = Data.instance.GetDate( i );
-            buf.Append( date.year ).Append( ' ' ).Append( ScriptableObjectSingleton<Localisation>.instance.Localise( "Month_" + date.month ) ).Append( " - " )
+            buf.Append( date.year ).Append( ' ' ).Append( ScriptableObjectSingleton<Localisation>.instance.Localise( $"Month_{date.month}_Short" ) ).Append( " - " )
                .Append( sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } ) );
             if ( i <= doneTurn ) preList.Add( buf.ToString() ); else postList.Add( buf.ToString() );
             buf.Clear();
          }
          pre = preList; post = postList;
       }
-
-      private static void LogState ( VehicleDesignerState state ) { try {
-         if ( state?.CurrentVehicle == null ) return;
-         Info( "Tooltip Vehicle state {0} / {1}", state.CurrentVehicle.buildTime, state.CurrentVehicle.combinedBuildFitTime );
-      } catch ( Exception x ) { Err( x ); } }
    }
 }
