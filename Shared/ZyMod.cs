@@ -232,7 +232,7 @@ namespace ZyMod {
       #endif
 
       /* Dump unity components to log. *
-      public static void DumpComponents ( UnityEngine.GameObject e ) => DumpComponents( Info, "", new HashSet<object>(), e );
+      public static void DumpComponents ( UnityEngine.GameObject e ) => DumpComponents( Info, e );
       public static void DumpComponents ( Action< object, object[] > output, UnityEngine.GameObject e ) => DumpComponents( output, "", new HashSet<object>(), e );
       internal static void DumpComponents ( Action< object, object[] > output, string prefix, HashSet<object> logged, UnityEngine.GameObject e ) {
          if ( prefix.Length > 10 ) return;
@@ -244,7 +244,7 @@ namespace ZyMod {
             foreach ( var c in e.GetComponents<UnityEngine.Component>() ) try {
                var typeName = TypeName( c );
                if ( c is UnityEngine.Transform cRect ) ;
-               else if ( c is UnityEngine.UI.Text txt ) Dump( output, "{0}...{1} {2} {3}", prefix, typeName, txt.color, txt.text );
+               else if ( c is UnityEngine.UI.Text txt ) Dump( output, "{0}...{1} {2}", prefix, typeName, txt.text );
                else if ( c is I2.Loc.Localize loc ) Dump( output, "{0}...{1} {2}", prefix, typeName, loc.mTerm );
                else if ( c is UnityEngine.UI.LayoutGroup layout ) Dump( output, "{0}...{1} Padding {2}", prefix, typeName, layout.padding );
                else Dump( output, "{0}...{1}", prefix, typeName );
@@ -410,8 +410,12 @@ namespace ZyMod {
          return patch;
       }
 
-      protected ModPatch TryPatch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) =>
-         TryPatch( type.Method( method ), prefix, postfix, transpiler );
+      protected ModPatch TryPatch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) { try {
+         return Patch( type.Method( method ), prefix, postfix, transpiler );
+      } catch ( Exception ex ) {
+         ModHelpers.Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, ex );
+         return null;
+      } }
       protected ModPatch TryPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) { try {
          return Patch( method, prefix, postfix, transpiler );
       } catch ( Exception ex ) {
