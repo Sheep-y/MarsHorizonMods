@@ -98,8 +98,13 @@ namespace ZyMod.MarsHorizon.Informed {
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
             Data.Date date = Data.instance.GetDate( i );
-            buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " )
-               .Append( sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } ) );
+            var prediction = sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } );
+            string colour = config.invalid_colour;
+            if ( prediction == Data.LaunchRecommendation.SubOptimal ) colour = config.suboptimal_colour;
+            else if ( prediction == Data.LaunchRecommendation.Optimal ) colour = config.optimal_colour;
+            if ( ! string.IsNullOrEmpty( colour ) ) buf.Append( "<color=" ).Append( colour ).Append( ">" );
+            buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " ).Append( prediction );
+            if ( ! string.IsNullOrEmpty( colour ) ) buf.Append( "</color>" );
             if ( i <= doneTurn ) preList.Add( buf.ToString() ); else postList.Add( buf.ToString() );
             buf.Clear();
          }
