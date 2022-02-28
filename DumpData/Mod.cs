@@ -10,6 +10,7 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.DumpData {
 
    public class Mod : MarsHorizonMod {
+      protected override string GetModName () => "DumpData";
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();

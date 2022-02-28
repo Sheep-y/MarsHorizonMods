@@ -9,11 +9,13 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    public class Mod : MarsHorizonMod {
+      protected override string GetModName () => "Informed";
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
          if ( config.show_base_bonus )
             new PatcherBaseScreen().Apply();
+         new PatcherVehicleDesigner().Apply();
       }
    }
 
