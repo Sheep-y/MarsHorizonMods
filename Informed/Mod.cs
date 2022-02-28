@@ -28,10 +28,12 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default true." ) ]
       public bool show_base_bonus = true;
 
-      [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Hover mouse in then out of vehicle part / upgrade / contractor to show the list.  Default 2.  0 to not show.  Max 6." ) ]
+      [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
       [ Config( "On vehicle designer screen, show launch window this many months after vehicle is ready.  Default 12.  0 to not show.  Max 36." ) ]
       public byte launch_window_hint_after_ready = 12;
+      [ Config( "Replace all left-hand-side hint with launch window if true.  Otherwise, hover mouse in then out of vehicle part / upgrade / contractor to see launch window.  Default true." ) ]
+      public bool always_show_launch_window = true;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200226;

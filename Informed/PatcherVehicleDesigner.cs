@@ -16,15 +16,15 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherVehicleDesigner : ModPatcher {
 
       internal void Apply () {
-         if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null ) {
-            TryPatch( typeof( VehicleDesignerScreen ), "Setup", postfix: nameof( TrackMission ) );
-            TryPatch( typeof( VehicleDesignerState ), "GetVehicleBuildOrRefitTime", postfix: nameof( TrackBuildTime ) );
+         if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null &&
+              TryPatch( typeof( VehicleDesignerVehicleStats ), "RefreshCostTimeInfo", postfix: nameof( TrackMission ) ) != null ) {
+            if ( config.always_show_launch_window )
+               TryPatch( typeof( VehicleDesignerTooltipManager ), "Show", postfix: nameof( ShowLaunchCalendar ) );
             TryPatch( typeof( VehicleDesignerTooltipManager ), "Hide", postfix: nameof( ShowLaunchCalendar ) );
          }
       }
 
       private static int buildTime = -1;
-      private static Client client;
       private static Mission mission;
       private static IEnumerable< string > cachedPre, cachedPost;
       private static VehicleDesignerTooltipManager manager;
@@ -50,27 +50,25 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       } catch ( Exception x ) { Err( x ); manager = null; } }
 
-      private static void TrackMission ( VehicleDesignerScreen __instance, Mission mission ) {
-         if ( manager == null || PatcherVehicleDesigner.mission == mission ) return;
-         Fine( "Set vehicle calendar destination {0}", mission?.template?.planetaryBody );
-         PatcherVehicleDesigner.mission = mission;
-         client = __instance.client;
+      private static void TrackMission ( VehicleDesignerState state ) {
+         if ( manager == null ) return;
+         if ( mission != state.Mission ) {
+            mission = state.Mission;
+            Fine( "Set vehicle destination to {0}", mission?.template?.planetaryBody );
+            buildTime = -1;
+         }
          cachedPre = cachedPost = null;
-         ShowLaunchCalendar();
-      }
-
-      private static void TrackBuildTime ( int __result ) {
-         if ( manager == null || buildTime <= 0 || buildTime == __result ) return;
-         Fine( "Update vehicle build time to {0}", __result );
-         buildTime = __result;
-         cachedPre = cachedPost = null;
+         var fitTime = state.GetVehicleBuildOrRefitTime( out _, true );
+         if ( buildTime == fitTime || fitTime <= 0 ) return;
+         Fine( "Update vehicle build time to {0}", fitTime );
+         buildTime = fitTime;
          ShowLaunchCalendar();
       }
 
       private static void ShowLaunchCalendar () { try {
-            if ( manager == null || buildTime < 0 || client == null || mission == null ) return;
+            if ( manager == null || buildTime < 0 || mission == null ) return;
             Fine( "Refreshing vehicle designer tooltips." );
-            tooltipHeader?.gameObject.SetActive( false );
+            if ( tooltipHeader != null ) tooltipHeader.tag = "Name_Body_" + mission.template.planetaryBody;
             FreeAll.Run( tooltipPooler );
             FreeAll.Run( warningTooltipPooler );
             if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
@@ -87,7 +85,10 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void GetLaunchCalendar ( out IEnumerable< string > pre, out IEnumerable< string > post ) {
          List< string > preList = new List< string >(), postList = new List< string >();
+         pre = preList; post = postList;
+         if ( buildTime <= 0 ) return;
          var buf = new StringBuilder();
+         var client = Controller.Instance.activeClient;
          var sim = client.simulation;
          var agency = client.agency;
          var destination = mission.template.planetaryBody;
@@ -97,12 +98,13 @@ namespace ZyMod.MarsHorizon.Informed {
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
             Data.Date date = Data.instance.GetDate( i );
-            buf.Append( date.year ).Append( ' ' ).Append( ScriptableObjectSingleton<Localisation>.instance.Localise( $"Month_{date.month}_Short" ) ).Append( " - " )
+            buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " )
                .Append( sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } ) );
             if ( i <= doneTurn ) preList.Add( buf.ToString() ); else postList.Add( buf.ToString() );
             buf.Clear();
          }
-         pre = preList; post = postList;
       }
+
+      private static string Localise ( string tag ) => ScriptableObjectSingleton<Localisation>.instance.Localise( tag );
    }
 }
