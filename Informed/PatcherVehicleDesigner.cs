@@ -28,7 +28,7 @@ namespace ZyMod.MarsHorizon.Informed {
       private static int buildTime = -1;
       private static Client client;
       private static Mission mission;
-      private static string cachedLaunchWindow;
+      private static IEnumerable< string > cachedPre, cachedPost;
       private static VehicleDesignerTooltipManager manager;
       private static SimplePooler< VehicleDesignerTooltip > tooltipPooler;
       private static SimplePooler< VehicleDesignerTooltip > warningTooltipPooler;
@@ -55,14 +55,14 @@ namespace ZyMod.MarsHorizon.Informed {
          Fine( "Set vehicle calendar destination {0}", mission?.template?.planetaryBody );
          PatcherVehicleDesigner.mission = mission;
          client = __instance.client;
-         cachedLaunchWindow = null;
+         cachedPre = cachedPost = null;
       }
 
       private static void TrackBuildTime ( int __result ) {
          if ( manager == null || buildTime == __result ) return;
          Fine( "Update vehicle bulid time to {0}", __result );
          buildTime = __result;
-         cachedLaunchWindow = null;
+         cachedPre = cachedPost = null;
          ShowLaunchCalendar();
       }
 
@@ -71,28 +71,34 @@ namespace ZyMod.MarsHorizon.Informed {
          Fine( "Refreshing vehicle designer tooltips." );
          FreeAll.Run( tooltipPooler );
          FreeAll.Run( warningTooltipPooler );
+         if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
          var tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
+         tooltip?.Set( "Building_Filter_UnderConstruction", "Title_Vehicle_Construction_Warning", true );
+         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = string.Join( "\n", cachedPre );
+         tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
          tooltip?.Set( "Calendar_LaunchWindow_Title", "TP_Calendar_1_Content", true );
-         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = GetLaunchCalendar();
+         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = string.Join( "\n", cachedPost );
          Display.Run( manager, true, false );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static string GetLaunchCalendar () {
-         if ( cachedLaunchWindow != null ) return cachedLaunchWindow;
+      private static void GetLaunchCalendar ( out IEnumerable< string > pre, out IEnumerable< string > post ) {
+         List< string > preList = new List< string >(), postList = new List< string >();
          var buf = new StringBuilder();
          var sim = client.simulation;
          var agency = client.agency;
          var destination = mission.template.planetaryBody;
-         int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime, fromTurn = doneTurn - 1, toTurn = doneTurn + 5;
+         int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime;
+         int fromTurn = doneTurn - config.launch_window_hint_before_ready + 1, toTurn = doneTurn + config.launch_window_hint_after_ready;
          Info( "Current turn {0}, build time {1}.  Calculating launch window for {4} from {2} to {3}", nowTurn, buildTime, fromTurn, toTurn, destination );
          var win = sim.GetAgencyLaunchWindow( agency, destination );
-         for ( var i = fromTurn ; i <= doneTurn ; i++ ) {
+         for ( var i = fromTurn ; i <= toTurn ; i++ ) {
             Data.Date date = Data.instance.GetDate( i );
-            buf.Append( date.year ).Append( ' ' ).Append( ScriptableObjectSingleton<Localisation>.instance.Localise( "Month_" + date.month ) ).Append( ' ' )
-               .Append( sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } ) )
-               .Append( "\n" );
+            buf.Append( date.year ).Append( ' ' ).Append( ScriptableObjectSingleton<Localisation>.instance.Localise( "Month_" + date.month ) ).Append( " - " )
+               .Append( sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } ) );
+            if ( i <= doneTurn ) preList.Add( buf.ToString() ); else postList.Add( buf.ToString() );
+            buf.Clear();
          }
-         return cachedLaunchWindow = buf.ToString();
+         pre = preList; post = postList;
       }
 
       private static void LogState ( VehicleDesignerState state ) { try {
