@@ -17,6 +17,7 @@ namespace ZyMod.MarsHorizon.Informed {
             new PatcherBaseScreen().Apply();
          if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 )
             new PatcherVehicleDesigner().Apply();
+         new PatcherMissionPlan().Apply();
       }
    }
 

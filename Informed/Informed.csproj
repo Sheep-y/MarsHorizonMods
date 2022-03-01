@@ -62,6 +62,7 @@
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
+    <Compile Include="PatcherMissionPlan.cs" />
     <Compile Include="PatcherVehicleDesigner.cs" />
     <Compile Include="PatcherBaseScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
