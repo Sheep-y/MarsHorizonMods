@@ -89,19 +89,19 @@ namespace ZyMod {
       public static string ModPath => new Uri( Assembly.GetExecutingAssembly().CodeBase ).LocalPath;
       public static string ModDir => Path.GetDirectoryName( ModPath );
 
-      public static IEnumerable< MethodInfo > Methods ( this Type type ) => type.GetMethods( Public | NonPublic | Instance | Static ).Where( e => ! e.IsAbstract );
+      public static IEnumerable< MethodInfo > Methods ( this Type type ) => type.GetMethods( Public | NonPublic | Instance | Static | DeclaredOnly ).Where( e => ! e.IsAbstract );
       public static IEnumerable< MethodInfo > Methods ( this Type type, string name ) => type.Methods().Where( e => e.Name == name );
 
-      public static MethodInfo Method ( this Type type, string name ) => type?.GetMethod( name, Public | NonPublic | Instance | Static );
-      public static MethodInfo Method ( this Type type, string name, params Type[] types ) => type?.GetMethod( name, Public | NonPublic | Instance | Static, null, types ?? Type.EmptyTypes, null );
+      public static MethodInfo Method ( this Type type, string name ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly );
+      public static MethodInfo Method ( this Type type, string name, params Type[] types ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly, null, types ?? Type.EmptyTypes, null );
       public static MethodInfo TryMethod ( this Type type, string name ) { try { return Method( type, name ); } catch ( Exception ) { return null; } }
       public static MethodInfo TryMethod ( this Type type, string name, params Type[] types ) { try { return Method( type, name, types ); } catch ( Exception ) { return null; } }
       public static object Run ( this MethodInfo func, object self, params object[] args ) => func.Invoke( self, args );
       public static object RunStatic ( this MethodInfo func, params object[] args ) => func.Invoke( null, args );
       public static object TryRun ( this MethodInfo func, object self, params object[] args ) { try { return Run( func, self, args ); } catch ( Exception x ) { return x; } }
       public static object TryRunStatic ( this MethodInfo func, params object[] args ) { try { return RunStatic( func, args ); } catch ( Exception x ) { return x; } }
-      public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static );
-      public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static );
+      public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static | DeclaredOnly );
+      public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
 
       private static MethodInfo GetILs, EnumMoveNext;
       // Find the instructions of a method.  Return null on failure.  TODO: Does not work on HarmonyX
