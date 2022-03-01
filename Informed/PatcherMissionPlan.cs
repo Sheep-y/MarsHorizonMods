@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
@@ -14,33 +15,42 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherMissionPlan : ModPatcher {
 
       internal void Apply () {
-         TryPatch( typeof( SolarScreen ), "EnterMissionSelectState", nameof( LogEnter ) ); // Initial switch from solar system to mission list
-
-         // MissionControl.Open
-         // MissionControl.SetMission
-         // MissionSelectSidebarScreen.Setup
-         // MissionSelectSidebarScreen.SetCategoryToggle
-         // MissionSelectSidebarScreen.SetState
-
-         TryPatch( typeof( MissionSelectSidebarGroup ), "AddMission", nameof( AddMission ) ); // Add mission buttons.
-         TryPatch( typeof( MissionSelectSidebarToggle ), "DoSelectToggle", nameof( DoSelectToggle ) ); // Mission button clicked.
-
-         TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", nameof( OnClick ) );
-         TryPatch( typeof( MissionPlanScreen ), "SetMission", nameof( SetMission ) );
-         TryPatch( typeof( MissionPlanScreen ), "SetMissionSelectState", nameof( SetMissionSelectState ) );
-
-         //TryPatch( typeof( MissionControl ), "GetMissionPlanState", nameof( LogGetMissionPlan ) ); // 4 times initial load, 3 times per select
-         //TryPatch( typeof( MissionPlanOverviewToggle ), "RefreshActionIcon", nameof( LogRefreshActionIcon ) ); // 4 times initial load, 3 times per select
+         TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
+         TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
+         TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
       }
 
-      private static void LogEnter () => Info( "SolarScreen.EnterMissionSelectState" );
-      private static void DoSelectToggle () => Info( "MissionPlanScreen.DoSelectToggle" );
-      private static void AddMission ( object __instance, Mission mission ) => Info( "{1}.AddMission {0}", mission, __instance.GetType() );
-      private static void SetMission ( object __instance, Mission mission ) => Info( "{1}.SetMission {0}", mission, __instance.GetType() );
-      private static void OnClick ( Mission mission ) => Info( "MissionSelectSidebarToggle.OnClick {0}", mission );
-      private static void SetMissionSelectState () => Info( "MissionPlanScreen.SetMissionSelectState" );
-      private static void LogGetMissionPlan ( Mission mission ) => Info( "MissionControl.GetMissionPlanState {0}", mission );
-      private static void LogRefreshActionIcon ( Mission mission ) => Info( "MissionPlanOverviewToggle.RefreshActionIcon {0}", mission );
+      private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";
+
+      private static void AddLaunchWindowButton ( MissionSelectSidebarScreen __instance, SimplePooler<MissionSelectSidebarGroup> ___missionGroupPooler ) { try {
+         Fine( "Adding the launch window button in mission select screen." );
+         var group = ___missionGroupPooler.Get();
+         group.Setup( "Title_Calendar" );
+         var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid };
+         group.AddMission( mission );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static bool SetLaunchWindowButton ( MissionSelectSidebarToggle __instance, Mission mission, AutoLocalise ___missionNameText, Image ___missionIcon, Toggle ___toggle ) { try {
+         if ( mission.guid != LaunchWindowGuid ) return true;
+         Fine( "Configuring launch window sidebar button" );
+         var type = typeof( MissionSelectSidebarToggle );
+         ___missionNameText.tag = "Calendar_LaunchWindow_Title";
+         __instance.name = "Calendar_LaunchWindow_Sidebar_Toggle";
+         ___missionIcon.gameObject.SetActive( false );
+         ___toggle.onValueChanged.RemoveAllListeners();
+         ___toggle.isOn = false;
+         ___toggle.onValueChanged.AddListener( ( isOn ) => {
+            if ( ! isOn ) return;
+            Fine( "Launch Window Button clicked for {0}", MissionControl.PlanetaryBody );
+         } );
+         type.Property( "Mission" ).SetValue( __instance, mission );
+         type.Method( "SetMissionState" ).Run( __instance, mission, MissionSelectSidebarToggle.EState.None );
+         Fine( "Configured launch window sidebar button" );
+         return false;
+      } catch ( Exception x ) { return Err( x, false ); } }
+
+      private static bool ShowLaunchWindow ( Mission mission ) => mission.guid != LaunchWindowGuid;
    }
 
+   //internal class LaunchWindowMission : Mission {}
 }
