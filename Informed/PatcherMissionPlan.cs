@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.UI;
+using static Astronautica.Data;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
@@ -21,12 +22,19 @@ namespace ZyMod.MarsHorizon.Informed {
       }
 
       private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";
+      private static readonly MissionTemplateInstance windowTemplate = new MissionTemplateInstance( new MissionTemplate{
+         id = "Calendar_LaunchWindow_Title",
+         defaultPayloads = new string[0],
+         phases = new MissionTemplate.Phase[0],
+         planetaryBody = PlanetaryBody.None
+      } ){ isRequestMission = true };
 
       private static void AddLaunchWindowButton ( MissionSelectSidebarScreen __instance, SimplePooler<MissionSelectSidebarGroup> ___missionGroupPooler ) { try {
          Info( "Adding launch window button to {0} mission list.", MissionControl.PlanetaryBody );
+         windowTemplate.template.planetaryBody = MissionControl.PlanetaryBody;
+         var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid, launchTurn = 0, templateInstance = windowTemplate };
          var group = ___missionGroupPooler.Get();
          group.Setup( "Title_Calendar" );
-         var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid };
          group.AddMission( mission );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -41,13 +49,9 @@ namespace ZyMod.MarsHorizon.Informed {
          ___toggle.isOn = false;
          ___toggle.onValueChanged.AddListener( ( isOn ) => { try {
             if ( ! isOn ) return;
-            var body = MissionControl.PlanetaryBody;
-            Fine( "Launch Window Button clicked for {0}", body );
+            Fine( "Launch Window Button clicked for {0}", (Data.PlanetaryBody) MissionControl.PlanetaryBody );
             var controller = Controller.Instance;
-            void Back () {
-               Fine( "Moving back!" );
-               controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
-            }
+            void Back () => controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
             controller.clientViewer.EnterCalendarScheduleState( mission, Back, Back );
          } catch ( Exception x ) { Err( x ); } } );
          type.Property( "Mission" ).SetValue( __instance, mission );
