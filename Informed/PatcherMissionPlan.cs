@@ -19,6 +19,7 @@ namespace ZyMod.MarsHorizon.Informed {
          TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
          TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
          TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
+         TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
       }
 
       private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";
@@ -32,7 +33,7 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void AddLaunchWindowButton ( MissionSelectSidebarScreen __instance, SimplePooler<MissionSelectSidebarGroup> ___missionGroupPooler ) { try {
          Info( "Adding launch window button to {0} mission list.", MissionControl.PlanetaryBody );
          windowTemplate.template.planetaryBody = MissionControl.PlanetaryBody;
-         var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid, launchTurn = 0, templateInstance = windowTemplate };
+         var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid, launchTurn = 0, vehicle = new Vehicle(), templateInstance = windowTemplate, missionState = Mission.EState.Successful };
          var group = ___missionGroupPooler.Get();
          group.Setup( "Title_Calendar" );
          group.AddMission( mission );
@@ -49,7 +50,7 @@ namespace ZyMod.MarsHorizon.Informed {
          ___toggle.isOn = false;
          ___toggle.onValueChanged.AddListener( ( isOn ) => { try {
             if ( ! isOn ) return;
-            Fine( "Launch Window Button clicked for {0}", (Data.PlanetaryBody) MissionControl.PlanetaryBody );
+            Fine( "Launch Window Button clicked for {0} to {1}", mission.template.originBody, mission.template.planetaryBody );
             var controller = Controller.Instance;
             void Back () => controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
             controller.clientViewer.EnterCalendarScheduleState( mission, Back, Back );
@@ -60,7 +61,12 @@ namespace ZyMod.MarsHorizon.Informed {
       } catch ( Exception x ) { return Err( x, false ); } }
 
       private static bool BlockLaunchWindowDblClick ( MissionSelectSidebarToggle __instance ) => __instance.Mission.guid != LaunchWindowGuid;
-   }
 
-   //internal class LaunchWindowMission : Mission {}
+      private static void SetCalendarTitle ( CalendarScreen __instance, ref string __result, ref bool localise ) { try {
+         if ( __instance.Mission?.guid != LaunchWindowGuid ) return;
+         localise = false;
+         var template = __instance.Mission.template;
+         __result = Localise( "Name_Body_" + template.originBody ) + " ⮞ " + Localise( "Name_Body_" + template.planetaryBody );
+      } catch ( Exception x ) { Err( x ); } }
+   }
 }

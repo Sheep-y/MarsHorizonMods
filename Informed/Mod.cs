@@ -23,6 +23,7 @@ namespace ZyMod.MarsHorizon.Informed {
 
    internal class ModPatcher : Patcher {
       internal static Config config = new Config();
+      internal static string Localise ( string tag ) => ScriptableObjectSingleton<Localisation>.instance.Localise( tag );
    }
 
    public class Config : IniConfig {

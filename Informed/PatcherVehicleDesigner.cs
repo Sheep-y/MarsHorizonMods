@@ -110,6 +110,5 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       }
 
-      private static string Localise ( string tag ) => ScriptableObjectSingleton<Localisation>.instance.Localise( tag );
    }
 }
