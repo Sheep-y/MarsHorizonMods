@@ -48,6 +48,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool fast_launch = true;
       [ Config( "Speed up mini-game animations such as reliablilty bar.  Default True." ) ]
       public bool fast_mission = true;
+      [ Config( "Speed up mini-game report animations.  Default True." ) ]
+      public bool fast_mission_result = true;
 
       [ Config( "[Bypass]\r\n; Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
       public bool bypass_fullscreen_notices = true;

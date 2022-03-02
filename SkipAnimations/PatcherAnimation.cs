@@ -2,6 +2,7 @@
 using DG.Tweening;
 using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,6 +50,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
             TryPatch( typeof( MissionGameplayActionResourceElement ).Method( "Show", typeof( bool ) ), nameof( SkipResourceTween ) );
+         }
+         if ( config.fast_mission_result ) {
+            TryPatch( typeof( MissionSummary ).Method( "Setup" ), postfix: nameof( SpeedUpMissionSummary ) );
+            TryPatch( typeof( MissionSummary ).Method( "SkipOnly" ), transpiler: nameof( SpeedUpMissionSummaryAnimation ) );
          }
       }
 
@@ -107,6 +112,25 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
       private static void SkipResourceTween ( ref bool tween ) => tween = false;
       #endregion
+
+      private static IEnumerable< CodeInstruction > SpeedUpMissionSummaryAnimation ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 5f, 100f, 1 );
+      private static void SpeedUpMissionSummary ( MissionSummary __instance ) => __instance.StartCoroutine( FastMissionSummary( __instance ) );
+      private static IEnumerator FastMissionSummary ( MissionSummary __instance ) {
+         var skip = typeof( MissionSummary ).Method( "SkipOnly" );
+         var continueField = typeof( MissionSummary ).Field( "continuing" );
+         Info( "Skipping mission summary animatoins." );
+         do {
+            try {
+               skip.Run( __instance );
+               if ( (bool) continueField.GetValue( __instance ) ) {
+                  Fine( "Mission summary closed." );
+                  yield break;
+               }
+            } catch ( Exception x ) { Err( x ); yield break; }
+            yield return null;
+         } while ( true );
+      }
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
