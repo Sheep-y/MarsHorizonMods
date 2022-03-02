@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.EventSystems;
@@ -22,10 +23,16 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( ClientViewer ), "UpdateNotifications", nameof( BypassPopupNotices ) );
          if ( config.auto_pass_normal_launch )
             TryPatch( typeof( LaunchEventsScreen ), "EndLaunchCinematics", postfix: nameof( BypassNormalLaunch ) );
-         if ( config.auto_pass_empty_levelup )
-            TryPatch( typeof( LaunchEventsScreen ), "PartLevellingSequence", postfix: nameof( BypassNoLevelUp ) );
-         if ( config.auto_pass_normal_action )
-            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
+         if ( config.auto_pass_normal_action || config.auto_pass_empty_levelup ) {
+            if ( tweenField == null || abortButton == null || autoResolveButton == null ) {
+               Warn( "LaunchEventsScreen field not found.  tweenField = {0}, abortButton = {1}, autoResolveButton = {2}", tweenField, abortButton, autoResolveButton );
+            } else {
+               if ( config.auto_pass_normal_action )
+                  TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
+               if ( config.auto_pass_empty_levelup )
+                  TryPatch( typeof( LaunchEventsScreen ), "PartLevellingSequence", postfix: nameof( BypassNoLevelUp ) );
+            }
+         }
       }
 
       private static void BypassFullScreenNotices ( NotificationCache missionNotifications ) { try {
@@ -47,29 +54,44 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       private static void BypassNormalLaunch ( LaunchEventsScreen __instance, string ___selectedEventId ) { try {
          Fine( "Launch mode {0}, event {1}", __instance.mode, __instance.Sim.GetLaunchEvent( ___selectedEventId ).type );
+         if ( __instance.mode != (int) LaunchEventsScreen.Mode.LaunchContinued ) return;
          if ( __instance.Sim.GetLaunchEvent( ___selectedEventId ).type != Mission.LaunchResult.LaunchEvent.Type.None ) return;
-         __instance.StartCoroutine( BypassLanuchReport( __instance, "uneventful launch" ) );
+         __instance.StartCoroutine( BypassLanuchReport( __instance, LaunchEventsScreen.Mode.LaunchReport ) );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void BypassNoLevelUp ( LaunchEventsScreen __instance, AutoLocalise ___partExperienceText ) { try {
          Fine( "Launch mode {0}, level up tag {1}", __instance.mode, ___partExperienceText.tag );
+         if ( __instance.mode != (int) LaunchEventsScreen.Mode.LaunchPartLevelling ) return;
          if ( ! string.Equals( ___partExperienceText.tag, "Launch_Screen_Experience_None_Desc", StringComparison.InvariantCultureIgnoreCase ) ) return;
-         __instance.StartCoroutine( BypassLanuchReport( __instance, "empty level up report" ) );
+         __instance.StartCoroutine( BypassLanuchReport( __instance, LaunchEventsScreen.Mode.LaunchPartLevelling ) );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static IEnumerator BypassLanuchReport ( LaunchEventsScreen __instance, string msg ) {
-         var type = typeof( LaunchEventsScreen );
-         var tweenField = type.Field( "activeTween" );
-         while ( tweenField.GetValue( __instance ) == null ) yield return null;
-         Fine( "Screen switch started." );
-         while ( tweenField.GetValue( __instance ) != null ) yield return null;
-         Fine( "Screen switch ended." );
-         if ( ( type.Field( "autoResolveButton" ).GetValue( __instance ) as Button )?.gameObject.activeSelf == true ) {
+      private static readonly FieldInfo tweenField = typeof( LaunchEventsScreen ).Field( "activeTween" );
+      private static readonly FieldInfo abortButton = typeof( LaunchEventsScreen ).Field( "abortButton" );
+      private static readonly FieldInfo autoResolveButton = typeof( LaunchEventsScreen ).Field( "autoResolveButton" );
+
+      private static IEnumerator BypassLanuchReport ( LaunchEventsScreen __instance, LaunchEventsScreen.Mode mode ) {
+         while ( tweenField?.GetValue( __instance ) == null ) yield return null;
+         Fine( "Waiting for {0}, screen switch started.", mode );
+         while ( tweenField?.GetValue( __instance ) != null ) yield return null;
+         Fine( "Waiting for {0}, screen switch ended.", mode );
+         if ( ( abortButton.GetValue( __instance ) as Button )?.gameObject.activeSelf == true ) {
+            Fine( "Not yet launched.  Waiting for next bypass." );
+            __instance.StartCoroutine( BypassLanuchReport( __instance, mode ) );
+            yield break;
+         }
+         if ( ( autoResolveButton.GetValue( __instance ) as Button )?.gameObject.activeSelf == true ) {
             Fine( "Auto resolve avaliable.  Aborting bypass." );
             yield break;
          }
-         Info( "Auto bypassing {0}.", msg );
-         type.Method( "Continue" ).Run( __instance );
+         if ( __instance.mode != (int) mode ) {
+            Info( "Launch mode {0}.  Expected {1}.  Aborting auto-bypass.", __instance.mode, (int) mode );
+            yield break;
+         }
+         Info( "Auto bypassing {1}.", __instance.mode, mode == LaunchEventsScreen.Mode.LaunchPartLevelling ? "empty level up" : "uneventful launch" );
+         try {
+            typeof( LaunchEventsScreen ).Method( "Continue" )?.Run( __instance );
+         } catch ( Exception x ) { Err( x ); }
       }
 
       private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
