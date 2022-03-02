@@ -52,14 +52,15 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void TrackMission ( VehicleDesignerState state ) {
          if ( manager == null ) return;
+         var vehicle = state.CurrentVehicle;
          if ( mission != state.Mission ) {
             mission = state.Mission;
-            Fine( "Set vehicle destination to {0}", mission?.template?.planetaryBody );
+            Fine( "Set vehicle destination to {0}.  Vehicle is {1}.", mission?.template?.planetaryBody, vehicle.isUnderConstruction ? "being built" : "built" );
             buildTime = -1;
          }
          cachedPre = cachedPost = null;
-         var fitTime = state.GetVehicleBuildOrRefitTime( out _, true );
-         if ( buildTime == fitTime || fitTime <= 0 ) return;
+         var fitTime = vehicle.isUnderConstruction ?  vehicle.combinedBuildFitTime : state.GetVehicleBuildOrRefitTime( out _, true );
+         if ( buildTime == fitTime || fitTime < 0 ) return;
          Fine( "Update vehicle build time to {0}", fitTime );
          buildTime = fitTime;
          ShowLaunchCalendar();
@@ -86,14 +87,14 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void GetLaunchCalendar ( out IEnumerable< string > pre, out IEnumerable< string > post ) {
          List< string > preList = new List< string >(), postList = new List< string >();
          pre = preList; post = postList;
-         if ( buildTime <= 0 ) return;
+         if ( buildTime < 0 ) return;
          var buf = new StringBuilder();
          var client = Controller.Instance.activeClient;
          var sim = client.simulation;
          var agency = client.agency;
          var destination = mission.template.planetaryBody;
          int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime;
-         int fromTurn = Math.Max( doneTurn - config.launch_window_hint_before_ready + 1, nowTurn + 1 ), toTurn = doneTurn + config.launch_window_hint_after_ready;
+         int fromTurn = Math.Max( doneTurn - config.launch_window_hint_before_ready + 1, nowTurn ), toTurn = doneTurn + config.launch_window_hint_after_ready;
          Info( "Current turn {0}, build time {1}.  Calculating launch window for {4} from {2} to {3}", nowTurn, buildTime, fromTurn, toTurn, destination );
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
