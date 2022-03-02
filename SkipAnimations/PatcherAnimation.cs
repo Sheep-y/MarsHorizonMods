@@ -52,8 +52,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayActionResourceElement ).Method( "Show", typeof( bool ) ), nameof( SkipResourceTween ) );
          }
          if ( config.fast_mission_result ) {
-            TryPatch( typeof( MissionSummary ).Method( "Setup" ), postfix: nameof( SpeedUpMissionSummary ) );
-            TryPatch( typeof( MissionSummary ).Method( "SkipOnly" ), transpiler: nameof( SpeedUpMissionSummaryAnimation ) );
+            TryPatch( typeof( MissionSummary ).Method( "SkipOnly" ), transpiler: nameof( SpeedUpMissionSkip ) );
+            TryPatch( typeof( MissionSummary ).Method( "AnimatePhaseProgress" ), postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
+            TryPatch( typeof( MissionSummary ).Method( "AnimateRewards" ), postfix: nameof( SpeedUpMissionSummary ) );
          }
       }
 
@@ -115,25 +116,13 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipResourceTween ( ref bool tween ) => tween = false;
       #endregion
 
-      private static IEnumerable< CodeInstruction > SpeedUpMissionSummaryAnimation ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 5f, 100f, 1 );
-      private static void SpeedUpMissionSummary ( MissionSummary __instance ) => __instance.StartCoroutine( FastMissionSummary( __instance ) );
-      private static IEnumerator FastMissionSummary ( MissionSummary __instance ) {
-         var skip = typeof( MissionSummary ).Method( "SkipOnly" );
-         var continueField = typeof( MissionSummary ).Field( "continuing" );
-         Info( "Skipping mission summary animations." );
-         do {
-            try {
-               skip.Run( __instance );
-               if ( (bool) continueField.GetValue( __instance ) ) {
-                  Fine( "Mission summary closed." );
-                  yield break;
-               }
-            } catch ( Exception x ) { Err( x ); yield break; }
-            yield return null;
-         } while ( true );
-      }
-
+      private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 5f, 50f, 1 );
+      private static IEnumerable< CodeInstruction > SpeedUpPhaseProgress ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( ReplaceFloat( codes, 0.75f, 0.1f, 1 ),  0.5f, 0.1f, 1 );
+      private static IEnumerable< CodeInstruction > SpeedUpRewards ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.05f, 3 ), 1f, 0.1f, 3 ), 1.5f, 0.15f, 1 );
+      private static void SpeedUpMissionSummary ( Tween __result ) => __result.timeScale = 100f;
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
          => ReplaceOperand( codes, "ldc.r4", from, to, expected_count );
