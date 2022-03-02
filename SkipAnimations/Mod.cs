@@ -14,7 +14,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
-         if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
+         if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             new PatcherCinematic().Apply();
          if ( config.remove_delays || config.skip_screen_fade || config.skip_mission_intro || config.fast_launch || config.fast_mission )
             new PatcherAnimation().Apply();
@@ -35,8 +35,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool skip_all_cinematic = false;
       [ Config( "Add newly seen cinematics to skip_cinmatics (below).  Default False." ) ]
       public bool skip_seen_cinematic = false;
+      [ Config( "Skip seen cinematics until game is closed.  Default True." ) ]
+      public bool skip_seen_cinematic_until_exit = true;
       [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, earth flybys, general sat failure." ) ]
-      public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
+      public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure,Space_Landing_Start_Payload,Space_Landing_Start_Shuttle";
 
       [ Config( "[Animation]\r\n; Remove or reduce assorted screen and action delays.  Default True." ) ]
       public bool remove_delays = true;

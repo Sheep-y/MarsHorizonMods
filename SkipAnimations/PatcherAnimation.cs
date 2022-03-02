@@ -58,34 +58,36 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       }
 
       #region Remove delays
+      private const float DELAY = 0.05f;
+
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
          Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour?.GetType().Name, behaviour?.name );
-         duration = 0f;
+         duration = DELAY;
       }
 
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, 0f, 2 );
+         => ReplaceFloat( codes, 0.5f, DELAY, 2 );
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCoroutine ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, 0f, 2 );
+         => ReplaceFloat( codes, 0.5f, DELAY, 2 );
       private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( ReplaceFloat( codes, 2f, 0f, 1 ), 0.5f, 0f, 1 );
+         => ReplaceFloat( ReplaceFloat( codes, 2f, 0f, 1 ), 0.5f, DELAY, 1 );
       private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, 0f, 1 );
+         => ReplaceFloat( codes, 0.5f, DELAY, 1 );
 
       private static void RemoveWait_Animator ( AnimatorDelay __instance ) {
          if ( __instance.maxDelay > 0 ) Fine( "Removing {0}s delay from animator {1}", __instance.maxDelay, __instance.name );
-         __instance.maxDelay = 0;
+         __instance.maxDelay = DELAY;
       }
       private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0;
       private static void RemoveWait_Blackout ( ref float ___tweenTime, ref float ___waitTime ) {
          if ( ___waitTime > 0 ) Fine( "Removing {0}s screen fade.", ___waitTime );
-         ___tweenTime = ___waitTime = 0;
+         ___tweenTime = ___waitTime = 0f;
       }
-      private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
-      private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
-      private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
-      private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0;
+      private static void RemoveWait_CompleteScreen ( ref float time ) => time = DELAY;
+      private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = DELAY;
+      private static void RemoveWait_Tween ( ref float interval ) => interval = DELAY;
+      private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0f;
       #endregion
 
       private static void SpeedUpLaunch ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
@@ -100,7 +102,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       #region Fast Mission
       private static void SpeedUpMission ( MissionGameplayScreen __instance, ref float ___timelineSkipSpeedup, ref bool ___isSkippable, ref bool ___initialWait ) {
          Fine( "Mission screen initiated." );
-         ___timelineSkipSpeedup = 100f;
+         ___timelineSkipSpeedup = 50f;
          ___isSkippable = true;
          ___initialWait = false;
          __instance.baseReliabilityRollSpeed = 100f;
@@ -119,7 +121,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static IEnumerator FastMissionSummary ( MissionSummary __instance ) {
          var skip = typeof( MissionSummary ).Method( "SkipOnly" );
          var continueField = typeof( MissionSummary ).Field( "continuing" );
-         Info( "Skipping mission summary animatoins." );
+         Info( "Skipping mission summary animations." );
          do {
             try {
                skip.Run( __instance );

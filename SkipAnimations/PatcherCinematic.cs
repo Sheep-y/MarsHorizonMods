@@ -15,7 +15,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       internal void Apply () {
          if ( config.skip_intro )
             TryPatch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
-         if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.SkipCinematics.Count > 0 )
+         if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
       }
 
@@ -34,20 +34,24 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static bool ShouldSkip ( string id ) {
          if ( lastCinematic == id ) return false;
          lastCinematic = id;
-         if ( config.SkipCinematics.Contains( id ) || config.skip_all_cinematic ) {
+         if ( config.SkipCinematics.Contains( id ) || config.skip_all_cinematic || TempSkip.Contains( id ) ) {
             Info( "Skipping cinematic {0}", id );
             return true;
          }
-         if ( ! config.skip_seen_cinematic ) {
-            Info( "Allowing cinematic {0}", id );
-            return false;
+         if ( config.skip_seen_cinematic_until_exit ) {
+            Info( "Adding {0} to temporary skip list until exit game.", id );
+            TempSkip.Add( id );
          }
-         Info( "Adding {0} to seen cinematics.", id );
-         config.AddCinematic( id );
+         if ( config.skip_seen_cinematic ) {
+            Info( "Adding {0} to seen cinematics.", id );
+            config.AddCinematic( id );
+         } else
+            Info( "Allowing cinematic {0}", id );
          return false;
       }
 
       private static HashSet< string > NonSkippable = new HashSet< string >();
+      private static HashSet< string > TempSkip = new HashSet< string >();
 
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance, bool ___isSkippable ) { try {
          if ( __result ) return;
