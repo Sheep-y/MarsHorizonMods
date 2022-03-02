@@ -1,10 +1,8 @@
 ﻿using Astronautica;
 using Astronautica.View;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.UI;
@@ -23,8 +21,8 @@ namespace ZyMod.MarsHorizon.Informed {
             TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
             TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
          }
-         if ( config.show_mission_expiry )
-            TryPatch( typeof( MissionBriefingObjectives ), "SetPhaseDetails", postfix: nameof( ShowMissionExpiry ) );
+         if ( config.show_new_mission_expiry || config.show_ongoing_mission_expiry )
+            TryPatch( typeof( MissionSidebarResearchRequirements ), "SetMission", postfix: nameof( ShowMissionExpiry ) );
       }
 
       private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";
@@ -77,8 +75,20 @@ namespace ZyMod.MarsHorizon.Informed {
          __result = Localise( "Name_Body_" + template.originBody ) + " ⮞ " + Localise( "Name_Body_" + template.planetaryBody );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static void ShowMissionExpiry ( MissionBriefingObjectives __instance, Mission mission ) { try {
-         Info( mission.missionState, mission.planState );
+      private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
+         Fine( "Checking {0} for expiry", mission );
+         if ( ! mission.IsRequestMission ) return;
+         if ( ! config.show_new_mission_expiry || ! config.show_ongoing_mission_expiry ) {
+            var isNew = MissionControl.IsMissionScheduled( mission.templateInstance, mission.requestMissionContext, mission.requestMissionType, false );
+            Fine( "Is {0} mission.", isNew ? "new" : "ongoing" );
+            if ( isNew ) { if ( ! config.show_new_mission_expiry ) return; }
+            else if ( ! config.show_ongoing_mission_expiry ) return;
+         }
+         var template = mission.templateInstance;
+         var remaining = template.lifespan + template.turnAdded - Controller.Instance.activeClient.simulation.universe.turn;
+         Info( "Mission will expires in {0} turns", remaining );
+         if ( remaining >= 0 )
+         ___descriptionText.text = Localise( ___descriptionText.tag ) + "\n\n" + Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() );
       } catch ( Exception x ) { Err( x ); } }
    }
 }

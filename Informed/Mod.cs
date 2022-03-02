@@ -17,35 +17,45 @@ namespace ZyMod.MarsHorizon.Informed {
             new PatcherBaseScreen().Apply();
          if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 )
             new PatcherVehicleDesigner().Apply();
-         if ( config.show_planet_launch_window || config.show_mission_expiry )
+         if ( config.show_planet_launch_window || config.show_new_mission_expiry )
             new PatcherMissionPlan().Apply();
       }
    }
 
    internal class ModPatcher : Patcher {
       internal static Config config = new Config();
-      internal static string Localise ( string tag ) => ScriptableObjectSingleton<Localisation>.instance.Localise( tag );
+      internal static string Localise ( string tag, params string[] vars ) {
+         Dictionary< string, string > variables = null;
+         if ( vars?.Length > 0 ) {
+            variables = new Dictionary< string, string >();
+            for ( var i = 0 ; i + 1 < vars.Length ; i += 2 )
+               variables.Add( vars[ i ], vars[ i + 1 ] );
+         }
+         return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
+      }
    }
 
    public class Config : IniConfig {
-      [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default true." ) ]
+      [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default True." ) ]
       public bool show_base_bonus = true;
-      [ Config( "Add a Launch Window button on planetery body mission list.  Default true." ) ]
+      [ Config( "Add a Launch Window button on planetery body mission list.  Default True." ) ]
       public bool show_planet_launch_window = true;
-      [ Config( "Show expiry countdown for inactive missions." ) ]
-      public bool show_mission_expiry = true;
+      [ Config( "Show expiry countdown for new missions.  Default True." ) ]
+      public bool show_new_mission_expiry = true;
+      [ Config( "Show expiry countdown for ongoing missions.  Default True." ) ]
+      public bool show_ongoing_mission_expiry = true;
 
       [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
-      [ Config( "On vehicle designer screen, show launch window this many months after vehicle is ready.  Default 12.  0 to not show.  Max 24." ) ]
-      public byte launch_window_hint_after_ready = 12;
+      [ Config( "On vehicle designer screen, show launch window this many months after vehicle is ready.  Default 10.  0 to not show.  Max 24." ) ]
+      public byte launch_window_hint_after_ready = 10;
       [ Config( "Replace all left-hand-side hint with launch window if true.  Otherwise, hover mouse in then out of vehicle part / upgrade / contractor to see launch window.  Default true." ) ]
       public bool always_show_launch_window = true;
-      [ Config( "Hint text colour for invalid launch dates.  Set to empty to not change (white)." ) ]
+      [ Config( "Hint text colour for invalid launch dates.  Set to empty to not change (white).  Default #FFBBBB" ) ]
       public string invalid_colour = "#FFBBBB";
-      [ Config( "Hint text colour for suboptimal launch dates.  Set to empty to not change (white)." ) ]
+      [ Config( "Hint text colour for suboptimal launch dates.  Set to empty to not change (white).  Default #EEDDDD" ) ]
       public string suboptimal_colour = "#EEDDDD";
-      [ Config( "Hint text colour for optimal launch dates.  Set to empty to not change (white).  Default empty." ) ]
+      [ Config( "Hint text colour for optimal launch dates.  Set to empty to not change (white).  Default #BBFFBB" ) ]
       public string optimal_colour = "#BBFFBB";
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]

@@ -80,7 +80,7 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void NewTooltip ( string header, string placeholder, string content ) {
          var tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
-         tooltip?.Set( header, placeholder, true );
+         tooltip.Set( header, placeholder, true );
          ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = content;
       }
 
