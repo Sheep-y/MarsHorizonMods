@@ -16,11 +16,15 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherMissionPlan : ModPatcher {
 
       internal void Apply () {
-         TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
-         TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
-         TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
-         TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
-         TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
+         if ( config.show_planet_launch_window ) {
+            TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
+            TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
+            TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
+            TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
+            TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
+         }
+         if ( config.show_mission_expiry )
+            TryPatch( typeof( MissionBriefingObjectives ), "SetPhaseDetails", postfix: nameof( ShowMissionExpiry ) );
       }
 
       private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";
@@ -71,6 +75,10 @@ namespace ZyMod.MarsHorizon.Informed {
          localise = false;
          var template = __instance.Mission.template;
          __result = Localise( "Name_Body_" + template.originBody ) + " ⮞ " + Localise( "Name_Body_" + template.planetaryBody );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void ShowMissionExpiry ( MissionBriefingObjectives __instance, Mission mission ) { try {
+         Info( mission.missionState, mission.planState );
       } catch ( Exception x ) { Err( x ); } }
    }
 }

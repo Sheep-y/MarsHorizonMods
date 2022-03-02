@@ -17,7 +17,8 @@ namespace ZyMod.MarsHorizon.Informed {
             new PatcherBaseScreen().Apply();
          if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 )
             new PatcherVehicleDesigner().Apply();
-         new PatcherMissionPlan().Apply();
+         if ( config.show_planet_launch_window || config.show_mission_expiry )
+            new PatcherMissionPlan().Apply();
       }
    }
 
@@ -29,6 +30,10 @@ namespace ZyMod.MarsHorizon.Informed {
    public class Config : IniConfig {
       [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default true." ) ]
       public bool show_base_bonus = true;
+      [ Config( "Add a Launch Window button on planetery body mission list.  Default true." ) ]
+      public bool show_planet_launch_window = true;
+      [ Config( "Show expiry countdown for inactive missions." ) ]
+      public bool show_mission_expiry = true;
 
       [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
