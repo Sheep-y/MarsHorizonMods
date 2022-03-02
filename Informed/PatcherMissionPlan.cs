@@ -18,6 +18,7 @@ namespace ZyMod.MarsHorizon.Informed {
       internal void Apply () {
          TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
          TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
+         TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
          TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
          TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
       }
@@ -48,15 +49,18 @@ namespace ZyMod.MarsHorizon.Informed {
          ___missionIcon.gameObject.SetActive( false );
          ___toggle.onValueChanged.RemoveAllListeners();
          ___toggle.isOn = false;
-         ___toggle.onValueChanged.AddListener( ( isOn ) => { try {
-            if ( ! isOn ) return;
-            Fine( "Launch Window Button clicked for {0} to {1}", mission.template.originBody, mission.template.planetaryBody );
-            var controller = Controller.Instance;
-            void Back () => controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
-            controller.clientViewer.EnterCalendarScheduleState( mission, Back, Back );
-         } catch ( Exception x ) { Err( x ); } } );
+         ___toggle.onValueChanged.AddListener( ( isOn ) => { if ( isOn ) ShowLaunchWindow( mission ); } );
          type.Property( "Mission" ).SetValue( __instance, mission );
          type.Method( "SetMissionState" ).Run( __instance, mission, MissionSelectSidebarToggle.EState.None );
+         return false;
+      } catch ( Exception x ) { return Err( x, false ); } }
+
+      private static bool ShowLaunchWindow ( Mission mission ) { try {
+         if ( mission.guid != LaunchWindowGuid ) return true;
+         Fine( "Launch Window Button clicked for {0} to {1}", mission.template.originBody, mission.template.planetaryBody );
+         var controller = Controller.Instance;
+         void Back () => controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
+         controller.clientViewer.EnterCalendarScheduleState( mission, Back, Back );
          return false;
       } catch ( Exception x ) { return Err( x, false ); } }
 
