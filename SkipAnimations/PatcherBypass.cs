@@ -71,7 +71,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static readonly FieldInfo autoResolveButton = typeof( LaunchEventsScreen ).Field( "autoResolveButton" );
 
       private static IEnumerator BypassLanuchReport ( LaunchEventsScreen __instance, LaunchEventsScreen.Mode mode ) {
-         while ( tweenField?.GetValue( __instance ) == null ) yield return null;
+         Fine( "Trying to skip {0}.  Tween {1}.", mode, tweenField?.GetValue( __instance ) );
+         while ( tweenField?.GetValue( __instance ) == null ) {
+            if ( ! __instance.gameObject.activeSelf ) { Fine( "Screen closed. Aborting skip." ); yield break; }
+            yield return null;
+         }
          Fine( "Waiting for {0}, screen switch started.", mode );
          while ( tweenField?.GetValue( __instance ) != null ) yield return null;
          Fine( "Waiting for {0}, screen switch ended.", mode );
