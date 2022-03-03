@@ -9,6 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using static Astronautica.Data;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
@@ -16,13 +18,40 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherVehicleDesigner : ModPatcher {
 
       internal void Apply () {
-         if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null &&
-              TryPatch( typeof( VehicleDesignerVehicleStats ), "RefreshCostTimeInfo", postfix: nameof( TrackMission ) ) != null ) {
-            if ( config.always_show_launch_window )
-               TryPatch( typeof( VehicleDesignerTooltipManager ), "Show", postfix: nameof( ShowLaunchCalendar ) );
-            TryPatch( typeof( VehicleDesignerTooltipManager ), "Hide", postfix: nameof( ShowLaunchCalendar ) );
+         if ( config.show_contractor_effects_on_button && eVal != null ) {
+            TryPatch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
+            TryPatch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", nameof( TrackDesignerState ) );
+            TryPatch( typeof( ContractorListItem ), "GetName", postfix: nameof( AddContractorEffects ) );
+         }
+         if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 ) {
+            if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null &&
+                 TryPatch( typeof( VehicleDesignerVehicleStats ), "RefreshCostTimeInfo", postfix: nameof( TrackMission ) ) != null ) {
+               if ( config.always_show_launch_window )
+                  TryPatch( typeof( VehicleDesignerTooltipManager ), "Show", postfix: nameof( ShowLaunchCalendar ) );
+               TryPatch( typeof( VehicleDesignerTooltipManager ), "Hide", postfix: nameof( ShowLaunchCalendar ) );
+            }
          }
       }
+
+      private static VehicleDesignerContractorUpgradeInfo upgradeInfo;
+      private static VehicleDesignerState designerState;
+      private static readonly MethodInfo eVal = typeof( VehicleDesignerState ).Method( "GetContractorEffectValue", typeof( Contractor.Effect ) );
+      private static readonly MethodInfo eIco = typeof( VehicleDesignerContractorUpgradeInfo ).Method( "GetContractorEffectIcon", typeof( Contractor.Effect ) );
+
+      private static void TrackDesignerState ( VehicleDesignerState state ) => designerState = state;
+      private static void TrackContractorUpgradeInfo ( VehicleDesignerContractorUpgradeInfo __instance ) => upgradeInfo = __instance;
+      private static void AddContractorEffects ( Contractor ___data, ref string __result ) { try {
+         if ( ___data?.effects == null || ___data.effects.Length == 0 || designerState == null ) return;
+         var buf = new StringBuilder( __result ).Append( "\n" );
+         foreach ( var effect in ___data.effects ) {
+            var val = (float) eVal.Run( designerState, effect );
+            var ico = upgradeInfo != null ? eIco?.Run( upgradeInfo, effect ) as Sprite : null;
+            buf.Append( val >= 0 ? "+" : "" ).AppendFormat( "{0:0%}", val );
+            if ( ico != null ) buf.Append( " <sprite name=\"" ).Append( ico.name ).Append( "\"/>" );
+            buf.Append( "   " );
+         }
+         __result = buf.ToString().Substring( 0, buf.Length - 3 );
+      } catch ( Exception x ) { Err( x ); manager = null; } }
 
       private static int buildTime = -1;
       private static Mission mission;
