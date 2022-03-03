@@ -37,8 +37,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool skip_seen_cinematic = false;
       [ Config( "Skip seen cinematics until game is closed.  Default True." ) ]
       public bool skip_seen_cinematic_until_exit = true;
-      [ Config( "Skip these cinematics, comma seprated.  Set to empty to reset.  Default starts with mission controls, launches, earth flybys, general sat failure." ) ]
-      public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure,Space_Landing_Start_Payload,Space_Landing_Start_Shuttle";
+      [ Config( "Skip these cinematics, comma seprated.  Set to empty (blank) to disable.  Set to \"default\" (without quotes) to reset.  Default skip mission controls, launches, lands, earth flybys, and general sat failure." ) ]
+      public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "[Animation]\r\n; Remove or reduce assorted screen and action delays.  Default True." ) ]
       public bool remove_delays = true;
@@ -71,6 +71,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       public override void Load ( object subject, string path ) { try {
          base.Load( subject, path );
+         if ( string.Equals( skip_cinematics, "default", StringComparison.InvariantCultureIgnoreCase ) ) {
+            skip_cinematics = new Config().skip_cinematics;
+            Task.Run( () => { lock ( SkipCinematics ) Save(); } );
+         }
          lock ( SkipCinematics ) {
             SkipCinematics.Clear();
             if ( skip_cinematics != null )
