@@ -48,7 +48,7 @@ namespace ZyMod.MarsHorizon.Informed {
          var type = typeof( MissionSelectSidebarToggle );
          ___missionNameText.tag = "Calendar_LaunchWindow_Title";
          __instance.name = "Calendar_LaunchWindow_Sidebar_Toggle";
-         ___missionIcon.gameObject.SetActive( false );
+         ___missionIcon.gameObject.SetActive( false ); // Spr_Icon_MissionPlan_Calendar
          ___toggle.onValueChanged.RemoveAllListeners();
          ___toggle.isOn = false;
          ___toggle.onValueChanged.AddListener( ( isOn ) => { if ( isOn ) ShowLaunchWindow( mission ); } );
@@ -60,9 +60,8 @@ namespace ZyMod.MarsHorizon.Informed {
       private static bool ShowLaunchWindow ( Mission mission ) { try {
          if ( mission.guid != LaunchWindowGuid ) return true;
          Fine( "Launch Window Button clicked for {0} to {1}", mission.template.originBody, mission.template.planetaryBody );
-         var controller = Controller.Instance;
-         void Back () => controller.gameUI.SetViewState( controller.clientViewer.stateMissionControlMissionSelect, true );
-         controller.clientViewer.EnterCalendarScheduleState( mission, Back, Back );
+         void Back () => Controller.Instance.gameUI.SetViewState( clientViewer.stateMissionControlMissionSelect, true );
+         clientViewer.EnterCalendarScheduleState( mission, Back, Back );
          return false;
       } catch ( Exception x ) { return Err( x, false ); } }
 
@@ -72,7 +71,7 @@ namespace ZyMod.MarsHorizon.Informed {
          if ( __instance.Mission?.guid != LaunchWindowGuid ) return;
          localise = false;
          var template = __instance.Mission.template;
-         __result = Localise( "Name_Body_" + template.originBody ) + " ⮞ " + Localise( "Name_Body_" + template.planetaryBody );
+         __result = Localise( "Name_Body_" + template.originBody ) + " -> " + Localise( "Name_Body_" + template.planetaryBody );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
@@ -85,7 +84,7 @@ namespace ZyMod.MarsHorizon.Informed {
             else if ( ! config.show_ongoing_mission_expiry ) return;
          }
          var template = mission.templateInstance;
-         var remaining = template.lifespan + template.turnAdded - Controller.Instance.activeClient.simulation.universe.turn;
+         var remaining = template.lifespan + template.turnAdded - simulation.universe.turn;
          Info( "Mission will expires in {0} turns", remaining );
          if ( remaining >= 0 )
          ___descriptionText.text = Localise( ___descriptionText.tag ) + "\n\n" + Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() );

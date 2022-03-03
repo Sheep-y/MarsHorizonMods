@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Astronautica.View;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,9 @@ namespace ZyMod.MarsHorizon.Informed {
          }
          return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
       }
+      internal static Client activeClient => Controller.Instance?.activeClient;
+      internal static ClientViewer clientViewer => Controller.Instance?.clientViewer;
+      internal static Simulation simulation => activeClient.simulation;
    }
 
    public class Config : IniConfig {
@@ -49,7 +53,7 @@ namespace ZyMod.MarsHorizon.Informed {
       public byte launch_window_hint_before_ready = 2;
       [ Config( "On vehicle designer screen, show launch window this many months after vehicle is ready.  Default 10.  0 to not show.  Max 24." ) ]
       public byte launch_window_hint_after_ready = 10;
-      [ Config( "Replace all left-hand-side hint with launch window if true.  Otherwise, hover mouse in then out of vehicle part / upgrade / contractor to see launch window.  Default true." ) ]
+      [ Config( "Replace all left-hand-side hint with launch window if true.  If false, game will show vehicle part / upgrade / contractor hint on hover as normal.  Default true." ) ]
       public bool always_show_launch_window = true;
       [ Config( "Hint text colour for invalid launch dates.  Set to empty to not change (white).  Default #FFBBBB" ) ]
       public string invalid_colour = "#FFBBBB";

@@ -89,9 +89,8 @@ namespace ZyMod.MarsHorizon.Informed {
          pre = preList; post = postList;
          if ( buildTime < 0 ) return;
          var buf = new StringBuilder();
-         var client = Controller.Instance.activeClient;
-         var sim = client.simulation;
-         var agency = client.agency;
+         var sim = simulation;
+         var agency = activeClient.agency;
          var destination = mission.template.planetaryBody;
          int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime;
          int fromTurn = Math.Max( doneTurn - config.launch_window_hint_before_ready + 1, nowTurn ), toTurn = doneTurn + config.launch_window_hint_after_ready;
