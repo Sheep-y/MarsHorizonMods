@@ -16,10 +16,12 @@ namespace ZyMod.MarsHorizon.Informed {
          config.Load();
          if ( config.show_base_bonus )
             new PatcherBaseScreen().Apply();
-         if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 )
-            new PatcherVehicleDesigner().Apply();
          if ( config.show_planet_launch_window || config.show_new_mission_expiry )
             new PatcherMissionPlan().Apply();
+         if ( config.show_supplement_in_booster_description )
+            new PatcherResearchScreen().Apply();
+         if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 )
+            new PatcherVehicleDesigner().Apply();
       }
    }
 
@@ -48,6 +50,8 @@ namespace ZyMod.MarsHorizon.Informed {
       public bool show_new_mission_expiry = true;
       [ Config( "Show expiry countdown for ongoing missions.  Default True." ) ]
       public bool show_ongoing_mission_expiry = true;
+      [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
+      public bool show_supplement_in_booster_description = true;
 
       [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
