@@ -52,9 +52,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayActionResourceElement ).Method( "Show", typeof( bool ) ), nameof( SkipResourceTween ) );
          }
          if ( config.fast_mission_result ) {
-            TryPatch( typeof( MissionSummary ).Method( "SkipOnly" ), transpiler: nameof( SpeedUpMissionSkip ) );
-            TryPatch( typeof( MissionSummary ).Method( "AnimatePhaseProgress" ), postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
-            TryPatch( typeof( MissionSummary ).Method( "AnimateRewards" ), postfix: nameof( SpeedUpMissionSummary ) );
+            TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
+            TryPatch( typeof( MissionSummary ), "AnimatePhaseProgress", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
+            TryPatch( typeof( MissionSummary ), "AnimateRewards", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpRewards ) );
+            TryPatch( typeof( MissionSummaryPhaseProgress ), "Animate", transpiler: nameof( SpeedUpPhaseAnimation ) );
          }
       }
 
@@ -118,10 +119,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 5f, 50f, 1 );
+      private static IEnumerable< CodeInstruction > SpeedUpPhaseAnimation ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.75f, 0.1f, 1 );
       private static IEnumerable< CodeInstruction > SpeedUpPhaseProgress ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( ReplaceFloat( codes, 0.75f, 0.1f, 1 ),  0.5f, 0.1f, 1 );
       private static IEnumerable< CodeInstruction > SpeedUpRewards ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.05f, 3 ), 1f, 0.1f, 3 ), 1.5f, 0.15f, 1 );
+         => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.1f, 3 ), 1f, 0.1f, 3 ), 1.5f, 0.1f, 1 );
       private static void SpeedUpMissionSummary ( Tween __result ) => __result.timeScale = 100f;
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
