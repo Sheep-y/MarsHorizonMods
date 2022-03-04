@@ -33,6 +33,7 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       }
 
+      #region Contractor
       private static VehicleDesignerContractorUpgradeInfo upgradeInfo;
       private static VehicleDesignerState designerState;
       private static readonly MethodInfo eVal = typeof( VehicleDesignerState ).Method( "GetContractorEffectValue", typeof( Contractor.Effect ) );
@@ -46,12 +47,14 @@ namespace ZyMod.MarsHorizon.Informed {
          foreach ( var effect in ___data.effects ) {
             var val = (float) eVal.Run( designerState, effect );
             var ico = upgradeInfo != null ? eIco?.Run( upgradeInfo, effect ) as Sprite : null;
-            buf.Append( val >= 0 ? "+" : "" ).AppendFormat( "{0:0%}", val );
-            if ( ico != null ) buf.Append( " <sprite name=\"" ).Append( ico.name ).Append( "\"/>" );
+            if ( ico != null ) buf.Append( "<sprite name=\"" ).Append( ico.name ).Append( "\"/> " );
+            buf.AppendFormat( "<color={0}>{1}{2:0%}</color>", effect.IsEffectNegative() ? "#FF6666" : "#00FF00", val >= 0 ? "+" : "", val );
             buf.Append( "   " );
          }
-         __result = buf.ToString().Substring( 0, buf.Length - 3 );
+         Fine( "{0} => {1}", __result, buf );
+         __result = buf.ToString().Trim();
       } catch ( Exception x ) { Err( x ); manager = null; } }
+      #endregion
 
       private static int buildTime = -1;
       private static Mission mission;
