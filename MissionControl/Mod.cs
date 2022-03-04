@@ -84,13 +84,14 @@ namespace ZyMod.MarsHorizon.MissionControl {
       }
 
       private static float origChance = -1f;
-      private static readonly Dictionary< Data.MissionTemplate, int > origWeight = new Dictionary< Data.MissionTemplate, int >();
+      private static readonly Dictionary< Data.MissionTemplate, int > origWeightM = new Dictionary< Data.MissionTemplate, int >();
+      private static readonly Dictionary< Data.MissionTemplate.RequestMissionType, int > origWeightT = new Dictionary< Data.MissionTemplate.RequestMissionType, int >();
 
       private static Data.MissionTemplate lastMission = null;
       private static bool allowed = false;
 
       private static void TrackNewMissionBefore ( Simulation __instance, Agency agency, bool forceGenerate ) { try {
-         origWeight.Clear();
+         origWeightM.Clear();
          lastMission = null;
          if ( forceGenerate ) {
             Info( "{0} is forcing a new mission.", agency.NameLocalised );
@@ -109,10 +110,12 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void TrackNewMissionAfter ( Agency agency, NetMessages.MissionRequest message, bool __result ) { try {
          if ( ! canMod( agency ) ) return;
          lastMission = null;
-         if ( origWeight.Count > 0 ) {
-            Fine( "Restoring {0} weights.", origWeight.Count );
-            foreach ( var pair in origWeight ) pair.Key.requestWeighting = pair.Value;
-            origWeight.Clear();
+         if ( origWeightM.Count > 0 || origWeightT.Count > 0 ) {
+            Fine( "Restoring {0}+{1} weights.", origWeightM.Count, origWeightT.Count );
+            foreach ( var pair in origWeightM ) pair.Key.requestWeighting = pair.Value;
+            foreach ( var pair in origWeightT ) pair.Key.weighting = pair.Value;
+            origWeightM.Clear();
+            origWeightT.Clear();
          }
          if ( ! __result ) { Fine( "No new mission." ); return; }
          Info( "New mission {0} {1} {2}.  Next mission after {3}+ turns.", message.milestoneMissionID, message.requestMissionType, message.isJointMission ? "(Join)" : "", message.turnsUntilNextMissionRequest );
@@ -126,7 +129,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( weight < 0 ) weight = m.requestWeighting;
          Fine( "Mission {0}, weight {1}{2}", m.primaryMilestone, m.requestWeighting, weight == m.requestWeighting ? "" : $" => {weight}" );
          if ( weight != m.requestWeighting ) {
-            origWeight[ m ] = m.requestWeighting;
+            origWeightM[ m ] = m.requestWeighting;
             m.requestWeighting = weight;
          }
          SetVariationWeights( m );
@@ -159,12 +162,15 @@ namespace ZyMod.MarsHorizon.MissionControl {
             if ( t.type == Data.MissionTemplate.RequestMissionType.EType.Lucrative ) tWeight = (int) Math.Round( tWeight * config.lucrative_weight_multiplier );
             if ( divider != 1 ) tWeight /= divider;
             Fine( "   > Variation {0}, weight {1}{2}", t.type, t.weighting, t.weighting == tWeight ? "" : $" => {tWeight}" );
-            t.weighting = tWeight;
+            if ( t.weighting != tWeight ) {
+               origWeightT[ t ] = t.weighting;
+               t.weighting = tWeight;
+            }
          }
       }
 
       private static void LogMissionRemoval ( bool __result ) {
-         if ( __result == allowed ) return;
+         if ( lastMission == null || __result == allowed ) return;
          Fine( allowed ? "X Mission removed due to era, research, or ongoing mission." : "X ... then restored after forced generation." );
          allowed = __result;
       }
