@@ -331,6 +331,7 @@ namespace ZyMod {
             fields = fields.Where( e => e.GetCustomAttribute<ConfigAttribute>() != null ).ToArray();
          return fields;
       }
+      /* Called before writing a type (target is Type && comment != ""), when writing a field, and after writing a type (target is Type && comment = "") */
       protected abstract void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, string comment );
       protected virtual void _Log ( TraceLevel level, object msg, params object[] arg ) => RootMod.Log?.Write( level, msg, arg );
    }

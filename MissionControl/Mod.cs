@@ -42,26 +42,26 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float player_request_mission_chance = -1;
       [ Config( "Chance of new request mission for AI.  Ditto." ) ]
       public float ai_request_mission_chance = -1;
-      [ Config( "Limit weight changes to player agency only.  Default true." ) ]
+      [ Config( "Limit weight changes to player agency only.  Default True." ) ]
       public bool reweight_only_player_agency = true;
 
-      [ Config( "[Variations]\r\n; Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
+      [ Config( "\r\n[Variations]\r\n; Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier = 2.4f;
       [ Config( "Try divide all variation weight by this amount to reduce work.  Affects lucrative_weight_multiplier accuracy.  Default 10.  Set to 1 to not change." ) ]
       public int variation_weight_divider = 10;
 
-      [ Config( "[Earth and Moon]\r\n; Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
-      public int earth_uncrewed_mission_weight = 40;
+      [ Config( "\r\n[Earth and Moon]\r\n; Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
+      public int earth_uncrewed_mission_weight = 30;
       public int earth_crewed_mission_weight = 20;
       public int moon_uncrewed_mission_weight = 20;
       public int moon_crewed_mission_weight = 10;
       public int space_station_mission_weight = 10;
 
-      [ Config( "[Inner Planets]" ) ]
+      [ Config( "\r\n[Inner Planets]" ) ]
       public int venus_mission_weight = 3;
       public int mercury_mission_weight = 2;
 
-      [ Config( "[Outter Planets]" ) ]
+      [ Config( "\r\n[Outter Planets]" ) ]
       public int mars_mission_weight = 5;
       public int jupiter_mission_weight = 0;
       public int saturn_mission_weight = 0;
@@ -69,7 +69,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public int neptune_mission_weight = 0;
       public int pluto_mission_weight = 0;
 
-      [ Config( "[Others]" ) ]
+      [ Config( "\r\n[Others]" ) ]
       public int other_mission_weight = 0;
 
    }
@@ -96,7 +96,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          rules.requestGenerationChance = chance;
          RootMod.Log?.Write( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
             "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, chance {1}.", agency.NameLocalised,
-            rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest );
+            1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void TrackNewMissionAfter ( Agency agency, NetMessages.MissionRequest message, bool __result ) { try {
