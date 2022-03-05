@@ -32,9 +32,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
          }
          return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
       }
-      internal static Client activeClient => Controller.Instance?.activeClient;
-      internal static ClientViewer clientViewer => Controller.Instance?.clientViewer;
-      internal static Simulation simulation => activeClient.simulation;
    }
 
    public class Config : IniConfig {
@@ -44,6 +41,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float ai_request_mission_chance = -1;
       [ Config( "Limit weight changes to player agency only.  Default True." ) ]
       public bool reweight_only_player_agency = true;
+      [ Config( "Use a standalone random number generator for new missions.  Also apply to AI.  Default True." ) ]
+      public bool standalone_mission_rng = true;
 
       [ Config( "\r\n[Joint]" ) ]
       [ Config( "Section note: join mission happens only to player agency.  Does not affect AI." ) ]
@@ -105,6 +104,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
             TryPatch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
          if ( config.joint_trait_multiplier >= 0 )
             TryPatch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
+         if ( config.standalone_mission_rng )
+            TryPatch( typeof( LINQExtensions ).Method( "RandomElement" ).MakeGenericMethod( typeof( Data.RequestMissionData ) ), postfix: nameof( RollRandomMission ) );
       }
 
       private static float origChance = -1f;
@@ -128,14 +129,14 @@ namespace ZyMod.MarsHorizon.MissionControl {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetJointMissionChance ( Simulation __instance, Agency agency, Agency selectedAgency ) { try {
-         Fine( "Rolling joint mission between {0} and {1}", agency.NameLocalised, selectedAgency?.NameLocalised ?? "{Any}" );
+         Fine( "Rolling joint mission between {0} and {1}.", agency.NameLocalised, selectedAgency?.NameLocalised ?? "{Any}" );
          var rules = __instance.gamedata.rules;
          if ( config.joint_mission_chance >= 0 && config.joint_mission_chance != rules.jointMissionChance ) {
-            Info( "Setting base joint mission chance from {0} to {1}", rules.jointMissionChance, config.joint_mission_chance );
+            Info( "Setting base joint mission chance from {0} to {1}.", rules.jointMissionChance, config.joint_mission_chance );
             rules.jointMissionChance = config.joint_mission_chance;
          }
          if ( config.diplomacy_office_bonus_chance >= 0 && config.diplomacy_office_bonus_chance != rules.diplomacyOfficeIncrease ) {
-            Info( "Setting Diplomacy Office joint mission bonus chance from {0} to {1}", rules.diplomacyOfficeIncrease, config.diplomacy_office_bonus_chance );
+            Info( "Setting Diplomacy Office joint mission bonus chance from {0} to {1}.", rules.diplomacyOfficeIncrease, config.diplomacy_office_bonus_chance );
             rules.diplomacyOfficeIncrease = config.diplomacy_office_bonus_chance;
          }
       } catch ( Exception x ) { Err( x ); } }
@@ -145,7 +146,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          for ( var i = 0 ; i < __result.Count ; i++ ) {
             var trait = __result[ i ];
             if ( config.joint_trait_multiplier < 0 || config.joint_trait_multiplier == trait.value ) return;
-            Info( "Setting trait {0} bonus chance from {1} to {2}", Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
+            Info( "Setting trait {0} bonus chance from {1} to {2}.", Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
             trait.value = config.joint_trait_multiplier;
             __result[ i ] = trait;
          }
@@ -170,7 +171,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          allowed = true;
          var weight = GetMissionWeight( m );
          if ( weight < 0 ) weight = m.requestWeighting;
-         Fine( "Mission {0}, weight {1}{2}", m.primaryMilestone, m.requestWeighting, weight == m.requestWeighting ? "" : $" => {weight}" );
+         Fine( "Mission {0}, weight {1}{2}.", m.primaryMilestone, m.requestWeighting, weight == m.requestWeighting ? "" : $" => {weight}" );
          if ( weight != m.requestWeighting ) {
             origWeightM[ m ] = m.requestWeighting;
             m.requestWeighting = weight;
@@ -234,5 +235,16 @@ namespace ZyMod.MarsHorizon.MissionControl {
          Fine( allowed ? "X Mission removed due to era, research, or ongoing mission." : "X ... then restored after forced generation." );
          allowed = __result;
       }
+
+      private static Random missionRNG;
+      private static void RollRandomMission ( IEnumerable< Data.RequestMissionData > sequence, ref Data.RequestMissionData  __result ) { try {
+         if ( missionRNG == null ) missionRNG = new Random();
+         List<Data.RequestMissionData> list = sequence.ToList();
+         var i = missionRNG.Next( 0, list.Count );
+         Info( "Unity rolled {0}-{1} ({2}) out of {3}.  RNG rolled {4} ({5}).",
+            list.IndexOf( __result ), list.LastIndexOf( __result ), __result.templateInstance.template.id, list.Count,
+            i, list[ i ].templateInstance.template.id );
+         __result = list[ i ];
+      } catch ( Exception x ) { Err( x ); } }
    }
 }
