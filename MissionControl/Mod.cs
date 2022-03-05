@@ -45,6 +45,15 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "Limit weight changes to player agency only.  Default True." ) ]
       public bool reweight_only_player_agency = true;
 
+      [ Config( "\r\n[Joint]" ) ]
+      [ Config( "Section note: join mission happens only to player agency.  Does not affect AI." ) ]
+      [ Config( "Base join mission chance.  Game default 0.1 (for 10%).  Set to -1 to not change (default)." ) ]
+      public float joint_mission_chance = -1;
+      [ Config( "Diplomacy Office bonus chance (added).  Game default 0.05 (for +5%).  Set to -1 to not change (default)." ) ]
+      public float diplomacy_office_bonus_chance = -1;
+      [ Config( "Team Player bonus chance (multiplied).  Game default 1 (for 100% bonus).  Set to -1 to not change (default)." ) ]
+      public float joint_trait_multiplier = -1;
+
       [ Config( "\r\n[Variations]" ) ]
       [ Config( "Multiply challenging variation (all level) chances.  Default 1.  Set to 1 to not change." ) ]
       public float challenging_weight_multiplier = 1;
@@ -92,6 +101,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
          TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
          TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionType" ), prefix: nameof( SetMissionWeight ), postfix: nameof( LogMissionRemoval ) );
          TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionContext" ), postfix: nameof( LogMissionRemoval ) );
+         if ( config.joint_mission_chance >= 0 || config.diplomacy_office_bonus_chance >= 0 )
+            TryPatch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
+         if ( config.joint_trait_multiplier >= 0 )
+            TryPatch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
       }
 
       private static float origChance = -1f;
@@ -110,11 +123,35 @@ namespace ZyMod.MarsHorizon.MissionControl {
          var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
          rules.requestGenerationChance = ( chance < 0 || chance > 1 ) ? origChance : chance;
          RootMod.Log?.Write( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
-            "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, mission chance {1}.", agency.NameLocalised,
+            "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, chance {1}.", agency.NameLocalised,
             1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static void TrackNewMissionAfter ( Agency agency, NetMessages.MissionRequest message, bool __result ) { try {
+      private static void SetJointMissionChance ( Simulation __instance, Agency agency, Agency selectedAgency ) { try {
+         Fine( "Rolling joint mission between {0} and {1}", agency.NameLocalised, selectedAgency?.NameLocalised ?? "{Any}" );
+         var rules = __instance.gamedata.rules;
+         if ( config.joint_mission_chance >= 0 && config.joint_mission_chance != rules.jointMissionChance ) {
+            Info( "Setting base joint mission chance from {0} to {1}", rules.jointMissionChance, config.joint_mission_chance );
+            rules.jointMissionChance = config.joint_mission_chance;
+         }
+         if ( config.diplomacy_office_bonus_chance >= 0 && config.diplomacy_office_bonus_chance != rules.diplomacyOfficeIncrease ) {
+            Info( "Setting Diplomacy Office joint mission bonus chance from {0} to {1}", rules.diplomacyOfficeIncrease, config.diplomacy_office_bonus_chance );
+            rules.diplomacyOfficeIncrease = config.diplomacy_office_bonus_chance;
+         }
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void SetTraitMissionChance ( Data.AgencyTrait.EAgencyTrait traitType, List< Data.AgencyTrait > __result ) { try {
+         if ( traitType != Data.AgencyTrait.EAgencyTrait.JointMissionSpawnRate || __result == null ) return;
+         for ( var i = 0 ; i < __result.Count ; i++ ) {
+            var trait = __result[ i ];
+            if ( config.joint_trait_multiplier < 0 || config.joint_trait_multiplier == trait.value ) return;
+            Info( "Setting trait {0} bonus chance from {1} to {2}", Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
+            trait.value = config.joint_trait_multiplier;
+            __result[ i ] = trait;
+         }
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void TrackNewMissionAfter ( NetMessages.MissionRequest message, bool __result ) { try {
          lastMission = null;
          if ( origWeightM.Count > 0 || origWeightT.Count > 0 ) {
             Fine( "Restoring {0}+{1} weights.", origWeightM.Count, origWeightT.Count );
