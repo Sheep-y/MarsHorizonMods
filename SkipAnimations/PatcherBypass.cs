@@ -21,14 +21,14 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), nameof( BypassFullScreenNotices ) );
          if ( config.bypass_popups_notices )
             TryPatch( typeof( ClientViewer ), "UpdateNotifications", nameof( BypassPopupNotices ) );
-         if ( config.auto_pass_normal_launch )
-            TryPatch( typeof( LaunchEventsScreen ), "EndLaunchCinematics", postfix: nameof( BypassNormalLaunch ) );
+         if ( config.auto_pass_normal_action )
+            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
          if ( config.auto_pass_normal_action || config.auto_pass_empty_levelup ) {
             if ( tweenField == null || abortButton == null || autoResolveButton == null ) {
                Warn( "LaunchEventsScreen field not found.  tweenField = {0}, abortButton = {1}, autoResolveButton = {2}", tweenField, abortButton, autoResolveButton );
             } else {
-               if ( config.auto_pass_normal_action )
-                  TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
+               if ( config.auto_pass_normal_launch )
+                  TryPatch( typeof( LaunchEventsScreen ), "EndLaunchCinematics", postfix: nameof( BypassNormalLaunch ) );
                if ( config.auto_pass_empty_levelup )
                   TryPatch( typeof( LaunchEventsScreen ), "PartLevellingSequence", postfix: nameof( BypassNoLevelUp ) );
             }
@@ -101,7 +101,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
          if ( @event != null ) return;
          Task.Run( async () => { try {
-            await Task.Delay( 50 );
+            await Task.Delay( 200 );
             Info( "Auto-bypassing uneventful action." );
             ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
             //ExecuteEvents.Execute( ___ignoreButton.gameObject, new PointerEventData( EventSystem.current ), ExecuteEvents.pointerClickHandler );
