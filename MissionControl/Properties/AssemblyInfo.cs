@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MissionControl")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle( "Mod: Mission Control" )]
+[assembly: AssemblyDescription( "A Mars Horizon mod to change weight of new missions" )]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MissionControl")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCompany( "Sheepy" )]
+[assembly: AssemblyProduct( "" )]
+[assembly: AssemblyCopyright( "" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -104,17 +104,13 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void TrackNewMissionBefore ( Simulation __instance, Agency agency, bool forceGenerate ) { try {
          origWeightM.Clear();
          lastMission = null;
-         if ( forceGenerate ) {
-            Info( "{0} is forcing a new mission.", agency.NameLocalised );
-            return;
-         }
-         var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
+         if ( forceGenerate ) { Info( "{0} is forcing a new mission.", agency.NameLocalised ); return; }
          var rules = __instance.gamedata.rules;
          if ( origChance < 0 ) origChance = rules.requestGenerationChance;
-         if ( chance < 0 || chance > 1 ) chance = origChance;
-         rules.requestGenerationChance = chance;
+         var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
+         rules.requestGenerationChance = ( chance < 0 || chance > 1 ) ? origChance : chance;
          RootMod.Log?.Write( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
-            "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, chance {1}.", agency.NameLocalised,
+            "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, mission chance {1}.", agency.NameLocalised,
             1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -132,7 +128,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetMissionWeight ( Agency agency, Data.MissionTemplate missionTemplate ) { try {
-         if ( ! canMod( agency ) || missionTemplate == lastMission ) return;
+         if ( ( config.reweight_only_player_agency && agency.isAI ) || missionTemplate == lastMission ) return;
          var m = lastMission = missionTemplate;
          allowed = true;
          var weight = GetMissionWeight( m );
@@ -201,7 +197,5 @@ namespace ZyMod.MarsHorizon.MissionControl {
          Fine( allowed ? "X Mission removed due to era, research, or ongoing mission." : "X ... then restored after forced generation." );
          allowed = __result;
       }
-
-      private static bool canMod ( Agency agency ) => ! config.reweight_only_player_agency || ! agency.isAI;
    }
 }
