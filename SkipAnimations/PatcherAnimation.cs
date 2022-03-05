@@ -49,7 +49,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
-            TryPatch( typeof( MissionGameplayActionResourceElement ).Method( "Show", typeof( bool ) ), nameof( SkipResourceTween ) );
          }
          if ( config.fast_mission_result ) {
             TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
@@ -107,14 +106,13 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          ___timelineSkipSpeedup = 50f;
          ___isSkippable = true;
          ___initialWait = false;
-         __instance.baseReliabilityRollSpeed = 100f;
-         __instance.skippedReliabilityRollSpeed = 100f;
+         __instance.baseReliabilityRollSpeed = 20f;
+         __instance.skippedReliabilityRollSpeed = 20f;
       }
-      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 100f );
-      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 5f;
-      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 10f;
+      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 20f );
+      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 10f;
+      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20f;
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
-      private static void SkipResourceTween ( ref bool tween ) => tween = false;
       #endregion
 
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )

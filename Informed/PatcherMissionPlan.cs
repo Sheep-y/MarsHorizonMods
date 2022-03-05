@@ -71,7 +71,7 @@ namespace ZyMod.MarsHorizon.Informed {
          if ( __instance.Mission?.guid != LaunchWindowGuid ) return;
          localise = false;
          var template = __instance.Mission.template;
-         __result = Localise( "Name_Body_" + template.originBody ) + " <sprite name=\"Spr_Icon_Arrow_Right\"/> " + Localise( "Name_Body_" + template.planetaryBody );
+         __result = Localise( "Name_Body_" + template.originBody ) + " -> " + Localise( "Name_Body_" + template.planetaryBody );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
