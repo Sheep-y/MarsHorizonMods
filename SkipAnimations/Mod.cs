@@ -29,7 +29,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
    public class Config : IniConfig {
 
-      [ Config( "[Cinematic]\r\n; Skip intro.  Default True." ) ]
+      [ Config( "\r\n[Cinematic]" ) ]
+      [ Config( "Skip intro.  Default True." ) ]
       public bool skip_intro = true;
       [ Config( "Force skip all non-intro cinematics (mission control, launch, mission payload).  Override other cinematic skip settings if True.  Default False." ) ]
       public bool skip_all_cinematic = false;
@@ -40,7 +41,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Skip these cinematics, comma seprated.  Set to empty (blank) to disable.  Set to \"default\" (without quotes) to reset.  Default skip mission controls, launches, lands, earth flybys, and general sat failure." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
-      [ Config( "\r\n[Animation]\r\n; Remove or reduce assorted screen and action delays.  Default True." ) ]
+      [ Config( "\r\n[Animation]" ) ]
+      [ Config( "Remove or reduce assorted screen and action delays.  Default True." ) ]
       public bool remove_delays = true;
       [ Config( "Skip screen fadings.  Default True." ) ]
       public bool skip_screen_fade = true;
@@ -53,7 +55,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Speed up mini-game report animations.  Default True." ) ]
       public bool fast_mission_result = true;
 
-      [ Config( "\r\n[Bypass]\r\n; Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
+      [ Config( "\r\n[Bypass]" ) ]
+      [ Config( "Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
       public bool bypass_fullscreen_notices = true;
       [ Config( "Bypass run of the mill popups such as research complete or mission phase.  Default True." ) ]
       public bool bypass_popups_notices = true;
@@ -64,7 +67,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Automatically continue uneventful mission actions.  Default True." ) ]
       public bool auto_pass_normal_action = true;
 
-      [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
+      [ Config( "\r\n" ) ]
+      [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;
 
       internal HashSet< string > SkipCinematics { get; } = new HashSet< string >();

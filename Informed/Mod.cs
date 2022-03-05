@@ -52,7 +52,8 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
       public bool show_supplement_in_booster_description = true;
 
-      [ Config( "\r\n[Vehicle Designer]\r\n; On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
+      [ Config( "\r\n[Vehicle Designer]" ) ]
+      [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
       [ Config( "On vehicle designer screen, show launch window this many months after vehicle is ready.  Default 10.  0 to not show.  Max 24." ) ]
       public byte launch_window_hint_after_ready = 10;
@@ -67,7 +68,8 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Show contractor effects on contractor buttons.  Default True." ) ]
       public bool show_contractor_effects_on_button = true;
 
-      [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
+      [ Config( "\r\n" ) ]
+      [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200226;
 
       public override void Load ( object subject, string path ) {

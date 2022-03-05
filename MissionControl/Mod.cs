@@ -45,24 +45,26 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "Limit weight changes to player agency only.  Default True." ) ]
       public bool reweight_only_player_agency = true;
 
-      [ Config( "\r\n[Variations]\r\n; Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
+      [ Config( "\r\n[Variations]" ) ]
+      [ Config( "Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier = 2.4f;
       [ Config( "Try divide all variation weight by this amount to reduce work.  Affects lucrative_weight_multiplier accuracy.  Default 10.  Set to 1 to not change." ) ]
       public int variation_weight_divider = 10;
 
-      [ Config( "\r\n[Earth and Moon]\r\n; Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
-                   public int earth_uncrewed_mission_weight = 30;
+      [ Config( "\r\n[Earth and Moon]" ) ]
+      [ Config( "Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
+      [ Config() ] public int earth_uncrewed_mission_weight = 30;
       [ Config() ] public int earth_crewed_mission_weight = 20;
       [ Config() ] public int moon_uncrewed_mission_weight = 20;
       [ Config() ] public int moon_crewed_mission_weight = 10;
       [ Config() ] public int space_station_mission_weight = 10;
 
       [ Config( "\r\n[Inner Planets]" ) ]
-                   public int venus_mission_weight = 3;
+      [ Config() ] public int venus_mission_weight = 3;
       [ Config() ] public int mercury_mission_weight = 2;
 
       [ Config( "\r\n[Outter Planets]" ) ]
-                   public int mars_mission_weight = 5;
+      [ Config() ] public int mars_mission_weight = 5;
       [ Config() ] public int jupiter_mission_weight = 0;
       [ Config() ] public int saturn_mission_weight = 0;
       [ Config() ] public int uranus_mission_weight = 0;
@@ -72,7 +74,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "\r\n[Others]" ) ]
       public int other_mission_weight = 0;
 
-      [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
+      [ Config( "\r\n" ) ]
+      [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200304;
    }
 

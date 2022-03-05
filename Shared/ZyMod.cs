@@ -312,27 +312,26 @@ namespace ZyMod {
          var type = subject.GetType();
          _Log( Info, "Writing {0} from {1}", path, type.FullName );
          using ( TextWriter tw = File.CreateText( path ) ) {
-            var attr = type.GetCustomAttribute<ConfigAttribute>();
-            var comment = ! ModHelpers.IsBlank( attr?.Comment ) ? attr.Comment : null;
-            _WriteData( tw, subject, type, subject, comment );
-            foreach ( var f in _ListFields( subject ) ) {
-               comment = ( attr = f.GetCustomAttribute<ConfigAttribute>() ) != null && ! string.IsNullOrEmpty( attr.Comment ) ? attr.Comment : null;
-               _WriteData( tw, subject, f, f.GetValue( subject ), comment );
-            }
-            _WriteData( tw, subject, type, subject, "" );
+            _WriteData( tw, subject, type, subject, _GetComments( type ) );
+            foreach ( var f in _ListFields( subject ) )
+               _WriteData( tw, subject, f, f.GetValue( subject ), _GetComments( f ) );
+            _WriteData( tw, subject, type, subject, null );
          }
          _Log( Verbose, "{0} bytes written", (Func<string>) ( () => new FileInfo( path ).Length.ToString() ) );
       } catch ( Exception ex ) { _Log( Warning, "Cannot create config file: {0}", ex ); } }
 
-      protected virtual IEnumerable<FieldInfo> _ListFields ( object subject ) {
+      protected virtual IEnumerable< string > _GetComments ( MemberInfo mem )
+         => mem.GetCustomAttributes( true ).OfType< ConfigAttribute >().Where( e => ! ModHelpers.IsBlank( e?.Comment ) ).Select( e => e.Comment );
+
+      protected virtual IEnumerable< FieldInfo > _ListFields ( object subject ) {
          var fields = subject.GetType().GetFields()
             .Where( e => ! e.IsStatic && ! e.IsInitOnly && ! e.IsNotSerialized && e.GetCustomAttribute<ObsoleteAttribute>() == null );
-         if ( fields.Any( e => e.GetCustomAttribute<ConfigAttribute>() != null ) ) // If any field has ConfigAttribute, save only these fields.
-            fields = fields.Where( e => e.GetCustomAttribute<ConfigAttribute>() != null ).ToArray();
+         bool HasConfig ( FieldInfo f ) => f.GetCustomAttributes().OfType< ConfigAttribute >().Any();
+         if ( fields.Any( HasConfig ) ) fields = fields.Where( HasConfig ).ToArray(); // If any field has ConfigAttribute, write only these fields.
          return fields;
       }
-      /* Called before writing a type (target is Type && comment != ""), when writing a field, and after writing a type (target is Type && comment = "") */
-      protected abstract void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, string comment );
+      /* Called before writing a type (target is Type && comment != ""), when writing a field, and after writing a type (target is Type && comment = null) */
+      protected abstract void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, IEnumerable< string > comment );
       protected virtual void _Log ( TraceLevel level, object msg, params object[] arg ) => RootMod.Log?.Write( level, msg, arg );
    }
 
@@ -349,8 +348,9 @@ namespace ZyMod {
             _SetField( subject, field, cells[1] ?? "" );
          }
       }
-      protected override void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, string comment ) {
-         if ( target is Type ) { if ( comment != "" ) f.WriteCsvLine( "Config", "Value", comment ?? "Comment" ); }
+      protected override void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, IEnumerable< string > comments ) {
+         var comment = comments?.Any() == true ? string.Join( " ", comments.ToArray() ) : null;
+         if ( target is Type ) f.WriteCsvLine( "Config", "Value", comment ?? "Comment" );
          else f.WriteCsvLine( target.Name, value, comment ?? "" );
       }
    }
@@ -367,18 +367,21 @@ namespace ZyMod {
             _SetField( subject, field, val );
          }
       }
-      protected override void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, string comment ) {
-         if ( ! string.IsNullOrEmpty( comment ) ) f.Write( comment.Substring( 0, 1 ).IndexOfAny( new char[]{ '[', ';', '\r', '\n' } ) != 0 ? $"; {comment}\r\n" : $"{comment}\r\n" );
+      protected override void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, IEnumerable< string > comments ) {
+         if ( comments != null )
+            foreach ( var comment in comments )
+               f.Write( comment.Substring( 0, 1 ).IndexOfAny( new char[]{ '[', ';', '\r', '\n' } ) != 0 ? $"; {comment}\r\n" : $"{comment}\r\n" );
          if ( target is Type ) return;
          if ( value != null ) {
-            value = comment = value.ToString();
-            if ( comment.Trim() != comment ) value = "\"" + comment + "\"";
+            var txt = value.ToString();
+            if ( txt.Trim() != txt ) txt = "\"" + txt + "\"";
+            value = txt;
          }
          f.Write( $"{target.Name} = {value}\r\n" );
       }
    }
 
-   [ AttributeUsage( AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property ) ]
+   [ AttributeUsage( AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true ) ]
    public class ConfigAttribute : Attribute { // Slap this on config attributes for auto-doc.
       public ConfigAttribute () {}
       public ConfigAttribute ( string comment ) { Comment = comment; }
