@@ -46,9 +46,17 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public bool reweight_only_player_agency = true;
 
       [ Config( "\r\n[Variations]" ) ]
+      [ Config( "Multiply challenging variation (all level) chances.  Default 1.  Set to 1 to not change." ) ]
+      public float challenging_weight_multiplier = 1;
+      [ Config( "Multiply experimental variation chances.  Default 1.  Set to 1 to not change." ) ]
+      public float experimental_weight_multiplier = 1;
       [ Config( "Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier = 2.4f;
-      [ Config( "Try divide all variation weight by this amount to reduce work.  Affects lucrative_weight_multiplier accuracy.  Default 10.  Set to 1 to not change." ) ]
+      [ Config( "Multiply publicised variation chances.  Default 1.  Set to 1 to not change." ) ]
+      public float publicised_weight_multiplier = 1;
+      [ Config( "Multiply test variation chances.  Default 1.  Set to 1 to not change." ) ]
+      public float test_weight_multiplier = 1;
+      [ Config( "Try divide all variation weight by this amount to save cpu.  Affects multiplier accuracy, set log level to fine to see exact weight.  Default 10.  Set to 1 to not change." ) ]
       public int variation_weight_divider = 10;
 
       [ Config( "\r\n[Earth and Moon]" ) ]
@@ -111,7 +119,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void TrackNewMissionAfter ( Agency agency, NetMessages.MissionRequest message, bool __result ) { try {
-         if ( ! canMod( agency ) ) return;
          lastMission = null;
          if ( origWeightM.Count > 0 || origWeightT.Count > 0 ) {
             Fine( "Restoring {0}+{1} weights.", origWeightM.Count, origWeightT.Count );
@@ -163,7 +170,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( divider != 1f  ) divider = m.requestMissionTypes.All( e => e.weighting % divider == 0 ) ? divider : 1;
          foreach ( var t in m.requestMissionTypes ) {
             var tWeight = t.weighting;
-            if ( t.type == Data.MissionTemplate.RequestMissionType.EType.Lucrative ) tWeight = (int) Math.Round( tWeight * config.lucrative_weight_multiplier );
+            var multiplier = GetVariationWeight( t );
+            if ( multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
             if ( divider != 1 ) tWeight /= divider;
             Fine( "   > Variation {0}, weight {1}{2}", t.type, t.weighting, t.weighting == tWeight ? "" : $" => {tWeight}" );
             if ( t.weighting != tWeight ) {
@@ -171,6 +179,21 @@ namespace ZyMod.MarsHorizon.MissionControl {
                t.weighting = tWeight;
             }
          }
+      }
+
+      private static float GetVariationWeight ( Data.MissionTemplate.RequestMissionType t ) {
+         switch ( t.type ) {
+            case Data.MissionTemplate.RequestMissionType.EType.Challenging_1 :
+            case Data.MissionTemplate.RequestMissionType.EType.Challenging_2 :
+            case Data.MissionTemplate.RequestMissionType.EType.Challenging_3 : return config.challenging_weight_multiplier;
+            case Data.MissionTemplate.RequestMissionType.EType.EfficiencyTest :
+            case Data.MissionTemplate.RequestMissionType.EType.MarsTechTest : return config.test_weight_multiplier;
+            case Data.MissionTemplate.RequestMissionType.EType.ExperimentalFuel :
+            case Data.MissionTemplate.RequestMissionType.EType.ExperimentalPayload : return config.experimental_weight_multiplier;
+            case Data.MissionTemplate.RequestMissionType.EType.Publicised : return config.publicised_weight_multiplier;
+            case Data.MissionTemplate.RequestMissionType.EType.Lucrative : return config.lucrative_weight_multiplier;
+         }
+         return 1f;
       }
 
       private static void LogMissionRemoval ( bool __result ) {
