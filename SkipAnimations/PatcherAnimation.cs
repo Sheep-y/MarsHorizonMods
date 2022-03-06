@@ -16,39 +16,39 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal void Apply () {
          if ( config.remove_delays ) {
-            TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), nameof( SkipMonoTimeDelays ) );
+            TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
             TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
             TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
             TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
 
             TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
-            TryPatch( typeof( AnimatorDelay ), "Start", nameof( RemoveWait_Animator ) );
-            TryPatch( typeof( HUDObjectiveList ), "_Refresh", nameof( RemoveWait_ObjectiveList ) );
+            TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
+            TryPatch( typeof( HUDObjectiveList ), "_Refresh", prefix: nameof( RemoveWait_ObjectiveList ) );
 
-            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( LaunchDayScreen ), "Wait", nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", nameof( RemoveWait_WaitForSecondsSkippable ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", nameof( RemoveWait_Tween ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", nameof( RemoveWait_Tween ) );
+            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( LaunchDayScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
+            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", prefix: nameof( RemoveWait_WaitForSecondsSkippable ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", prefix: nameof( RemoveWait_Tween ) );
+            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", prefix: nameof( RemoveWait_Tween ) );
             foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
-               TryPatch( m, nameof( RemoveWait_TweenDo ) );
+               TryPatch( m, prefix: nameof( RemoveWait_TweenDo ) );
          }
          if ( config.skip_screen_fade )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
-               TryPatch( m, nameof( RemoveWait_Blackout ) );
+               TryPatch( m, prefix: nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {
             foreach ( var m in new string[] { "AstroInitialise", "InSequence", "LaunchReportSequence", "PartLevellingSequence" } )
-               TryPatch( typeof( LaunchEventsScreen ), m, nameof( SpeedUpLaunch ) );
+               TryPatch( typeof( LaunchEventsScreen ), m, prefix: nameof( SpeedUpLaunch ) );
             TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", postfix: nameof( SkipLaunchAnimation ) );
          }
          if ( config.skip_mission_intro )
-            TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", nameof( SkipPayloadDeploy ) );
+            TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", prefix: nameof( SkipPayloadDeploy ) );
          if ( config.fast_mission ) {
             TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", postfix: nameof( SpeedUpMission ) );
-            TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", nameof( SkipReliabilityFill ) );
-            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", nameof( SpeedUpMissionEffects ) );
-            TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", nameof( SpeedUpMissionSwoosh ) );
-            TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", nameof( SpeedUpMissionScreenEffect ) );
+            TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", prefix: nameof( SkipReliabilityFill ) );
+            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", prefix: nameof( SpeedUpMissionEffects ) );
+            TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
+            TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", prefix: nameof( SpeedUpMissionScreenEffect ) );
          }
          if ( config.fast_mission_result ) {
             TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
@@ -113,7 +113,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 10f;
       private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20f;
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
-      #endregion
 
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 5f, 50f, 1 );
@@ -124,6 +123,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static IEnumerable< CodeInstruction > SpeedUpRewards ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.1f, 3 ), 1f, 0.1f, 3 ), 1.5f, 0.1f, 1 );
       private static void SpeedUpMissionSummary ( Tween __result ) => __result.timeScale = 100f;
+      #endregion
+
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
          => ReplaceOperand( codes, "ldc.r4", from, to, expected_count );

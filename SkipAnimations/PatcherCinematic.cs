@@ -15,7 +15,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal void Apply () {
          if ( config.skip_intro )
-            TryPatch( typeof( SplashDelayScene ), "Start", nameof( SkipSplash ) );
+            TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );
          if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
          if ( RootMod.Log.LogLevel == System.Diagnostics.TraceLevel.Verbose )
@@ -53,8 +53,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          return false;
       }
 
-      private static HashSet< string > NonSkippable = new HashSet< string >();
-      private static HashSet< string > TempSkip = new HashSet< string >();
+      private static readonly HashSet< string > NonSkippable = new HashSet< string >();
+      private static readonly HashSet< string > TempSkip = new HashSet< string >();
 
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance, bool ___isSkippable ) { try {
          if ( __result ) return;

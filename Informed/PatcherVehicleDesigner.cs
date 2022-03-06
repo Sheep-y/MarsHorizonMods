@@ -20,7 +20,7 @@ namespace ZyMod.MarsHorizon.Informed {
       internal void Apply () {
          if ( config.show_contractor_effects_on_button && eVal != null ) {
             TryPatch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
-            TryPatch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", nameof( TrackDesignerState ) );
+            TryPatch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", prefix: nameof( TrackDesignerState ) );
             TryPatch( typeof( ContractorListItem ), "GetName", postfix: nameof( AddContractorEffects ) );
          }
          if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 ) {
@@ -63,10 +63,10 @@ namespace ZyMod.MarsHorizon.Informed {
       private static AutoLocalise tooltipHeader;
       private static SimplePooler< VehicleDesignerTooltip > tooltipPooler;
       private static SimplePooler< VehicleDesignerTooltip > warningTooltipPooler;
-      private static MethodInfo Display = typeof( VehicleDesignerTooltipManager ).Method( "Display", typeof( bool ), typeof( bool ) );
-      private static MethodInfo FreeAll = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "FreeAll", new Type[0] );
-      private static MethodInfo Get = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "Get", new Type[0] );
-      private static FieldInfo Tooltip = typeof( VehicleDesignerTooltip ).Field( "tooltip" );
+      private static readonly MethodInfo Display = typeof( VehicleDesignerTooltipManager ).Method( "Display", typeof( bool ), typeof( bool ) );
+      private static readonly MethodInfo FreeAll = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "FreeAll", new Type[0] );
+      private static readonly MethodInfo Get = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "Get", new Type[0] );
+      private static readonly FieldInfo Tooltip = typeof( VehicleDesignerTooltip ).Field( "tooltip" );
 
       private static void TrackTooltip () { try {
          Type type = typeof( VehicleDesignerTooltipManager );

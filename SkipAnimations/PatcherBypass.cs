@@ -18,9 +18,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal void Apply () {
          if ( config.bypass_fullscreen_notices )
-            TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), nameof( BypassFullScreenNotices ) );
+            TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), prefix: nameof( BypassFullScreenNotices ) );
          if ( config.bypass_popups_notices )
-            TryPatch( typeof( ClientViewer ), "UpdateNotifications", nameof( BypassPopupNotices ) );
+            TryPatch( typeof( ClientViewer ), "UpdateNotifications", prefix: nameof( BypassPopupNotices ) );
          if ( config.auto_pass_normal_action )
             TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
          if ( config.auto_pass_normal_action || config.auto_pass_empty_levelup ) {
