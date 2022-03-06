@@ -55,14 +55,17 @@ namespace ZyMod.MarsHorizon.Informed {
          links = bonus.Where( e => e.Value != 0 ).Select( e => new Data.Effect{ type = e.Key, strength = e.Value } ).ToArray();
       } catch ( Exception x ) { Err( x ); } }
 
+      private static readonly MethodInfo Refresh = typeof( BaseHighlightToolTipElement ).Method( "RefreshModifierListElement" );
+      private static readonly FieldInfo ModList = typeof( BaseHighlightToolTipElement ).Field( "modifierList" );
+      private static readonly FieldInfo Name = typeof( BaseHighlightToolTipElement ).Field( "objectName" );
+      private static readonly FieldInfo Cost = typeof( BaseHighlightToolTipElement ).Field( "clearCost" );
+
       private static void ShowModifiers ( BaseHighlightToolTipElement tooltip, Data.Effect[] effects ) {
          if ( effects.Length == 0 ) return;
          Fine( "Refreshing total building modifiers." );
-         var type = typeof( BaseHighlightToolTipElement );
-         var refresh = type.Method( "RefreshModifierListElement" );
          var modifierList = GetModifierList( tooltip );
-         if ( refresh == null || modifierList == null ) {
-            Error( "BaseScreen.highlightToolTipElement.(RefreshModifierListElement|modifierList) not found or type mismatch." );
+         if ( Refresh == null || modifierList == null ) {
+            Error( "Not found: BaseHighlightToolTipElement RefreshModifierListElement = {0}, modifierList = {2}", Refresh, modifierList );
             return;
          }
          modifierList.FreeAll();
@@ -70,16 +73,16 @@ namespace ZyMod.MarsHorizon.Informed {
          foreach ( var e in effects ) {
             Fine( "{0} = {1}", e.type, e.strength );
             var link = new Data.Building.AdjacencyLink{ bonus = new Data.Blueprint.AdjacencyBonus{ effect = e } };
-            refresh.Run( tooltip, link, modifierList.Get() );
+            Refresh.Run( tooltip, link, modifierList.Get() );
          }
          tooltip.gameObject.SetActive( true );
-         ( type.Field( "objectName" )?.GetValue( tooltip ) as TextSetter ).text = ScriptableObjectSingleton<Localisation>.instance.Localise( "Base" );
-         ( type.Field( "clearCost" )?.GetValue( tooltip ) as TextSetter ).gameObject.SetActive( false );
+         ( Name?.GetValue( tooltip ) as TextSetter ).text = ScriptableObjectSingleton<Localisation>.instance.Localise( "Base" );
+         ( Cost?.GetValue( tooltip ) as TextSetter ).gameObject.SetActive( false );
          //( type.Field( "modifierListTitle" )?.GetValue( tooltip ) as Transform )?.gameObject.SetActive( false );
          //( type.Field( "modifierListParent" )?.GetValue( tooltip ) as Transform )?.gameObject.SetActive( true );
       }
 
       private static SimplePooler< BuildingModifierElement > GetModifierList ( BaseHighlightToolTipElement tooltip ) =>
-         typeof( BaseHighlightToolTipElement ).Field( "modifierList" )?.GetValue( tooltip ) as SimplePooler< BuildingModifierElement >;
+         ModList?.GetValue( tooltip ) as SimplePooler< BuildingModifierElement >;
    }
 }
