@@ -50,6 +50,7 @@ namespace ZyMod.MarsHorizon.Informed {
                var effect = link.bonus.effect;
                var type = effect.type;
                bonus[ type ] = ( bonus.TryGetValue( type, out var val ) ? val : 0 ) + effect.strength;
+               Fine( "{2} {3} <<< {0} <=> {1} / Total {4}", a.name, b.name, type, effect.strength, bonus[ type ] );
             }
          }
          links = bonus.Where( e => e.Value != 0 ).Select( e => new Data.Effect{ type = e.Key, strength = e.Value } ).ToArray();
