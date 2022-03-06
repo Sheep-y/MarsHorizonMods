@@ -15,13 +15,16 @@ namespace ZyMod.MarsHorizon.Informed {
       internal void Apply () {
          if ( config.show_base_bonus ) {
             TryPatch( typeof( AstroViewElement ), "Refresh", postfix: nameof( ClearBaseBonus ) );
+            TryPatch( typeof( BaseScreen ), "EnterPurchaseState", postfix: nameof( HideBaseBonus ) );
             TryPatch( typeof( BaseScreen ), "OnCellHovered", postfix: nameof( ShowBaseBonus ) );
          }
       }
 
       private static Data.Effect[] links;
+      private static BaseHighlightToolTipElement tooltip;
 
       private static void ClearBaseBonus () => links = null;
+      private static void HideBaseBonus () => tooltip?.gameObject.SetActive( false );
 
       private static void ShowBaseBonus ( BaseScreen __instance ) { try {
          if ( __instance.Mode != BaseScreen.EMode.Main || __instance.HoveredBuildingObject != null ) return;
@@ -34,7 +37,7 @@ namespace ZyMod.MarsHorizon.Informed {
             if ( buildings == null || buildings.Count == 0 ) return;
             RefreshBaseBonus( buildings );
          }
-         ShowModifiers( __instance.highlightToolTipElement, links );
+         ShowModifiers( tooltip = __instance.highlightToolTipElement, links );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void RefreshBaseBonus ( List< BuildingObject > buildings ) { try {
