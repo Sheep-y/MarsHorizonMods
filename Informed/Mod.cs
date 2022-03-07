@@ -15,7 +15,7 @@ namespace ZyMod.MarsHorizon.Informed {
          config.Load();
          if ( config.show_base_bonus )
             new PatcherBaseScreen().Apply();
-         if ( config.show_planet_launch_window || config.show_new_mission_expiry )
+         if ( config.show_planet_launch_window || config.show_mission_expiry )
             new PatcherMissionPlan().Apply();
          if ( config.show_supplement_in_booster_description )
             new PatcherResearchScreen().Apply();
@@ -45,10 +45,8 @@ namespace ZyMod.MarsHorizon.Informed {
       public bool show_base_bonus = true;
       [ Config( "Add a Launch Window button on planetery body mission list.  Default True." ) ]
       public bool show_planet_launch_window = true;
-      [ Config( "Show expiry countdown for new missions.  Default True." ) ]
-      public bool show_new_mission_expiry = true;
-      [ Config( "Show expiry countdown for ongoing missions.  Default True." ) ]
-      public bool show_ongoing_mission_expiry = true;
+      [ Config( "Show expiry countdown for request and joint missions.  Default True." ) ]
+      public bool show_mission_expiry = true;
       [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
       public bool show_supplement_in_booster_description = true;
 

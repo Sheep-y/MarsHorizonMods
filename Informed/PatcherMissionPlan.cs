@@ -75,19 +75,19 @@ namespace ZyMod.MarsHorizon.Informed {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
-         Fine( "Checking {0} for expiry", mission );
-         if ( ! mission.IsRequestMission ) return;
-         if ( ! config.show_new_mission_expiry || ! config.show_ongoing_mission_expiry ) {
-            var isNew = MissionControl.IsMissionScheduled( mission.templateInstance, mission.requestMissionContext, mission.requestMissionType, false );
-            Fine( "Is {0} mission.", isNew ? "new" : "ongoing" );
-            if ( isNew ) { if ( ! config.show_new_mission_expiry ) return; }
-            else if ( ! config.show_ongoing_mission_expiry ) return;
+         var buf = new StringBuilder( "\n\n" );
+         // TODO: Show payload build time & weight in mission info.
+         if ( config.show_mission_expiry ) {
+            Fine( "Checking {0} for expiry", mission );
+            if ( ! mission.IsRequestMission ) return;
+            var template = mission.templateInstance;
+            var remaining = template.lifespan + template.turnAdded - simulation.universe.turn;
+            Info( "Mission will expires in {0} turns", remaining );
+            if ( remaining >= 0 )
+               buf.Append( Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() ) );
          }
-         var template = mission.templateInstance;
-         var remaining = template.lifespan + template.turnAdded - simulation.universe.turn;
-         Info( "Mission will expires in {0} turns", remaining );
-         if ( remaining >= 0 )
-         ___descriptionText.text = Localise( ___descriptionText.tag ) + "\n\n" + Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() );
+         if ( buf.Length > 2 )
+            ___descriptionText.text = Localise( ___descriptionText.tag ) + buf.ToString();
       } catch ( Exception x ) { Err( x ); } }
    }
 }
