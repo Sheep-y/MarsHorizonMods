@@ -21,7 +21,7 @@ namespace ZyMod.MarsHorizon.Informed {
             TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
             TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
          }
-         if ( config.show_new_mission_expiry || config.show_ongoing_mission_expiry )
+         if ( config.show_mission_expiry || config.show_mission_payload )
             TryPatch( typeof( MissionSidebarResearchRequirements ), "SetMission", postfix: nameof( ShowMissionExpiry ) );
       }
 
@@ -75,16 +75,29 @@ namespace ZyMod.MarsHorizon.Informed {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
-         var buf = new StringBuilder( "\n\n" );
-         // TODO: Show payload build time & weight in mission info.
-         if ( config.show_mission_expiry ) {
-            Fine( "Checking {0} for expiry", mission );
-            if ( ! mission.IsRequestMission ) return;
-            var template = mission.templateInstance;
-            var remaining = template.lifespan + template.turnAdded - simulation.universe.turn;
-            Info( "Mission will expires in {0} turns", remaining );
+         var buf = new StringBuilder();
+         if ( config.show_mission_payload && mission.missionState == Mission.EState.Planning && ! mission.template.IsSoundingRocking ) {
+            var agency = mission.agency;
+            var template = mission.template;
+            if ( mission.IsRequestMission || simulation.HasAgencyCompletedResearch( agency, template.id ) ) {
+               var payloads = simulation.GetAgencyMissionPayloads( agency, mission );
+               Fine( "Found {0} payloads for {1}", payloads?.Count().ToString() ?? "null", template.id );
+               if ( payloads != null && payloads.Length > 0 )
+                  buf.Append( "\n\n" ).Append( Localise( "Mission_Setup_Category_Payload_Selected" ) );
+                  foreach ( var payload in payloads ) {
+                     if ( ! template.TryGetPayloadLocalisationDescriptionOverride( payload.id, mission.requestMissionContext, out var pname ) ) pname = $"Name_{payload.id}";
+                     var time = simulation.GetAgencyPayloadBuildTime( agency, payload );
+                     buf.AppendFormat( "\n{0} ({1} {2} {3:n0}kg)", Localise( pname ), time, Localise( time > 1 ? "Month_Plural" : "Month_Singular" ), payload.weight );
+                     if ( ! simulation.HasAgencyUnlockedPayload( agency, payload ) ) buf.Append( " <sprite name=\"WarningScience\"/>" );
+                  }
+            }
+         } else Fine( mission.missionState );
+         if ( config.show_mission_expiry && mission.IsRequestMission ) {
+            var tInstance = mission.templateInstance;
+            var remaining = tInstance.lifespan + tInstance.turnAdded - simulation.universe.turn;
+            Fine( "{0} will expires in {1} turns", mission.template.id, remaining );
             if ( remaining >= 0 )
-               buf.Append( Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() ) );
+               buf.Append( "\n\n" ).Append( Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() ) );
          }
          if ( buf.Length > 2 )
             ___descriptionText.text = Localise( ___descriptionText.tag ) + buf.ToString();

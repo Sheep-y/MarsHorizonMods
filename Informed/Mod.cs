@@ -47,6 +47,8 @@ namespace ZyMod.MarsHorizon.Informed {
       public bool show_planet_launch_window = true;
       [ Config( "Show expiry countdown for request and joint missions.  Default True." ) ]
       public bool show_mission_expiry = true;
+      [ Config( "Show payload(s) time and weight of researched but unplanned mission.  Default True." ) ]
+      public bool show_mission_payload = true;
       [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
       public bool show_supplement_in_booster_description = true;
 
