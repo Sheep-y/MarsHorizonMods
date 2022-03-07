@@ -23,7 +23,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( ClientViewer ), "UpdateNotifications", prefix: nameof( BypassPopupNotices ) );
          if ( config.auto_pass_normal_action )
             TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
-         if ( config.auto_pass_normal_action || config.auto_pass_empty_levelup ) {
+         if ( config.auto_pass_normal_launch || config.auto_pass_empty_levelup ) {
             if ( tweenField == null || abortButton == null || autoResolveButton == null ) {
                Warn( "LaunchEventsScreen field not found.  tweenField = {0}, abortButton = {1}, autoResolveButton = {2}", tweenField, abortButton, autoResolveButton );
             } else {
@@ -101,7 +101,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
          if ( @event != null ) return;
          Task.Run( async () => { try {
-            await Task.Delay( 200 );
+            await Task.Delay( 300 );
             Info( "Auto-bypassing uneventful action." );
             ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
             //ExecuteEvents.Execute( ___ignoreButton.gameObject, new PointerEventData( EventSystem.current ), ExecuteEvents.pointerClickHandler );
