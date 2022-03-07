@@ -104,8 +104,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
             TryPatch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
          if ( config.joint_trait_multiplier >= 0 )
             TryPatch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
-         if ( config.standalone_mission_rng )
+         if ( config.standalone_mission_rng ) {
+            TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackPlayerNewMission ) );
             TryPatch( typeof( LINQExtensions ).Method( "RandomElement" ).MakeGenericMethod( typeof( Data.RequestMissionData ) ), postfix: nameof( RollRandomMission ) );
+         }
       }
 
       private static float origChance = -1f;
@@ -236,8 +238,12 @@ namespace ZyMod.MarsHorizon.MissionControl {
          allowed = __result;
       }
 
+      private static bool isAI = true;
+      private static void TrackPlayerNewMission ( Agency agency ) => isAI = ! agency.isAI;
+
       private static Random missionRNG;
       private static void RollRandomMission ( IEnumerable< Data.RequestMissionData > sequence, ref Data.RequestMissionData  __result ) { try {
+         if ( isAI ) return;
          if ( missionRNG == null ) missionRNG = new Random();
          List<Data.RequestMissionData> list = sequence.ToList();
          var i = missionRNG.Next( 0, list.Count );
