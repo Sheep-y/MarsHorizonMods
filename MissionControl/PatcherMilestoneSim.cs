@@ -17,7 +17,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
    internal class PatcherMilestoneSim: ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( Simulation ), "GetNewMilestoneChallenge", postfix: nameof( ClearMilestoneChecks ) );
+         TryPatch( typeof( Simulation ), "GetNewMilestoneChallenge", prefix: nameof( CaptureCurrentReward ), postfix: nameof( ClearMilestoneChecks ) );
          TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", prefix: nameof( FilterMilestoneChallenge ) );
          TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );
       }
@@ -26,13 +26,16 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static int lastReward = -1;
       private static readonly HashSet< RewardType > blocks = new HashSet< RewardType >();
 
+      private static void CaptureCurrentReward ( Agency agency )
+         => lastReward = agency?.activeMilestoneChallenge == null ? -1 : (int) agency.activeMilestoneChallenge.Reward;
+
       private static void FilterMilestoneChallenge ( Simulation __instance, MilestoneChallenge mChallenge, Agency agency, ref int rValue ) { try {
          if ( mChallenge == null || agency == null ) return;
          if ( config.change_only_player_agency && agency.isAI ) return;
          if ( isNewChallenge ) RefreshMilestoneChallenge( __instance, agency );
          agency.activeMilestoneChallenge = null; // Avoid triggering type duplication change
-         Fine( "{0} new milestone challenge rewards {1}.  Old reward was {2}.", agency.NameLocalised, (RewardType) rValue, lastReward >= 0 ? ( (RewardType) lastReward ).ToString() : "None" );
-            if ( blocks.Contains( (RewardType) rValue ) ) {
+         Fine( "{0} new milestone challenge rewards {1}.", agency.NameLocalised, (RewardType) rValue );
+         if ( blocks.Contains( (RewardType) rValue ) ) {
             var list = Enum.GetValues( typeof( RewardType ) ).OfType< RewardType >().Except( blocks ).ToList();
             Fine( "Valid reward(s): {0}", (Func<string>) ( () => string.Join( ", ", list.Select( e => e.ToString() ) ) ) );
             if ( list.Count == 0 ) throw new InvalidOperationException( "Empty reward type list." );
@@ -56,8 +59,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void RefreshMilestoneChallenge ( Simulation sim, Agency agency ) { try {
          isNewChallenge = false;
          Fine( "New milestone challenge." );
-         var oldChallenge = agency.activeMilestoneChallenge;
-         lastReward = oldChallenge == null ? -1 : (int) oldChallenge.Reward;
          var highpass = config.milestone_challenge_research_highpass;
          if ( highpass >= 0 && sim != null ) {
             blocks.Clear();
@@ -76,12 +77,12 @@ namespace ZyMod.MarsHorizon.MissionControl {
                blocks.Add( RewardType.VehicleResearch );
          }
          if ( config.milestone_challenge_fund_multiplier <= 0 && blocks.Count < 3 ) {
-            Info( "Blocking fund type milestone rewards: milestone_challenge_fund_multiplier <= 0" );
+            Info( "Blocking Fund type milestone rewards: milestone_challenge_fund_multiplier <= 0" );
             blocks.Add( RewardType.Funds );
          }
-         if ( config.milestone_challenge_no_duplicate_reward && blocks.Count < 3 && oldChallenge != null ) {
-               Info( "Blocking {0} type milestone rewards: milestone_challenge_no_duplicate_reward = true", oldChallenge.Reward );
-               blocks.Add( oldChallenge.Reward );
+         if ( config.milestone_challenge_no_duplicate_reward && blocks.Count < 3 && lastReward >= 0 ) {
+               Info( "Blocking {0} type milestone rewards: milestone_challenge_no_duplicate_reward = true", (RewardType) lastReward );
+               blocks.Add( (RewardType) lastReward );
          }
       } catch ( Exception x ) { Err( x ); } }
 
