@@ -62,6 +62,8 @@
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
+    <Compile Include="PatcherMilestoneSim.cs" />
+    <Compile Include="PatcherMissionSim.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

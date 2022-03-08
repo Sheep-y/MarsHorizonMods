@@ -17,7 +17,9 @@ namespace ZyMod.MarsHorizon.MissionControl {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
-         new PatcherSimulation().Apply();
+         if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 )
+            new PatcherMilestoneSim().Apply();
+         new PatcherMissionSim().Apply();
       }
    }
 
@@ -35,6 +37,13 @@ namespace ZyMod.MarsHorizon.MissionControl {
    }
 
    public class Config : IniConfig {
+      [ Config( "\r\n[Milestone]" ) ]
+      [ Config( "Fund multiplier of milestone challenges.  Default 1.5 for 150%.  Set to 0 or negative to prevent fund rewards from showing up." ) ]
+      public float milestone_challenge_fund_multiplier = 1.5f;
+      [ Config( "Disable research cost milestone challenges at this many research left or less in that tree.  Default 3.  Set to -1 to never disable, or 100 to always disable.  On trigger, if milestone_challenge_fund_multiplier is negative, a positive value will be used." ) ]
+      public int milestone_challenge_research_highpass = 3;
+
+      [ Config( "\r\n[Mission]" ) ]
       [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to -1 to not change (default)." ) ]
       public float player_request_mission_chance = -1;
       [ Config( "Chance of new request mission for AI.  Ditto." ) ]
