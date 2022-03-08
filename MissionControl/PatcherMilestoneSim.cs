@@ -19,8 +19,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       internal void Apply () {
          TryPatch( typeof( Simulation ), "GetNewMilestoneChallenge", postfix: nameof( ClearMilestoneChecks ) );
          TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", prefix: nameof( FilterMilestoneChallenge ) );
-         if ( config.milestone_challenge_fund_multiplier != 1 && config.milestone_challenge_fund_multiplier != 0 && config.milestone_challenge_fund_multiplier != -1 )
-            TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );
+         TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );
       }
 
       private static bool isNewChallenge = true;
@@ -29,27 +28,22 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void FilterMilestoneChallenge ( Simulation __instance, MilestoneChallenge mChallenge, Agency agency, ref int rValue ) { try {
          if ( agency.isAI || mChallenge == null ) return;
          if ( isNewChallenge ) RefreshMilestoneChallenge( __instance, agency );
-         var oldChallenge = agency.activeMilestoneChallenge;
-         var oldVal = oldChallenge == null ? -1 : (int) oldChallenge.Reward;
-         Fine( "Last challenge was {0}.  New challenge will be {1}.", oldChallenge?.Reward.ToString() ?? "null", (RewardType) rValue );
-         var rTypes = Enum.GetValues( typeof( RewardType ) );
-         if ( blocks.Contains( (RewardType) rValue ) ) {
-            var list = rTypes.OfType< RewardType >().Except( blocks ).Where( e => (int) e != oldVal ).ToList();
-            Fine( "Valid type(s): {0}", (Func<string>) ( () => string.Join( ", ", list.Select( e => e.ToString() ) ) ) );
-            if ( list.Count == 0 ) { Error( new InvalidOperationException( "Empty type list." ) ); return; }
-            var newVal = list.RandomElement();
-            Info( "Reroll. New challenge will now be {0}.", newVal );
-            rValue = (int) newVal;
+         agency.activeMilestoneChallenge = null; // Avoid triggering type duplication change
+         Fine( "New milestone challenge is {0}.", (RewardType) rValue );
+            if ( blocks.Contains( (RewardType) rValue ) ) {
+            var list = Enum.GetValues( typeof( RewardType ) ).OfType< RewardType >().Except( blocks ).ToList();
+            Fine( "Valid reward(s): {0}", (Func<string>) ( () => string.Join( ", ", list.Select( e => e.ToString() ) ) ) );
+            if ( list.Count == 0 ) throw new InvalidOperationException( "Empty type list." );
+            rValue = (int) list.RandomElement();
+            Info( "Reroll. New milestone challenge is now {0}.", (RewardType) rValue );
          }
-         // The increment code seems to always get triggered.
-         Fine( "Reducing  {0} {1}", rValue, mChallenge.Reward );
-         rValue = rValue == 0 ? rTypes.Length - 1 : rValue - 1;
-         mChallenge.Reward = (RewardType) rValue;
+         mChallenge.Reward = (RewardType) rValue; // Make sure everything aligns
       } catch ( Exception x ) { Err( x ); } }
 
       private static void AdjustMilestoneChallengeFund ( Agency agency, MilestoneChallenge mChallenge ) { try {
-         Fine( mChallenge.Reward );
-         if ( agency.isAI || mChallenge == null || mChallenge.FundsReward == 0 ) return;
+         if ( agency.activeMilestoneChallenge == null ) agency.activeMilestoneChallenge = mChallenge;
+         var multiplier = config.milestone_challenge_fund_multiplier;
+         if ( agency.isAI || mChallenge == null || mChallenge.FundsReward == 0 || multiplier == 1 || multiplier == -1 || multiplier == 0 ) return;
          var newFund = (int) Math.Round( mChallenge.FundsReward * Math.Abs( config.milestone_challenge_fund_multiplier ) );
          Info( "Fund rewards of {0}: {1} => {2}", mChallenge.Id, mChallenge.FundsReward, newFund );
          mChallenge.FundsReward = newFund;
@@ -76,13 +70,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
                blocks.Add( RewardType.VehicleResearch );
          }
          if ( config.milestone_challenge_fund_multiplier <= 0 && blocks.Count < 3 ) {
-            Info( "Blocking fund type milestone rewards: milestone_challenge_fund_multiplier = 0." );
+            Info( "Blocking fund type milestone rewards: milestone_challenge_fund_multiplier <= 0." );
             blocks.Add( RewardType.Funds );
-         }
-         var current = agency.activeMilestoneChallenge.Reward;
-         if ( blocks.Count == 3 && agency.activeMilestoneChallenge != null && ! blocks.Contains( current ) ) {
-            agency.activeMilestoneChallenge.Reward = blocks.RandomElement();
-            Fine( "Current reward type changed from {0} to {1} due to blockage.", current, agency.activeMilestoneChallenge.Reward );
          }
       } catch ( Exception x ) { Err( x ); } }
 
