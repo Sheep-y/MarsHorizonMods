@@ -37,20 +37,23 @@ namespace ZyMod.MarsHorizon.MissionControl {
    }
 
    public class Config : IniConfig {
+      [ Config( "Apply milestone challenge filtes and mission weight change to player only, and not to AI.  Default True." ) ]
+      public bool change_only_player_agency = true;
+
       [ Config( "\r\n[Milestone]" ) ]
       [ Config( "Fund multiplier of milestone challenges.  Default 1.5 for 150%.  Set to 0 or negative to prevent fund rewards from showing up." ) ]
       public float milestone_challenge_fund_multiplier = 1.5f;
       [ Config( "Disable research cost milestone challenges at this many research left or less in that tree.  Default 3.  Set to -1 to never disable, or 100 to always disable.  On trigger, if milestone_challenge_fund_multiplier is negative, a positive value will be used." ) ]
       public int milestone_challenge_research_highpass = 3;
+      [ Config( "The game was designed to not give you the same challenge reward type as the completed one, but a bug prevents it.  This option restores the behaviour whenever feasible." ) ]
+      public bool milestone_challenge_no_duplicate_reward = true;
 
       [ Config( "\r\n[Mission]" ) ]
       [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to -1 to not change (default)." ) ]
       public float player_request_mission_chance = -1;
       [ Config( "Chance of new request mission for AI.  Ditto." ) ]
       public float ai_request_mission_chance = -1;
-      [ Config( "Limit weight changes to player agency only.  Default True." ) ]
-      public bool reweight_only_player_agency = true;
-      [ Config( "Use a standalone random number generator for new missions.  Also apply to AI.  Default True." ) ]
+      [ Config( "Use a standalone random number generator for new player missions.  Default True." ) ]
       public bool standalone_mission_rng = true;
 
       [ Config( "\r\n[Joint]" ) ]

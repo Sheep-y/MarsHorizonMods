@@ -23,37 +23,43 @@ namespace ZyMod.MarsHorizon.MissionControl {
       }
 
       private static bool isNewChallenge = true;
+      private static int lastReward = -1;
       private static readonly HashSet< RewardType > blocks = new HashSet< RewardType >();
 
       private static void FilterMilestoneChallenge ( Simulation __instance, MilestoneChallenge mChallenge, Agency agency, ref int rValue ) { try {
-         if ( agency.isAI || mChallenge == null ) return;
+         if ( mChallenge == null || agency == null ) return;
+         if ( config.change_only_player_agency && agency.isAI ) return;
          if ( isNewChallenge ) RefreshMilestoneChallenge( __instance, agency );
          agency.activeMilestoneChallenge = null; // Avoid triggering type duplication change
-         Fine( "New milestone challenge is {0}.", (RewardType) rValue );
+         Fine( "{0} new milestone challenge rewards {1}.  Old reward was {2}.", agency.NameLocalised, (RewardType) rValue, lastReward >= 0 ? ( (RewardType) lastReward ).ToString() : "None" );
             if ( blocks.Contains( (RewardType) rValue ) ) {
             var list = Enum.GetValues( typeof( RewardType ) ).OfType< RewardType >().Except( blocks ).ToList();
             Fine( "Valid reward(s): {0}", (Func<string>) ( () => string.Join( ", ", list.Select( e => e.ToString() ) ) ) );
-            if ( list.Count == 0 ) throw new InvalidOperationException( "Empty type list." );
+            if ( list.Count == 0 ) throw new InvalidOperationException( "Empty reward type list." );
             rValue = (int) list.RandomElement();
-            Info( "Reroll. New milestone challenge is now {0}.", (RewardType) rValue );
+            Info( "Reroll. New milestone challenge now rewards {0}.", (RewardType) rValue );
          }
          mChallenge.Reward = (RewardType) rValue; // Make sure everything aligns
       } catch ( Exception x ) { Err( x ); } }
 
       private static void AdjustMilestoneChallengeFund ( Agency agency, MilestoneChallenge mChallenge ) { try {
+         if ( agency == null ) return;
          if ( agency.activeMilestoneChallenge == null ) agency.activeMilestoneChallenge = mChallenge;
+         if ( config.change_only_player_agency && agency.isAI ) return;
          var multiplier = config.milestone_challenge_fund_multiplier;
-         if ( agency.isAI || mChallenge == null || mChallenge.FundsReward == 0 || multiplier == 1 || multiplier == -1 || multiplier == 0 ) return;
+         if ( mChallenge == null || mChallenge.FundsReward == 0 || multiplier == 1 || multiplier == -1 || multiplier == 0 ) return;
          var newFund = (int) Math.Round( mChallenge.FundsReward * Math.Abs( config.milestone_challenge_fund_multiplier ) );
          Info( "Fund rewards of {0}: {1} => {2}", mChallenge.Id, mChallenge.FundsReward, newFund );
          mChallenge.FundsReward = newFund;
       } catch ( Exception x ) { Err( x ); } }
 
       private static void RefreshMilestoneChallenge ( Simulation sim, Agency agency ) { try {
-         Fine( "New milestone challenge." );
          isNewChallenge = false;
+         Fine( "New milestone challenge." );
+         var oldChallenge = agency.activeMilestoneChallenge;
+         lastReward = oldChallenge == null ? -1 : (int) oldChallenge.Reward;
          var highpass = config.milestone_challenge_research_highpass;
-         if ( highpass >= 0 ) {
+         if ( highpass >= 0 && sim != null ) {
             blocks.Clear();
             var researchCountByType = new Dictionary< TechTree.Type, int >( 3 );
             foreach ( var id in agency.researchProgress.Keys ) {
@@ -61,7 +67,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
                if ( ! researchCountByType.TryGetValue( type, out var count ) ) count = 0;
                researchCountByType[ type ] = count + 1;
             }
-            foreach ( var row in researchCountByType ) if ( row.Key != TechTree.Type.None ) Fine( "{0} = {1} total", row.Key, row.Value );
+            foreach ( var row in researchCountByType ) if ( row.Key != TechTree.Type.None ) Fine( "{0} research = {1} total", row.Key, row.Value );
             if ( ShouldBlock( agency.missionResearchCompletedCount, researchCountByType, TechTree.Type.Missions ) )
                blocks.Add( RewardType.MissionResearch );
             if ( ShouldBlock( agency.baseResearchCompletedCount, researchCountByType, TechTree.Type.Base ) )
@@ -70,8 +76,12 @@ namespace ZyMod.MarsHorizon.MissionControl {
                blocks.Add( RewardType.VehicleResearch );
          }
          if ( config.milestone_challenge_fund_multiplier <= 0 && blocks.Count < 3 ) {
-            Info( "Blocking fund type milestone rewards: milestone_challenge_fund_multiplier <= 0." );
+            Info( "Blocking fund type milestone rewards: milestone_challenge_fund_multiplier <= 0" );
             blocks.Add( RewardType.Funds );
+         }
+         if ( config.milestone_challenge_no_duplicate_reward && blocks.Count < 3 && oldChallenge != null ) {
+               Info( "Blocking {0} type milestone rewards: milestone_challenge_no_duplicate_reward = true", oldChallenge.Reward );
+               blocks.Add( oldChallenge.Reward );
          }
       } catch ( Exception x ) { Err( x ); } }
 

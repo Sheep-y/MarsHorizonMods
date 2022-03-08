@@ -85,7 +85,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetMissionWeight ( Agency agency, Data.MissionTemplate missionTemplate ) { try {
-         if ( ( config.reweight_only_player_agency && agency.isAI ) || missionTemplate == lastMission ) return;
+         if ( ( config.change_only_player_agency && agency.isAI ) || missionTemplate == lastMission ) return;
          var m = lastMission = missionTemplate;
          allowed = true;
          var weight = GetMissionWeight( m );
