@@ -30,18 +30,24 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
       private static Data.MissionTemplate lastMission = null;
       private static bool allowed = false;
+      private static int lucrative_count;
 
       private static void TrackNewMissionBefore ( Simulation __instance, Agency agency, bool forceGenerate ) { try {
          origWeightM.Clear();
          lastMission = null;
+         if ( config.lucrative_weight_multiplier_open != 1 ) {
+            lucrative_count = agency.missionRequests.Concat( agency.jointMissionRequests ).Count( e =>
+               e.templateInstance.template.GetTotalMissionRewards().funds > 0 || e.requestMissionType.type == Data.MissionTemplate.RequestMissionType.EType.Lucrative );
+         } else
+            lucrative_count = -1;
          if ( forceGenerate ) { Info( "{0} is forcing a new mission.", agency.NameLocalised ); return; }
          var rules = __instance.gamedata.rules;
          if ( origChance < 0 ) origChance = rules.requestGenerationChance;
          var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
          rules.requestGenerationChance = ( chance < 0 || chance > 1 ) ? origChance : chance;
          RootMod.Log?.Write( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
-            "{0} checking new mission.  Current count {2}/{3}, cooldown {4}, chance {1}.", agency.NameLocalised,
-            1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest );
+            "{0} checking new mission.  Current count {2}/{3} ({5} lucrative), cooldown {4}, chance {1}.", agency.NameLocalised,
+            1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest, lucrative_count );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetJointMissionChance ( Simulation __instance, Agency agency, Agency selectedAgency ) { try {
@@ -68,7 +74,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          }
       } catch ( Exception x ) { Err( x ); } }
 
-      private static void TrackNewMissionAfter ( NetMessages.MissionRequest message, bool __result ) { try {
+      private static void TrackNewMissionAfter ( Simulation __instance, NetMessages.MissionRequest message, bool __result ) { try {
          lastMission = null;
          if ( origWeightM.Count > 0 || origWeightT.Count > 0 ) {
             Fine( "Restoring {0}+{1} weights.", origWeightM.Count, origWeightT.Count );
@@ -77,6 +83,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
             origWeightM.Clear();
             origWeightT.Clear();
          }
+         if ( origChance >= 0 ) __instance.gamedata.rules.requestGenerationChance = origChance;
          if ( ! __result ) { Fine( "No new mission." ); return; }
          Info( "New mission {0} {1} {2}.  Next mission after {3}+ turns.", message.milestoneMissionID, message.requestMissionType, message.isJointMission ? "(Join)" : "", message.turnsUntilNextMissionRequest );
       } catch ( Exception x ) { Err( x ); } }
@@ -141,14 +148,17 @@ namespace ZyMod.MarsHorizon.MissionControl {
             case Data.MissionTemplate.RequestMissionType.EType.ExperimentalFuel :
             case Data.MissionTemplate.RequestMissionType.EType.ExperimentalPayload : return config.experimental_weight_multiplier;
             case Data.MissionTemplate.RequestMissionType.EType.Publicised : return config.publicised_weight_multiplier;
-            case Data.MissionTemplate.RequestMissionType.EType.Lucrative : return config.lucrative_weight_multiplier;
+            case Data.MissionTemplate.RequestMissionType.EType.Lucrative :
+               if ( lucrative_count == 0 && config.lucrative_weight_multiplier_open != 1 )
+                  return config.lucrative_weight_multiplier * config.lucrative_weight_multiplier_open;
+               return config.lucrative_weight_multiplier;
          }
          return 1f;
       }
 
       private static void LogMissionRemoval ( bool __result ) {
          if ( lastMission == null || __result == allowed ) return;
-         Fine( allowed ? "X Mission removed due to era, research, or ongoing mission." : "X ... then restored after forced generation." );
+         Fine( allowed ? "X Mission removed due to era, research, or ongoing mission." : "X ... then restored by forced generation." );
          allowed = __result;
       }
 

@@ -41,9 +41,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public bool change_only_player_agency = true;
 
       [ Config( "\r\n[Milestone]" ) ]
+      [ Config( "(This mod only affects new milestone challenges, not existing challengs.)" ) ]
       [ Config( "Fund multiplier of milestone challenges.  Default 1.5 for 150%.  Set to 0 or negative to prevent fund rewards from showing up." ) ]
       public float milestone_challenge_fund_multiplier = 1.5f;
-      [ Config( "Disable research cost milestone challenges at this many research left or less in that tree.  Default 3.  Set to -1 to never disable, or 100 to always disable.  On trigger, if milestone_challenge_fund_multiplier is negative, a positive value will be used." ) ]
+      [ Config( "Disable research cost milestone challenges at this many research left or less in that tree.  Default 3.  Set to -1 to never disable, or 100 to always disable.  When all tech trees are blocked, reward will always be fund.  If milestone_challenge_fund_multiplier is negative, a positive value will be used." ) ]
       public int milestone_challenge_research_highpass = 3;
       [ Config( "The game was designed to not give you the same challenge reward type as the completed one, but a bug prevents it.  This option restores the behaviour whenever feasible." ) ]
       public bool milestone_challenge_no_duplicate_reward = true;
@@ -70,13 +71,15 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float challenging_weight_multiplier = 1;
       [ Config( "Multiply experimental variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float experimental_weight_multiplier = 1;
-      [ Config( "Multiply lucartive variation chances.  Default 2.4.  Set to 1 to not change." ) ]
-      public float lucrative_weight_multiplier = 2.4f;
+      [ Config( "Multiply lucartive variation chances (baseline).  Default 1.8.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier = 1.8f;
+      [ Config( "Multiply lucartive variation chances when none exists.  Default 2.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_open = 2;
       [ Config( "Multiply publicised variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float publicised_weight_multiplier = 1;
       [ Config( "Multiply test variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float test_weight_multiplier = 1;
-      [ Config( "Try divide all variation weight by this amount to save cpu.  Affects multiplier accuracy, set log level to fine to see exact weight.  Default 10.  Set to 1 to not change." ) ]
+      [ Config( "Try divide all variation weight by this amount to save cpu.  Affects multiplier accuracy; set log level to fine to see exact weights.  Default 10.  Set to 1 to not change." ) ]
       public int variation_weight_divider = 10;
 
       [ Config( "\r\n[Earth and Moon]" ) ]
