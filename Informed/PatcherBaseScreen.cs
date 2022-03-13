@@ -35,7 +35,7 @@ namespace ZyMod.MarsHorizon.Informed {
             if ( buildings == null || buildings.Count == 0 ) return;
             RefreshBaseBonus( buildings );
          }
-         ShowModifiers( tooltip = __instance.highlightToolTipElement, links );
+         if ( links?.Length > 0 ) ShowModifiers( tooltip = __instance.highlightToolTipElement, links );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void RefreshBaseBonus ( List< BuildingObject > buildings ) { try {
@@ -60,7 +60,6 @@ namespace ZyMod.MarsHorizon.Informed {
       private static readonly FieldInfo Cost = typeof( BaseHighlightToolTipElement ).Field( "clearCost" );
 
       private static void ShowModifiers ( BaseHighlightToolTipElement tooltip, Data.Effect[] effects ) {
-         if ( effects.Length == 0 ) return;
          Fine( "Refreshing total building modifiers." );
          var modifierList = GetModifierList( tooltip );
          if ( Refresh == null || modifierList == null ) {

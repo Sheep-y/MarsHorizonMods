@@ -16,13 +16,11 @@ namespace ZyMod.MarsHorizon {
       public static void Main () { try {
          var first = IsFirstMod();
          foreach ( var t in GetTypes( Assembly.GetExecutingAssembly() ) ) {
-            if ( t.IsNotPublic || t.IsAbstract ) continue;
-            if ( t.IsSubclassOf( typeof( MarsHorizonMod ) ) ) {
-               var mod = Activator.CreateInstance( t ) as MarsHorizonMod;
-               mod.shouldLogAssembly = first;
-               mod.Initialize();
-               break;
-            }
+            if ( t.IsNotPublic || t.IsAbstract || ! t.IsSubclassOf( typeof( MarsHorizonMod ) ) ) continue;
+            var mod = Activator.CreateInstance( t ) as MarsHorizonMod;
+            mod.shouldLogAssembly = first;
+            mod.Initialize();
+            break;
          }
          if ( first ) LoadMarsHorizonMods( GetPath( Assembly.GetExecutingAssembly() ) );
       } catch ( Exception x ) { Error( x ); } }
@@ -60,7 +58,7 @@ namespace ZyMod.MarsHorizon {
             main.RunStatic();
             return;
          }
-         Warn( "Cannot find public static Main() from {0}", asm.CodeBase );
+         Warn( "Cannot find public static void Main() from {0}", asm.CodeBase );
       }
 
       private static string GetPath ( Assembly asm ) => new Uri( asm.CodeBase ).LocalPath;
