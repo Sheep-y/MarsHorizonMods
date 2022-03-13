@@ -63,6 +63,7 @@
       <Link>ZyMod.cs</Link>
     </Compile>
     <Compile Include="PatcherMilestoneSim.cs" />
+    <Compile Include="PatcherAutoResolve.cs" />
     <Compile Include="PatcherMissionSim.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

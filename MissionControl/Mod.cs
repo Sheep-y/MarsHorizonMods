@@ -20,6 +20,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 )
             new PatcherMilestoneSim().Apply();
          new PatcherMissionSim().Apply();
+         new PatcherAutoResolve().Apply();
       }
    }
 
