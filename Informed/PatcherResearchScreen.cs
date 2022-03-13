@@ -1,13 +1,9 @@
 ﻿using Astronautica;
 using Astronautica.Tutorial.Tooltips;
 using Astronautica.View;
-using Astronautica.View.Research;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using static Astronautica.Data;
 using static ZyMod.ModHelpers;
 
