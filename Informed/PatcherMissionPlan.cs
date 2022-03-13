@@ -76,9 +76,17 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void ShowMissionExpiry ( Mission mission, AutoLocalise ___descriptionText ) { try {
          var buf = new StringBuilder();
+         if ( config.show_mission_expiry && mission.IsRequestMission ) {
+            var tInstance = mission.templateInstance;
+            var remaining = tInstance.lifespan + tInstance.turnAdded - simulation.universe.turn;
+            Fine( "{0} will expires in {1} turns", mission.template.id, remaining );
+            if ( remaining >= 0 )
+               buf.Append( "\n\n" ).Append( Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() ) );
+         }
          if ( config.show_mission_payload && mission.missionState == Mission.EState.Planning && ! mission.template.IsSoundingRocking ) {
             var agency = mission.agency;
             var template = mission.template;
+            var minCrew = template.minCrew;
             if ( mission.IsRequestMission || simulation.HasAgencyCompletedResearch( agency, template.id ) ) {
                var payloads = simulation.GetAgencyMissionPayloads( agency, mission );
                Fine( "Found {0} payloads for {1}", payloads?.Count().ToString() ?? "null", template.id );
@@ -87,18 +95,16 @@ namespace ZyMod.MarsHorizon.Informed {
                   foreach ( var payload in payloads ) {
                      if ( ! template.TryGetPayloadLocalisationDescriptionOverride( payload.id, mission.requestMissionContext, out var pname ) ) pname = $"Name_{payload.id}";
                      var time = simulation.GetAgencyPayloadBuildTime( agency, payload );
-                     buf.AppendFormat( "\n{0} ({1} {2} {3:n0}kg)", Localise( pname ), time, Localise( time > 1 ? "Month_Plural" : "Month_Singular" ), payload.weight );
+                     buf.AppendFormat( "\n{0} <size=85%> {1} {2}  {3:n0}kg", Localise( pname ), time, Localise( time > 1 ? "Month_Plural" : "Month_Singular" ), payload.weight );
+                     if ( minCrew > 0 ) {
+                        buf.AppendFormat( "  <sprite name=\"Payload_Crew\"> {0}", minCrew );
+                        if ( minCrew != payload.maxCrew ) buf.AppendFormat( "-{0}", payload.maxCrew );
+                     }
+                     buf.Append( "</size>" );
                      if ( ! simulation.HasAgencyUnlockedPayload( agency, payload ) ) buf.Append( " <sprite name=\"WarningScience\"/>" );
                   }
             }
          } else Fine( mission.missionState );
-         if ( config.show_mission_expiry && mission.IsRequestMission ) {
-            var tInstance = mission.templateInstance;
-            var remaining = tInstance.lifespan + tInstance.turnAdded - simulation.universe.turn;
-            Fine( "{0} will expires in {1} turns", mission.template.id, remaining );
-            if ( remaining >= 0 )
-               buf.Append( "\n\n" ).Append( Localise( "Mission_Summary_Turns_Remaining", "turns", remaining.ToString() ) );
-         }
          if ( buf.Length > 2 )
             ___descriptionText.text = Localise( ___descriptionText.tag ) + buf.ToString();
       } catch ( Exception x ) { Err( x ); } }
