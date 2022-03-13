@@ -45,14 +45,8 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void AppendSupplementStats ( string key ) { try {
          if ( sups == null || key != key_cap ) return;
          Info( "Adding {0} boosters to stat list", sups.Length );
-         var agent = activeClient.agency;
-         foreach ( var id in sups ) {
-            var part = FindPart( id );
-            string icon = null;
-            if ( ! agent.HasCompletedResearch( id ) ) icon = agent.activeResearch?.id == id ? "Spr_Icon_Screen_Research_64x64" : "WarningScience";
-            if ( icon != null ) icon = $" <sprite name=\"{icon}\"/>";
-            statItemPooler.Reuse().Set( " + " + Localise( $"Name_{id}" ) + icon, Data.instance.FormatWeight( part.capacity + cap ) );
-         }
+         foreach ( var id in sups )
+            statItemPooler.Reuse().Set( " + " + Localise( $"Name_{id}" ) + " <sprite name=\"WarningScience\"/>", Data.instance.FormatWeight( FindPart( id ).capacity + cap ) );
          sups = null;
       } catch ( Exception x ) { Err( x ); } }
    }
