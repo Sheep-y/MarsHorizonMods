@@ -235,17 +235,18 @@ namespace ZyMod {
       public static void DumpComponents ( UnityEngine.GameObject e ) => DumpComponents( Info, e );
       public static void DumpComponents ( Action< object, object[] > output, UnityEngine.GameObject e ) => DumpComponents( output, "", new HashSet<object>(), e );
       internal static void DumpComponents ( Action< object, object[] > output, string prefix, HashSet<object> logged, UnityEngine.GameObject e ) {
-         if ( prefix.Length > 10 ) return;
+         if ( prefix.Length > 12 ) return;
          if ( e == null || logged.Contains( e ) ) return;
          logged.Add( e );
          Dump( output, "{0}- '{1}'{2} {3}{4}{5}{6} :{7}", prefix, e.name, ToTag( e.tag ), FindText( e ), TypeName( e ),
             e.activeSelf ? "" : " (Inactive)", e.layer == 0 ? "" : $" Layer {e.layer}", ToString( e.GetComponent<UnityEngine.Transform>() ) );
-         if ( prefix.Length == 0 )
+         if ( prefix.Length <= 6 )
             foreach ( var c in e.GetComponents<UnityEngine.Component>() ) try {
                var typeName = TypeName( c );
                if ( c is UnityEngine.Transform cRect ) ;
                else if ( c is UnityEngine.UI.Text txt ) Dump( output, "{0}...{1} {2}", prefix, typeName, txt.text );
-               else if ( c is I2.Loc.Localize loc ) Dump( output, "{0}...{1} {2}", prefix, typeName, loc.mTerm );
+               else if ( c is UnityEngine.UI.Image img ) Dump( output, "{0}...{1} {2} {3}", prefix, typeName, img.sprite?.name ?? img.mainTexture?.name, img.type );
+               //else if ( c is I2.Loc.Localize loc ) Dump( output, "{0}...{1} {2}", prefix, typeName, loc.mTerm );
                else if ( c is UnityEngine.UI.LayoutGroup layout ) Dump( output, "{0}...{1} Padding {2}", prefix, typeName, layout.padding );
                else Dump( output, "{0}...{1}", prefix, typeName );
             } catch ( Exception ) { }
