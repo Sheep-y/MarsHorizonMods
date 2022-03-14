@@ -10,7 +10,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       }
 
       private static void TrackMissionAutoResolve ( AutoresolveMission __instance, AutoresolveMission.EResult __result ) { try {
-         Info( "Auto-resolve mission roll: {0:P2}/{1:P0} = {2}", __instance.Roll, __instance.Chance, __result );
+         Info( "Auto-resolve mission roll: {0:P2}/{1}% = {2}", __instance.Roll, __instance.Chance, __result );
       } catch ( Exception x ) { Err( x ); } }
    }
 }

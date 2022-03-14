@@ -68,7 +68,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          for ( var i = 0 ; i < __result.Count ; i++ ) {
             var trait = __result[ i ];
             if ( config.joint_trait_multiplier < 0 || config.joint_trait_multiplier == trait.value ) return;
-            Info( "Setting trait {0} bonus chance from {1} to {2}.", Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
+            Info( "Setting trait {0} bonus chance from {1} to {2}.", MarsHorizonMod.Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
             trait.value = config.joint_trait_multiplier;
             __result[ i ] = trait;
          }
@@ -163,7 +163,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       }
 
       private static bool isAI = true;
-      private static void TrackPlayerNewMission ( Agency agency ) => isAI = ! agency.isAI;
+      private static void TrackPlayerNewMission ( Agency agency ) => isAI = agency.isAI;
 
       private static Random missionRNG;
       private static void RollRandomMission ( IEnumerable< Data.RequestMissionData > sequence, ref Data.RequestMissionData  __result ) { try {
