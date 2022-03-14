@@ -21,6 +21,8 @@ namespace ZyMod.MarsHorizon.Informed {
             new PatcherResearchScreen().Apply();
          if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 || config.show_contractor_effects_on_button )
             new PatcherVehicleDesigner().Apply();
+         if ( config.hint_available_mission || config.hint_propose_join_mission || config.hint_spacepedia_hide )
+            new PatcherMainHUD().Apply();
       }
    }
 
@@ -59,6 +61,14 @@ namespace ZyMod.MarsHorizon.Informed {
       public string optimal_colour = "#BBFFBB";
       [ Config( "Show contractor effects on contractor buttons.  Default True." ) ]
       public bool show_contractor_effects_on_button = true;
+
+      [ Config( "\r\n[Solar System]" ) ]
+      [ Config( "Show alert icon next to mission button when a slot is available.  Default True." ) ]
+      public bool hint_available_mission = true;
+      [ Config( "Show alert icon next to diplomacy button when joint mission can be proposed.  Default True." ) ]
+      public bool hint_propose_join_mission = true;
+      [ Config( "Hide spacepedia alert icon.  Default True." ) ]
+      public bool hint_spacepedia_hide = true;
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
