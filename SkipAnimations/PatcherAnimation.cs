@@ -56,7 +56,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       }
 
       #region Remove delays
-      private const float DELAY = 0.05f;
+      private const float DELAY = 0.1f;
 
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
          if ( duration <= 0.1f ) return;
@@ -107,7 +107,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          __instance.skippedReliabilityRollSpeed = 20f;
       }
       private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 20f );
-      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 10f;
+      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 5;
       private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20f;
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
 
