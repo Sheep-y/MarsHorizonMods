@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpData", "DumpData\DumpDa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissionControl", "MissionControl\MissionControl.csproj", "{094C42D0-2A2C-4333-B60A-D35DBA9C3080}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSpaceSlots", "DeepSpaceSlots\DeepSpaceSlots.csproj", "{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\Shared.projitems*{cc3f2d84-7515-4fe6-85b2-72713933dd4d}*SharedItemsImports = 13
@@ -38,6 +40,10 @@ Global
 		{094C42D0-2A2C-4333-B60A-D35DBA9C3080}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{094C42D0-2A2C-4333-B60A-D35DBA9C3080}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{094C42D0-2A2C-4333-B60A-D35DBA9C3080}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
