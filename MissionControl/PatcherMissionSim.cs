@@ -124,7 +124,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void SetVariationWeights ( Data.MissionTemplate m ) {
          if ( m.requestWeighting == 0 ) return;
          var divider = config.variation_weight_divider;
-         if ( divider != 1f  ) divider = m.requestMissionTypes.All( e => e.weighting % divider == 0 ) ? divider : 1;
+         if ( divider != 1 ) divider = m.requestMissionTypes.All( e => e.weighting % divider == 0 ) ? divider : 1;
          foreach ( var t in m.requestMissionTypes ) {
             var tWeight = t.weighting;
             var multiplier = GetVariationWeight( t );

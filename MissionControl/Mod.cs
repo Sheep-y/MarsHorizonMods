@@ -109,5 +109,18 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200304;
+
+      public override void Load ( object subject, string path ) {
+         base.Load( subject, path );
+         if ( ! ( subject is Config conf ) ) return;
+         if ( conf.challenging_weight_multiplier < 0 ) conf.challenging_weight_multiplier = 1;
+         if ( conf.experimental_weight_multiplier < 0 ) conf.experimental_weight_multiplier = 1;
+         if ( conf.lucrative_weight_multiplier < 0 ) conf.lucrative_weight_multiplier = 1;
+         if ( conf.lucrative_weight_multiplier_open < 0 ) conf.lucrative_weight_multiplier_open = 1;
+         if ( conf.lucrative_weight_multiplier_open < 0 ) conf.lucrative_weight_multiplier_open = 1;
+         if ( conf.publicised_weight_multiplier < 0 ) conf.publicised_weight_multiplier = 1;
+         if ( conf.test_weight_multiplier < 0 ) conf.test_weight_multiplier = 1;
+         if ( conf.variation_weight_divider < 0 ) conf.variation_weight_divider = 1;
+      }
    }
 }
