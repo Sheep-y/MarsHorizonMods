@@ -69,6 +69,15 @@ namespace ZyMod.MarsHorizon {
          return Path.Combine( Directory.GetParent( path ).FullName, "LocalLow", "Auroch Digital", "Mars Horizon" );
       }
 
+      internal static string Localise ( string tag, params string[] vars ) {
+         Dictionary< string, string > variables = null;
+         if ( vars?.Length > 0 ) {
+            variables = new Dictionary< string, string >();
+            for ( var i = 0 ; i + 1 < vars.Length ; i += 2 )
+               variables.Add( vars[ i ], vars[ i + 1 ] );
+         }
+         return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
+      }
    }
 
 }

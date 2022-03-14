@@ -26,15 +26,7 @@ namespace ZyMod.MarsHorizon.Informed {
 
    internal class ModPatcher : Patcher {
       internal static Config config = new Config();
-      internal static string Localise ( string tag, params string[] vars ) {
-         Dictionary< string, string > variables = null;
-         if ( vars?.Length > 0 ) {
-            variables = new Dictionary< string, string >();
-            for ( var i = 0 ; i + 1 < vars.Length ; i += 2 )
-               variables.Add( vars[ i ], vars[ i + 1 ] );
-         }
-         return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
-      }
+      internal static string Localise ( string tag, params string[] vars ) => MarsHorizonMod.Localise( tag, vars );
       internal static Client activeClient => Controller.Instance?.activeClient;
       internal static ClientViewer clientViewer => Controller.Instance?.clientViewer;
       internal static Simulation simulation => activeClient.simulation;
