@@ -102,7 +102,7 @@ namespace ZyMod.MarsHorizon.Informed {
                      if ( ! simulation.HasAgencyUnlockedPayload( agency, payload ) ) buf.Append( " <sprite name=\"WarningScience\"/>" );
                   }
             }
-         } else Fine( mission.missionState );
+         }
          if ( buf.Length > 2 )
             ___descriptionText.text = Localise( ___descriptionText.tag ) + buf.ToString();
       } catch ( Exception x ) { Err( x ); } }
