@@ -68,7 +68,7 @@ namespace ZyMod.MarsHorizon.Informed {
          }
          modifierList.FreeAll();
 
-         foreach ( var e in effects ) {
+         foreach ( var e in effects.OrderBy( e => e.type ) ) {
             Fine( "{0} = {1}", e.type, e.strength );
             var link = new Data.Building.AdjacencyLink{ bonus = new Data.Blueprint.AdjacencyBonus{ effect = e } };
             Refresh.Run( tooltip, link, modifierList.Get() );
