@@ -1,12 +1,7 @@
-﻿using Astronautica;
-using Astronautica.View;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 using static ZyMod.ModHelpers;
 
@@ -68,8 +63,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float experimental_weight_multiplier = 1;
       [ Config( "Multiply lucartive variation chances (baseline).  Default 1.8.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier = 1.8f;
-      [ Config( "Multiply lucartive variation chances when none exists.  Default 2.  Set to 1 to not change." ) ]
-      public float lucrative_weight_multiplier_open = 2;
+      [ Config( "Multiply lucartive variation chances when none exists (multiplied).  Default 2.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_opening = 2;
+      [ Config( "Multiply lucartive variation chances when all researches are done (multiplied).  Default 20.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_full_tech = 10;
       [ Config( "Multiply publicised variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float publicised_weight_multiplier = 1;
       [ Config( "Multiply test variation chances.  Default 1.  Set to 1 to not change." ) ]
@@ -110,8 +107,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( conf.challenging_weight_multiplier < 0 ) conf.challenging_weight_multiplier = 1;
          if ( conf.experimental_weight_multiplier < 0 ) conf.experimental_weight_multiplier = 1;
          if ( conf.lucrative_weight_multiplier < 0 ) conf.lucrative_weight_multiplier = 1;
-         if ( conf.lucrative_weight_multiplier_open < 0 ) conf.lucrative_weight_multiplier_open = 1;
-         if ( conf.lucrative_weight_multiplier_open < 0 ) conf.lucrative_weight_multiplier_open = 1;
+         if ( conf.lucrative_weight_multiplier_opening < 0 ) conf.lucrative_weight_multiplier_opening = 1;
+         if ( conf.lucrative_weight_multiplier_full_tech < 0 ) conf.lucrative_weight_multiplier_full_tech = 1;
          if ( conf.publicised_weight_multiplier < 0 ) conf.publicised_weight_multiplier = 1;
          if ( conf.test_weight_multiplier < 0 ) conf.test_weight_multiplier = 1;
          if ( conf.variation_weight_divider < 0 ) conf.variation_weight_divider = 1;

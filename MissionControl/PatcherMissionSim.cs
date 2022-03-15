@@ -29,17 +29,18 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static readonly Dictionary< Data.MissionTemplate.RequestMissionType, int > origWeightT = new Dictionary< Data.MissionTemplate.RequestMissionType, int >();
 
       private static Data.MissionTemplate lastMission = null;
-      private static bool allowed = false;
-      private static int lucrative_count;
+      private static bool allowed = false, allResearchDone = false;
+      private static int lucrative_count = -1;
 
       private static void TrackNewMissionBefore ( Simulation __instance, Agency agency, bool forceGenerate ) { try {
          origWeightM.Clear();
          lastMission = null;
-         if ( config.lucrative_weight_multiplier_open != 1 ) {
+         if ( config.lucrative_weight_multiplier_opening != 1 ) {
             lucrative_count = agency.missionRequests.Concat( agency.jointMissionRequests ).Count( e =>
                e.templateInstance.template.GetTotalMissionRewards().funds > 0 || e.requestMissionType.type == Data.MissionTemplate.RequestMissionType.EType.Lucrative );
          } else
             lucrative_count = -1;
+         allResearchDone = config.lucrative_weight_multiplier_full_tech != 1 && agency.HasCompletedAllResearch();
          if ( forceGenerate ) { Info( "{0} is forcing a new mission.", agency.NameLocalised ); return; }
          var rules = __instance.gamedata.rules;
          if ( origChance < 0 ) origChance = rules.requestGenerationChance;
@@ -149,9 +150,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
             case Data.MissionTemplate.RequestMissionType.EType.ExperimentalPayload : return config.experimental_weight_multiplier;
             case Data.MissionTemplate.RequestMissionType.EType.Publicised : return config.publicised_weight_multiplier;
             case Data.MissionTemplate.RequestMissionType.EType.Lucrative :
-               if ( lucrative_count == 0 && config.lucrative_weight_multiplier_open != 1 )
-                  return config.lucrative_weight_multiplier * config.lucrative_weight_multiplier_open;
-               return config.lucrative_weight_multiplier;
+               var result = config.lucrative_weight_multiplier;
+               if ( lucrative_count == 0 ) result *= config.lucrative_weight_multiplier_opening;
+               if ( allResearchDone ) result *= config.lucrative_weight_multiplier_full_tech;
+               return result;
          }
          return 1f;
       }
