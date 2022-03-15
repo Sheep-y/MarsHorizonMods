@@ -23,7 +23,7 @@ namespace ZyMod.MarsHorizon.Informed {
       }
 
       private static Sprite icoInfo, icoMission, icoDiplomacy;
-      private static FieldInfo InfoIcon = typeof( SidebarOption ).Field( "infoIcon" );
+      private static readonly FieldInfo InfoIcon = typeof( SidebarOption ).Field( "infoIcon" );
 
       private static void GetInfoIcon ( SidebarOption ___missionsOption, SidebarOption ___diplomacyOption, SidebarOption ___spacepediaOption ) { try {
          if ( icoInfo != null ) return;
