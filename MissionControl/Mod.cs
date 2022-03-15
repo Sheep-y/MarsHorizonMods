@@ -17,10 +17,11 @@ namespace ZyMod.MarsHorizon.MissionControl {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
+         new PatcherMissionSim().Apply();
+         if ( config.standalone_resolve_rng )
+            new PatcherAutoResolve().Apply();
          if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 )
             new PatcherMilestoneSim().Apply();
-         new PatcherMissionSim().Apply();
-         new PatcherAutoResolve().Apply();
       }
    }
 
@@ -46,8 +47,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float player_request_mission_chance = -1;
       [ Config( "Chance of new request mission for AI.  Ditto." ) ]
       public float ai_request_mission_chance = -1;
-      [ Config( "Use a standalone random number generator for new player missions.  Default True." ) ]
+      [ Config( "Use a standalone random number generator to decide new player missions.  Default True." ) ]
       public bool standalone_mission_rng = true;
+      [ Config( "Use a standalone random number generator to decide auto resolve.  Default True." ) ]
+      public bool standalone_resolve_rng = true;
 
       [ Config( "\r\n[Joint]" ) ]
       [ Config( "Section note: join mission happens only to player agency.  Does not affect AI." ) ]
