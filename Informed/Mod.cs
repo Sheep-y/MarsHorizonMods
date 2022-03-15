@@ -19,7 +19,7 @@ namespace ZyMod.MarsHorizon.Informed {
             new PatcherMissionPlan().Apply();
          if ( config.show_supplement_in_booster_description )
             new PatcherResearchScreen().Apply();
-         if ( config.launch_window_hint_before_ready > 0 && config.launch_window_hint_before_ready > 0 || config.show_contractor_effects_on_button )
+         if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_before_ready > 0 || config.show_contractor_effects_on_button )
             new PatcherVehicleDesigner().Apply();
          if ( config.hint_available_mission || config.hint_propose_join_mission || config.hint_spacepedia_hide )
             new PatcherMainHUD().Apply();
@@ -27,7 +27,7 @@ namespace ZyMod.MarsHorizon.Informed {
    }
 
    internal class ModPatcher : Patcher {
-      internal static Config config = new Config();
+      internal static readonly Config config = new Config();
       internal static string Localise ( string tag, params string[] vars ) => MarsHorizonMod.Localise( tag, vars );
       internal static Client activeClient => Controller.Instance?.activeClient;
       internal static ClientViewer clientViewer => Controller.Instance?.clientViewer;

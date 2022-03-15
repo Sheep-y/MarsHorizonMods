@@ -10,7 +10,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherAnimation : ModPatcher {
-
       internal void Apply () {
          if ( config.remove_delays ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );

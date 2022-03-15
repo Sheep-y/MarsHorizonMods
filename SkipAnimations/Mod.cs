@@ -24,11 +24,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
    }
 
    internal class ModPatcher : Patcher {
-      internal static Config config = new Config();
+      internal static readonly Config config = new Config();
    }
 
    public class Config : IniConfig {
-
       [ Config( "\r\n[Cinematic]" ) ]
       [ Config( "Skip intro.  Default True." ) ]
       public bool skip_intro = true;
@@ -99,5 +98,4 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          Task.Run( () => { lock ( SkipCinematics ) Save(); } );
       } catch ( Exception x ) { Err( x ); } }
    }
-
 }

@@ -21,7 +21,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
    }
 
    internal class ModPatcher : Patcher {
-      internal static Config config = new Config();
+      internal static readonly Config config = new Config();
    }
 
    public class Config : IniConfig {

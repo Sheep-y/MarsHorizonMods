@@ -10,7 +10,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherResearchScreen : ModPatcher {
-
       internal void Apply () {
          if ( config.show_supplement_in_booster_description ) {
             TryPatch( typeof( TutorialTooltipStats ), "SetupResearchBooster", prefix: nameof( SetSupplementList ), postfix: nameof( ClearSupplementList ) );

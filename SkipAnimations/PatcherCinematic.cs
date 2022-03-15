@@ -9,7 +9,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherCinematic : ModPatcher {
-
       internal void Apply () {
          if ( config.skip_intro )
             TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );

@@ -79,5 +79,4 @@ namespace ZyMod.MarsHorizon {
          return ScriptableObjectSingleton<Localisation>.instance.Localise( tag, variables );
       }
    }
-
 }

@@ -15,7 +15,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherVehicleDesigner : ModPatcher {
-
       internal void Apply () {
          if ( config.show_contractor_effects_on_button && eVal != null ) {
             TryPatch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
@@ -112,7 +111,7 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void NewTooltip ( string header, string placeholder, string content ) {
          var tooltip = Get.Run( tooltipPooler ) as VehicleDesignerTooltip;
          tooltip.Set( header, placeholder, true );
-         ( Tooltip.GetValue( tooltip ) as AutoLocalise ).text = content;
+         if ( Tooltip.GetValue( tooltip ) is AutoLocalise loc ) loc.text = content;
       }
 
       private static void GetLaunchCalendar ( out IEnumerable< string > pre, out IEnumerable< string > post ) {
@@ -140,6 +139,5 @@ namespace ZyMod.MarsHorizon.Informed {
             buf.Clear();
          }
       }
-
    }
 }

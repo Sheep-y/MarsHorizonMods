@@ -136,5 +136,4 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          return slot <= available;
       }
    }
-
 }

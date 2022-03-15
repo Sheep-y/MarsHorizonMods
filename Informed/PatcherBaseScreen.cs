@@ -9,7 +9,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherBaseScreen : ModPatcher {
-
       internal void Apply () {
          if ( config.show_base_bonus ) {
             TryPatch( typeof( AstroViewElement ), "Refresh", postfix: nameof( ClearBaseBonus ) );

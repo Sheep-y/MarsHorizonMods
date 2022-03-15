@@ -10,7 +10,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMainHUD : ModPatcher {
-
       internal void Apply () {
          TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
          if ( config.hint_available_mission )

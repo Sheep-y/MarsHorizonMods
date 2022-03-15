@@ -10,7 +10,6 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMissionPlan : ModPatcher {
-
       internal void Apply () {
          if ( config.show_planet_launch_window ) {
             TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
