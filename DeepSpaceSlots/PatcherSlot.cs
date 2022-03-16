@@ -14,6 +14,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       internal void Apply () {
          TryPatch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecaleMissionSlots ) );
          TryPatch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecaleMissionSlots ) );
+         TryPatch( typeof( MissionSummary ), "Setup", postfix: nameof( RecaleAfterPhase ) );
          TryPatch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
          if ( TryPatch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
             TryPatch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
@@ -74,6 +75,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       } catch ( Exception x ) { return Err( x, 0 ); } }
 
       private static void RecaleMissionSlots ( AstroViewElement __instance ) => RecaleMissions( __instance.agency );
+      private static void RecaleAfterPhase ( Mission mission ) => RecaleMissions( mission.agency );
 
       private static void RecaleMissions ( Agency agency ) { try {
          deepSpaceMissions.Clear();
@@ -99,8 +101,11 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
       private static void ReAddMissions ( PlannedMissionsScreen __instance, RectTransform ___installationsParent, SimplePooler<PlannedMissionsScreenToggle> ___installations ) { try {
          var header = ___installationsParent.GetComponentInChildren< TMPro.TextMeshProUGUI >();
-         if ( header != null )
-            header.text = MarsHorizonMod.Localise( deepSpaceMissions.Count == 0 ? "Installations" : "MissionControl_Ongoing_Title" );
+         if ( header != null ) {
+            var txt = MarsHorizonMod.Localise( deepSpaceMissions.Count == 0 ? "Installations" : "MissionControl_Ongoing_Title" );
+            if ( deepSpaceMissions.Count > 0 ) txt += $" ({deepSpaceMissions.Count + ___installations.Count })";
+            header.text = txt;
+         }
          if ( deepSpaceMissions.Count == 0 || ___installations == null ) return;
          foreach ( var mission in deepSpaceMissions )
             ___installations.Get().SetMission( __instance, mission, MissionPlanScreen.EState.Overview );
