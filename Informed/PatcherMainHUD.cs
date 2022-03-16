@@ -1,6 +1,5 @@
 ﻿using Astronautica.View;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -18,7 +17,6 @@ namespace ZyMod.MarsHorizon.Informed {
             TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintJointMission ) );
          if ( config.hint_spacepedia_hide )
             TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HideSpacepediaHint ) );
-            //TryPatch( typeof( SpacepediaScreen ), "MarkAllRead", postfix: nameof( FixSpacepediaMarkAll ) );
       }
 
       private static Sprite icoInfo, icoMission, icoDiplomacy;
@@ -51,7 +49,6 @@ namespace ZyMod.MarsHorizon.Informed {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HideSpacepediaHint ( SidebarOption ___spacepediaOption ) { try {
-         //if ( IsActive( ___spacepediaOption ) ) return;
          ___spacepediaOption.SetInfoActive( 0 );
       } catch ( Exception x ) { Err( x ); } }
 
