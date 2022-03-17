@@ -20,6 +20,7 @@ namespace ZyMod.MarsHorizon.Informed {
       }
 
       private static Sprite icoInfo, icoMission, icoDiplomacy;
+      private static Color clrInfo, clrWarn;
       private static readonly FieldInfo InfoIcon = typeof( SidebarOption ).Field( "infoIcon" );
 
       private static void GetInfoIcon ( SidebarOption ___missionsOption, SidebarOption ___diplomacyOption, SidebarOption ___spacepediaOption ) { try {
@@ -27,25 +28,35 @@ namespace ZyMod.MarsHorizon.Informed {
          icoInfo = GetIcon( ___spacepediaOption ).sprite;
          icoMission = GetIcon( ___missionsOption ).sprite;
          icoDiplomacy = GetIcon( ___diplomacyOption ).sprite;
+         clrInfo = GetHighlight( ___spacepediaOption ).color;
+         clrWarn = GetHighlight( ___missionsOption ).color;
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HintAvailableMission ( HUDScreenSelect __instance, SidebarOption ___missionsOption ) { try {
-         GetIcon( ___missionsOption ).sprite = icoMission;
-         if ( IsActive( ___missionsOption ) ) return;
-         var i = __instance.client.simulation.GetAgencyAvailableMissionSlots( __instance.agency );
-         if ( i > 0 ) {
-            ___missionsOption.SetInfoActive( i );
-            GetIcon( ___missionsOption ).sprite = icoInfo;
+         var i = 0;
+         var showInfo = ! IsActive( ___missionsOption );
+         if ( showInfo ) {
+            i = __instance.client.simulation.GetAgencyAvailableMissionSlots( __instance.agency );
+            showInfo = i > 0;
          }
+         if ( showInfo ) {
+            Fine( "Hinting {0} available missions.", i );
+            ___missionsOption.SetInfoActive( i );
+         }
+         GetIcon( ___missionsOption ).sprite = showInfo ? icoInfo : icoMission;
+         GetHighlight( ___missionsOption ).color = showInfo ? clrInfo : clrWarn;
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HintJointMission ( HUDScreenSelect __instance, SidebarOption ___diplomacyOption ) { try {
-         GetIcon( ___diplomacyOption ).sprite = icoDiplomacy;
-         if ( IsActive( ___diplomacyOption ) ) return;
-         if ( __instance.client.simulation.CanAgencyGenerateJointMissionRequest( __instance.agency, out _ ) ) {
+         var showInfo = ! IsActive( ___diplomacyOption );
+         if ( showInfo )
+            showInfo = __instance.client.simulation.CanAgencyGenerateJointMissionRequest( __instance.agency, out _ );
+         if ( showInfo ) {
+            Fine( "Hinting joint mission cooldown." );
             ___diplomacyOption.SetInfoActive( 1 );
-            GetIcon( ___diplomacyOption ).sprite = icoInfo;
          }
+         GetIcon( ___diplomacyOption ).sprite = showInfo ? icoInfo : icoMission;
+         GetHighlight( ___diplomacyOption ).color = showInfo ? clrInfo : clrWarn;
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HideSpacepediaHint ( SidebarOption ___spacepediaOption ) { try {
@@ -54,5 +65,6 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static bool IsActive ( SidebarOption opt ) => ( InfoIcon?.GetValue( opt ) is GameObject obj && obj.activeSelf );
       private static Image GetIcon ( SidebarOption opt ) => opt.gameObject.GetComponentsInChildren< Image >( true ).First( e => e.sprite.name.StartsWith( "Spr_Icon_" ) );
+      private static Image GetHighlight ( SidebarOption opt ) => opt.gameObject.GetComponentsInChildren< Image >( true ).First( e => e.sprite.name.EndsWith( "_Notification" ) );
    }
 }
