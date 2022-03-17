@@ -10,7 +10,8 @@ namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMainHUD : ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
+         if ( config.hint_dynamic_colour )
+            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
          if ( config.hint_available_mission )
             TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintAvailableMission ) );
          if ( config.hint_propose_join_mission )
@@ -43,8 +44,10 @@ namespace ZyMod.MarsHorizon.Informed {
             Fine( "Hinting {0} available missions.", i );
             ___missionsOption.SetInfoActive( i );
          }
-         GetIcon( ___missionsOption ).sprite = showInfo ? icoInfo : icoMission;
-         GetHighlight( ___missionsOption ).color = showInfo ? clrInfo : clrWarn;
+         if ( icoInfo != null ) {
+            GetIcon( ___missionsOption ).sprite = showInfo ? icoInfo : icoMission;
+            GetHighlight( ___missionsOption ).color = showInfo ? clrInfo : clrWarn;
+         }
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HintJointMission ( HUDScreenSelect __instance, SidebarOption ___diplomacyOption ) { try {
@@ -55,8 +58,10 @@ namespace ZyMod.MarsHorizon.Informed {
             Fine( "Hinting joint mission cooldown." );
             ___diplomacyOption.SetInfoActive( 1 );
          }
-         GetIcon( ___diplomacyOption ).sprite = showInfo ? icoInfo : icoMission;
-         GetHighlight( ___diplomacyOption ).color = showInfo ? clrInfo : clrWarn;
+         if ( icoInfo != null ) {
+            GetIcon( ___diplomacyOption ).sprite = showInfo ? icoInfo : icoDiplomacy;
+            GetHighlight( ___diplomacyOption ).color = showInfo ? clrInfo : clrWarn;
+         }
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HideSpacepediaHint ( SidebarOption ___spacepediaOption ) { try {

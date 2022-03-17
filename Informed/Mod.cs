@@ -37,12 +37,6 @@ namespace ZyMod.MarsHorizon.Informed {
    public class Config : IniConfig {
       [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default True." ) ]
       public bool show_base_bonus = true;
-      [ Config( "Add a Launch Window button on planetery body mission list.  Default True." ) ]
-      public bool show_planet_launch_window = true;
-      [ Config( "Show expiry countdown for request and joint missions.  Default True." ) ]
-      public bool show_mission_expiry = true;
-      [ Config( "Show payload(s) time and weight of researched but unplanned mission.  Default True." ) ]
-      public bool show_mission_payload = true;
       [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
       public bool show_supplement_in_booster_description = true;
 
@@ -63,12 +57,20 @@ namespace ZyMod.MarsHorizon.Informed {
       public bool show_contractor_effects_on_button = true;
 
       [ Config( "\r\n[Solar System]" ) ]
+      [ Config( "Add a Launch Window button on planetery body mission list.  Default True." ) ]
+      public bool show_planet_launch_window = true;
+      [ Config( "Show expiry countdown for request and joint missions.  Default True." ) ]
+      public bool show_mission_expiry = true;
+      [ Config( "Show payload(s) time and weight of researched but unplanned mission.  Default True." ) ]
+      public bool show_mission_payload = true;
       [ Config( "Show alert icon next to mission button when a slot is available.  Default True." ) ]
       public bool hint_available_mission = true;
       [ Config( "Show alert icon next to diplomacy button when joint mission can be proposed.  Default True." ) ]
       public bool hint_propose_join_mission = true;
       [ Config( "Hide spacepedia alert icon.  Default True." ) ]
       public bool hint_spacepedia_hide = true;
+      [ Config( "Toggle highlight colour and icon to distinguish vanilla notices (warnings) and mod notice (info).  Default True." ) ]
+      public bool hint_dynamic_colour = true;
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
