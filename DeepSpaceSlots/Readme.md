@@ -73,6 +73,7 @@ but should be otherwise compatible with Steam and Epic.
 This mod does not change save games or game files.
 If a save is made with mission(s) on the deep space slots, and is later loaded without the mod,
 all missions will still be up and running. But you won't be able to launch new mission until the number of missions drops back to vanilla level.
+The same also happens if the mod config is changed leading to less missions to be transferred.
 
 
 # Mod Compatibility #

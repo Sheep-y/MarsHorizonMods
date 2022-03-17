@@ -31,7 +31,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
             if ( mission.currentPhaseIndex < config.deep_space_min_phase || ( now - mission.launchTurn ) < config.deep_space_min_turn ) return false;
             if ( config.deep_space_require_crewless && mission.CrewParticipated ) return false;
             var template = mission.template;
-            if ( template.PhaseCount <= config.deep_space_require_phase ) return false;
+            if ( template.PhaseCount < config.deep_space_require_phase ) return false;
             Fine( "Mission {0} launched on {1}, phase {2}/{3}, turn {4}/{5}, can transfer to deep space slot.",
                mission.LocalisationTag(), mission.launchTurn, mission.currentPhaseIndex, template.PhaseCount, now - mission.launchTurn, mission.Duration );
             return true;
