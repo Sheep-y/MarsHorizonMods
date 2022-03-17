@@ -15,13 +15,13 @@ namespace ZyMod.MarsHorizon.Informed {
          config.Load();
          if ( config.show_base_bonus )
             new PatcherBaseScreen().Apply();
-         if ( config.show_planet_launch_window || config.show_mission_expiry )
+         if ( config.show_planet_launch_window || config.show_mission_expiry || config.show_mission_payload )
             new PatcherMissionPlan().Apply();
          if ( config.show_supplement_in_booster_description )
             new PatcherResearchScreen().Apply();
-         if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_before_ready > 0 || config.show_contractor_effects_on_button )
+         if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 || config.show_contractor_effects_on_button )
             new PatcherVehicleDesigner().Apply();
-         if ( config.hint_available_mission || config.hint_propose_join_mission || config.hint_spacepedia_hide )
+         if ( config.hint_available_mission || config.hint_new_candidates || config.hint_propose_join_mission || config.hint_spacepedia_hide )
             new PatcherMainHUD().Apply();
       }
    }
@@ -63,9 +63,11 @@ namespace ZyMod.MarsHorizon.Informed {
       public bool show_mission_expiry = true;
       [ Config( "Show payload(s) time and weight of researched but unplanned mission.  Default True." ) ]
       public bool show_mission_payload = true;
-      [ Config( "Show alert icon next to mission button when a slot is available.  Default True." ) ]
+      [ Config( "Show an icon next to mission button when a slot is available.  Default True." ) ]
       public bool hint_available_mission = true;
-      [ Config( "Show alert icon next to diplomacy button when joint mission can be proposed.  Default True." ) ]
+      [ Config( "Show an icon next to crew button when new candidates are available.  Default True." ) ]
+      public bool hint_new_candidates = true;
+      [ Config( "Show an icon next to diplomacy button when joint mission can be proposed.  Default True." ) ]
       public bool hint_propose_join_mission = true;
       [ Config( "Hide spacepedia alert icon.  Default True." ) ]
       public bool hint_spacepedia_hide = true;

@@ -19,11 +19,12 @@ Features can be individually disabled by mod config (see below).
 ## Solar System Screen ##
 
 * Show info icon next to Mission when a mission slot is availble.
+* Show info icon next to Crew when new candidates are availble.
 * Show info icon next to Diplomacy when a joint mission can be proposed.
 * Spacepedia will now never show an icon.
 
-Well, I could have fixed the Mark All Read button, but hiding the icon is _way_ simpler, and also _way_ more reliable.
-If you _are_ modding your game, you probably don't need the hint anyway.  Plus, a simple google should show you a simple json fix.
+Hiding spacepedia notice is _way_ simpler, and _way_ more reliable, than trying to fix the mark all button in-game.
+If you insist, a simple google should show you a simple json fix.
 
 ## Planet Screen ##
 
