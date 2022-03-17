@@ -37,50 +37,34 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void HintAvailableMission ( HUDScreenSelect __instance, SidebarOption ___missionsOption ) { try {
          var i = 0;
-         var showInfo = ! IsActive( ___missionsOption );
-         if ( showInfo ) {
-            i = __instance.client.simulation.GetAgencyAvailableMissionSlots( __instance.agency );
-            showInfo = i > 0;
-         }
-         if ( showInfo ) {
-            Fine( "Hinting {0} available missions.", i );
-            ___missionsOption.SetInfoActive( i );
-         }
-         if ( icoInfo != null ) {
-            GetIcon( ___missionsOption ).sprite = showInfo ? icoInfo : icoWarn;
-            GetHighlight( ___missionsOption ).color = showInfo ? clrInfo : clrWarn;
-         }
+         if ( ! IsActive( ___missionsOption ) ) i = __instance.client.simulation.GetAgencyAvailableMissionSlots( __instance.agency );
+         SetInfoState( ___missionsOption, i, "Hinting {0} available missions." );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HintNewCandidates ( HUDScreenSelect __instance, SidebarOption ___crewOption ) { try {
          var i = 0;
-         var showInfo = ! IsActive( ___crewOption );
-         if ( showInfo ) {
+         if ( ! IsActive( ___crewOption ) )
             foreach ( var crew in __instance.agency.astronautRecruitPool )
-               if ( ! GameStats.HasEntry( "CrewMember", crew.GetStatsId() ) ) i++;
-            showInfo = i > 0;
-         }
-         if ( showInfo ) {
-            Fine( "Hinting {0} available Candidates.", i );
-            ___crewOption.SetInfoActive( i );
-         }
-         if ( icoInfo != null ) {
-            GetIcon( ___crewOption ).sprite = showInfo ? icoInfo : icoWarn;
-            GetHighlight( ___crewOption ).color = showInfo ? clrInfo : clrWarn;
-         }
+               if ( ! GameStats.HasEntry( "CrewMember", crew.GetStatsId() ) )
+                  i++;
+         SetInfoState( ___crewOption, i, "Hinting {0} available candidates." );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void HintJointMission ( HUDScreenSelect __instance, SidebarOption ___diplomacyOption ) { try {
-         var showInfo = ! IsActive( ___diplomacyOption );
-         if ( showInfo )
-            showInfo = __instance.client.simulation.CanAgencyGenerateJointMissionRequest( __instance.agency, out _ );
-         if ( showInfo ) {
-            Fine( "Hinting joint mission cooldown." );
-            ___diplomacyOption.SetInfoActive( 1 );
-         }
+         var i = 0;
+         if ( ! IsActive( ___diplomacyOption ) &&
+               __instance.client.simulation.CanAgencyGenerateJointMissionRequest( __instance.agency, out _ ) )
+            i = 1;
+         SetInfoState( ___diplomacyOption, 1, "Hinting joint mission cooldown." );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void SetInfoState ( SidebarOption opt, int active, string msg ) { try {
+         if ( active < 0 ) active = 0;
+         else Fine( msg, active );
+         opt.SetInfoActive( active );
          if ( icoInfo != null ) {
-            GetIcon( ___diplomacyOption ).sprite = showInfo ? icoInfo : icoWarn;
-            GetHighlight( ___diplomacyOption ).color = showInfo ? clrInfo : clrWarn;
+            GetIcon( opt ).sprite = active > 0 ? icoInfo : icoWarn;
+            GetHighlight( opt ).color = active > 0 ? clrInfo : clrWarn;
          }
       } catch ( Exception x ) { Err( x ); } }
 
