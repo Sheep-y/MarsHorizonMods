@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using static ZyMod.ModHelpers;
 
@@ -46,8 +45,16 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       } catch ( Exception x ) { return Err( x, new List<Mission>() ); } }
 
       private static int GetDeepSpaceMissionSlots ( Agency agency ) { try {
+         int b = GetBuildingSlots( agency ), m = GetMissionSlots( agency ), t = GetTechSlots( agency );
+         Info( "Deep space mission slots: Building {0}, Mission {1}, Research {2}", b, m, t );
+         return b + m + t;
+      } catch ( Exception x ) { return Err( x, 0 ); } }
+
+      private static int GetBuildingSlots ( Agency agency ) { try {
          var ext = 0f;
          var result = 0;
+         var c1 = ! string.IsNullOrEmpty( config.custom_building1_id ) && config.custom_building1_slot > 0;
+         var c2 = ! string.IsNullOrEmpty( config.custom_building2_id ) && config.custom_building2_slot > 0;
          foreach ( var building in agency.buildings ) {
             if ( ! building.IsComplete ) continue;
             var id = building.blueprintId;
@@ -57,21 +64,41 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
                result += config.deep_space_network_slot;
             else if ( id == "Building_MissionControl_Expand" )
                ext += config.mission_control_ext_slot;
-            else if ( id.Equals( config.custom_building1_id, StringComparison.InvariantCultureIgnoreCase ) )
+            else if ( c1 && id.Equals( config.custom_building1_id, StringComparison.InvariantCultureIgnoreCase ) )
                result += config.custom_building1_slot;
-            else if ( id.Equals( config.custom_building2_id, StringComparison.InvariantCultureIgnoreCase ) )
+            else if ( c2 && id.Equals( config.custom_building2_id, StringComparison.InvariantCultureIgnoreCase ) )
                result += config.custom_building2_slot;
          }
-         Fine( "Total deep space slot from buildings: {0} + {1}.", result, ext );
-         if ( config.grand_tour_phase2_slot > 0 ) {
+         return result + (int) Math.Floor( ext + 0.021f ); // 0.33 x 3 = 1, 0.66 x 3 = 2
+      } catch ( Exception x ) { return Err( x, 0 ); } }
+
+      private static int GetMissionSlots ( Agency agency ) { try {
+         var result = 0;
+         var c1 = ! string.IsNullOrEmpty( config.custom_mission1_id ) && config.custom_mission1_slot > 0;
+         var c2 = ! string.IsNullOrEmpty( config.custom_mission2_id ) && config.custom_mission2_slot > 0;
+         if ( config.grand_tour_phase2_slot > 0 || c1 || c2 ) {
             foreach ( var mission in agency.missions ) {
-               if ( mission.template.id == "milestone_the_grand_tour" && mission.currentPhaseIndex >= 2 ) {
+               if ( mission.template.id == "milestone_the_grand_tour" && mission.currentPhaseIndex >= 2 )
                   result += config.grand_tour_phase2_slot;
-                  break;
-               }
+               if ( c1 && mission.template.id == config.custom_mission1_id && mission.currentPhaseIndex >= config.custom_mission1_phase )
+                  result += config.custom_mission1_slot;
+               if ( c2 && mission.template.id == config.custom_mission2_id && mission.currentPhaseIndex >= config.custom_mission2_phase )
+                  result += config.custom_mission2_slot;
             }
          }
-         return result + (int) Math.Floor( ext + 0.021f ); // 0.33 x 3 = 1, 0.66 x 3 = 2
+         return result;
+      } catch ( Exception x ) { return Err( x, 0 ); } }
+
+      private static int GetTechSlots ( Agency agency ) { try {
+         var result = 0;
+         var c1 = ! string.IsNullOrEmpty( config.custom_tech1_id ) && config.custom_tech1_slot > 0;
+         var c2 = ! string.IsNullOrEmpty( config.custom_tech2_id ) && config.custom_tech2_slot > 0;
+         if ( c1 || c2 ) {
+            var sim = simulation;
+            if ( c1 && sim.HasAgencyCompletedResearch( agency, config.custom_tech1_id ) ) result += config.custom_tech1_slot;
+            if ( c2 && sim.HasAgencyCompletedResearch( agency, config.custom_tech2_id ) ) result += config.custom_tech2_slot;
+         }
+         return result;
       } catch ( Exception x ) { return Err( x, 0 ); } }
 
       private static void RecaleMissionSlots ( AstroViewElement __instance ) => RecaleMissions( __instance.agency );
@@ -135,7 +162,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          RecaleMissions( agency );
          int remoteMissionCount = deepSpaceMissions.Count;
          if ( remoteMissionCount == 0 ) return true;
-         var available = Controller.Instance?.activeClient.simulation.GetAgencyAvailableMissionSlots( agency );
+         var available = simulation.GetAgencyAvailableMissionSlots( agency );
          Fine( "Destroy building would lost {0} deep space slot.  Current have {1} deep space missions, {2} deep space slot, and {3} general free slot.", remoteMissionCount, deepSpaceMissionSlot, available );
          if ( remoteMissionCount < deepSpaceMissionSlot ) available += deepSpaceMissionSlot - remoteMissionCount;
          return slot <= available;
