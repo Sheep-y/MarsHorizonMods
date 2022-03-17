@@ -11,25 +11,25 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherAnimation : ModPatcher {
       internal void Apply () {
-         if ( config.remove_delays ) {
+         if ( config.max_delay >= 0 && config.max_delay <= 0.5f ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
             TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
-            TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
+            //TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
             TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
-
             TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
             TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
-            TryPatch( typeof( HUDObjectiveList ), "_Refresh", prefix: nameof( RemoveWait_ObjectiveList ) );
-
+         }
+         if ( config.remove_delays ) {
+            //TryPatch( typeof( HUDObjectiveList ), "_Refresh", prefix: nameof( RemoveWait_ObjectiveList ) );
             TryPatch( typeof( ConstructionCompleteScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
             TryPatch( typeof( LaunchDayScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
             TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", prefix: nameof( RemoveWait_WaitForSecondsSkippable ) );
             TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", prefix: nameof( RemoveWait_Tween ) );
             TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", prefix: nameof( RemoveWait_Tween ) );
-            foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
-               TryPatch( m, prefix: nameof( RemoveWait_TweenDo ) );
+            //foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
+            //   TryPatch( m, prefix: nameof( RemoveWait_TweenDo ) );
          }
-         if ( config.skip_screen_fade )
+         if ( config.max_screen_fade >= 0 )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
                TryPatch( m, prefix: nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {
@@ -43,9 +43,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", postfix: nameof( SpeedUpMission ) );
             TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", prefix: nameof( SkipReliabilityFill ) );
             TryPatch( typeof( MissionGameplayScene ), "PostInitialise", prefix: nameof( SpeedUpMissionEffects ) );
-            TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
             TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", prefix: nameof( SpeedUpMissionScreenEffect ) );
          }
+         if ( config.swoosh_speed > 0 )
+            TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
          if ( config.fast_mission_result ) {
             TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
             TryPatch( typeof( MissionSummary ), "AnimatePhaseProgress", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
@@ -55,35 +56,34 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       }
 
       #region Remove delays
-      private const float DELAY = 0.1f;
-
       private static void SkipMonoTimeDelays ( ref float duration, MonoBehaviour behaviour, Action callback ) {
-         if ( duration <= 0.1f ) return;
+         if ( duration <= config.max_delay ) return;
          Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour?.GetType().Name, behaviour?.name );
-         duration = DELAY;
+         duration = config.max_delay;
       }
-
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, DELAY, 2 );
+         => ReplaceFloat( codes, 0.5f, config.max_delay, 2 );
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCoroutine ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, DELAY, 2 );
-      private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( ReplaceFloat( codes, 2f, 0f, 1 ), 0.5f, DELAY, 1 );
-      private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, DELAY, 1 );
-
-      private static void RemoveWait_Animator ( AnimatorDelay __instance ) {
-         if ( __instance.maxDelay > 0 ) Fine( "Removing {0}s delay from animator {1}", __instance.maxDelay, __instance.name );
-         __instance.maxDelay = DELAY;
+         => ReplaceFloat( codes, 0.5f, config.max_delay, 2 );
+      private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes ) {
+         if ( config.max_delay < 2f ) codes = ReplaceFloat( codes, 2f, config.max_delay, 1 );
+         return ReplaceFloat( codes, 0.5f, config.max_delay, 1 );
       }
+      private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.5f, config.max_delay, 1 );
+      private static void RemoveWait_Animator ( AnimatorDelay __instance ) {
+         if ( __instance.maxDelay > config.max_delay ) Fine( "Removing {0}s delay from animator {1}", __instance.maxDelay, __instance.name );
+         __instance.maxDelay = config.max_delay;
+      }
+
       private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0;
       private static void RemoveWait_Blackout ( ref float ___tweenTime, ref float ___waitTime ) {
-         if ( ___waitTime > 0 ) Fine( "Removing {0}s screen fade.", ___waitTime );
-         ___tweenTime = ___waitTime = 0f;
+         if ( ___waitTime > config.max_screen_fade ) Fine( "Reduce {0}s screen fade to {1}.", ___waitTime, config.max_screen_fade );
+         ___tweenTime = ___waitTime = config.max_screen_fade;
       }
-      private static void RemoveWait_CompleteScreen ( ref float time ) => time = DELAY;
-      private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = DELAY;
-      private static void RemoveWait_Tween ( ref float interval ) => interval = DELAY;
+      private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
+      private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
+      private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
       private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0f;
       #endregion
 
@@ -105,9 +105,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          __instance.baseReliabilityRollSpeed = 20f;
          __instance.skippedReliabilityRollSpeed = 20f;
       }
-      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 20f );
-      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = 5;
-      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20f;
+      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 1f );
+      private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = config.swoosh_speed;
+      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20;
       private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
 
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )

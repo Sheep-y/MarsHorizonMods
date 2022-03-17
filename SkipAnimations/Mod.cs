@@ -16,7 +16,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          config.Load();
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             new PatcherCinematic().Apply();
-         if ( config.remove_delays || config.skip_screen_fade || config.skip_mission_intro || config.fast_launch || config.fast_mission )
+         if ( config.max_delay >= 0 || config.remove_delays || config.max_screen_fade >= 0 || config.skip_mission_intro ||
+               config.fast_launch || config.fast_mission || config.fast_mission_result || config.swoosh_speed > 0 )
             new PatcherAnimation().Apply();
          if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
             new PatcherBypass().Apply();
@@ -41,10 +42,12 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Remove or reduce assorted screen and action delays.  Default True." ) ]
+      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable." ) ]
+      public float max_delay = 0.1f;
+      [ Config( "Max screen fading duration.  Default 0.  Set to -1 to disable." ) ]
+      public float max_screen_fade = 0f;
+      [ Config( "Remove or reduce assorted screen delays.  Default True." ) ]
       public bool remove_delays = true;
-      [ Config( "Skip screen fadings.  Default True." ) ]
-      public bool skip_screen_fade = true;
       [ Config( "Deploy payload in background, skip payload connection, and skip task popup.  Default True." ) ]
       public bool skip_mission_intro = true;
       [ Config( "Skip launch countdown and speed up launch animations.  Default True." ) ]
@@ -53,6 +56,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool fast_mission = true;
       [ Config( "Speed up mini-game report animations.  Default True." ) ]
       public bool fast_mission_result = true;
+      [ Config( "Mini-game resource swoosh speed.  Set to 0 or -1 to disable." ) ]
+      public float swoosh_speed = 10f;
 
       [ Config( "\r\n[Bypass]" ) ]
       [ Config( "Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]

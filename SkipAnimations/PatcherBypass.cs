@@ -97,7 +97,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void BypassNormalAction ( Data.MissionEvent @event, Button ___ignoreButton ) { try {
          if ( @event != null ) return;
          Task.Run( async () => { try {
-            await Task.Delay( 300 );
+            await Task.Delay( 200 );
             Info( "Auto-bypassing uneventful action." );
             ___ignoreButton.OnPointerClick( new PointerEventData( EventSystem.current ) );
             //ExecuteEvents.Execute( ___ignoreButton.gameObject, new PointerEventData( EventSystem.current ), ExecuteEvents.pointerClickHandler );
