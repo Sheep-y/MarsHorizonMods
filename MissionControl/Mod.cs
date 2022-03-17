@@ -15,7 +15,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          new PatcherMissionSim().Apply();
          if ( config.standalone_resolve_rng )
             new PatcherAutoResolve().Apply();
-         if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 )
+         if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 || config.milestone_challenge_no_duplicate_reward )
             new PatcherMilestoneSim().Apply();
       }
    }
@@ -65,8 +65,8 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float lucrative_weight_multiplier = 1.8f;
       [ Config( "Multiply lucartive variation chances when none exists (multiplied).  Default 2.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier_opening = 2;
-      [ Config( "Multiply lucartive variation chances when all researches are done (multiplied).  Default 20.  Set to 1 to not change." ) ]
-      public float lucrative_weight_multiplier_full_tech = 10;
+      [ Config( "Multiply lucartive variation chances when all researches are done (multiplied).  Default 5.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_full_tech = 5;
       [ Config( "Multiply publicised variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float publicised_weight_multiplier = 1;
       [ Config( "Multiply test variation chances.  Default 1.  Set to 1 to not change." ) ]
