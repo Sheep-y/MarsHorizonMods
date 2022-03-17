@@ -11,13 +11,15 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherAnimation : ModPatcher {
       internal void Apply () {
-         if ( config.max_delay >= 0 && config.max_delay <= 0.5f ) {
+         if ( config.max_delay >= 0 ) {
             TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
-            TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
-            //TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
             TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
-            TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
-            TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
+            if ( config.max_delay <= 0.5f ) {
+               TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
+               //TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
+               TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
+               TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
+            }
          }
          if ( config.remove_delays ) {
             //TryPatch( typeof( HUDObjectiveList ), "_Refresh", prefix: nameof( RemoveWait_ObjectiveList ) );
@@ -67,7 +69,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          => ReplaceFloat( codes, 0.5f, config.max_delay, 2 );
       private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes ) {
          if ( config.max_delay < 2f ) codes = ReplaceFloat( codes, 2f, config.max_delay, 1 );
-         return ReplaceFloat( codes, 0.5f, config.max_delay, 1 );
+         if ( config.max_delay < 0.5f ) codes = ReplaceFloat( codes, 0.5f, config.max_delay, 1 );
+         return codes;
       }
       private static IEnumerable< CodeInstruction > NoWait_ContinueGameCo ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 0.5f, config.max_delay, 1 );
@@ -113,11 +116,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 5f, 50f, 1 );
       private static IEnumerable< CodeInstruction > SpeedUpPhaseAnimation ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.75f, 0.1f, 1 );
+         => ReplaceFloat( codes, 0.75f, 0.2f, 1 );
       private static IEnumerable< CodeInstruction > SpeedUpPhaseProgress ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( ReplaceFloat( codes, 0.75f, 0.1f, 1 ),  0.5f, 0.1f, 1 );
+         => ReplaceFloat( ReplaceFloat( codes, 0.75f, 0.2f, 1 ),  0.5f, 0.2f, 1 );
       private static IEnumerable< CodeInstruction > SpeedUpRewards ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.1f, 3 ), 1f, 0.1f, 3 ), 1.5f, 0.1f, 1 );
+         => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.2f, 3 ), 1f, 0.2f, 3 ), 1.5f, 0.2f, 1 );
       private static void SpeedUpMissionSummary ( Tween __result ) => __result.timeScale = 100f;
       #endregion
 

@@ -42,10 +42,10 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable." ) ]
-      public float max_delay = 0.1f;
-      [ Config( "Max screen fading duration.  Default 0.  Set to -1 to disable." ) ]
-      public float max_screen_fade = 0f;
+      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable.  A low delay will cause UI deform on mini-game." ) ]
+      public float max_delay = 0.2f;
+      [ Config( "Max screen fading duration.  Set to -1 to disable." ) ]
+      public float max_screen_fade = 0.1f;
       [ Config( "Remove or reduce assorted screen delays.  Default True." ) ]
       public bool remove_delays = true;
       [ Config( "Deploy payload in background, skip payload connection, and skip task popup.  Default True." ) ]
