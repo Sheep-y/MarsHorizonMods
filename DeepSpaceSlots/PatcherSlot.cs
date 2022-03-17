@@ -25,14 +25,16 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
       private static IEnumerable< Mission > GetCurrentDeepSpaceMissions ( Agency agency ) { try {
          Fine( "Scanning deep space missions." );
+         var now = simulation.universe.turn;
          return agency.missions.Where( ( mission ) => {
-            if ( mission.missionState != Mission.EState.Active || mission.Duration < 30 ) return false;
+            if ( mission.missionState != Mission.EState.Active || mission.Duration < config.deep_space_require_duration ) return false;
+            if ( mission.currentPhaseIndex < config.deep_space_min_phase || ( now - mission.launchTurn ) < config.deep_space_min_turn ) return false;
+            if ( config.deep_space_require_crewless && mission.CrewParticipated ) return false;
             var template = mission.template;
-            if ( template.PhaseCount <= 2 || template.phases.Skip( 2 ).Sum( e => e.turnDelay ) < 6 ) return false;
-            var result = mission.currentPhaseIndex > 1;
-            Fine( "Mission {0} launched on {1}, duration {4}, phase {2}/{3}, {5} transfer to deep space network.",
-               mission.LocalisationTag(), mission.launchTurn, mission.currentPhaseIndex, template.PhaseCount, mission.Duration, result ? "can" : "future" );
-            return result;
+            if ( template.PhaseCount <= config.deep_space_require_phase ) return false;
+            Fine( "Mission {0} launched on {1}, phase {2}/{3}, turn {4}/{5}, can transfer to deep space slot.",
+               mission.LocalisationTag(), mission.launchTurn, mission.currentPhaseIndex, template.PhaseCount, now - mission.launchTurn, mission.Duration );
+            return true;
             /*
             var distance = mission.template.distance;
             if ( distance <= Data.Distance.InnerPlanets ) return false;

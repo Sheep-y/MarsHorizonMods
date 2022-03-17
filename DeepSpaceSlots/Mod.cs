@@ -20,6 +20,19 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
    }
 
    public class Config : IniConfig {
+      [ Config( "[Qualification]" ) ]
+      [ Config( "As the number of mission destination may increase in the future, " ) ]
+      [ Config( "Min. total duration (months) for a mission to be qualifed as deep space." ) ]
+      public byte deep_space_require_duration = 30;
+      [ Config( "Min. total phases for a mission to be qualified as deep space." ) ]
+      public byte deep_space_require_phase = 3;
+      [ Config( "Exclude crewed missions from deep space slot.  Default False." ) ]
+      public bool deep_space_require_crewless = false;
+      [ Config( "Min. phase for a mission to be trasferred to deep space slot." ) ]
+      public byte deep_space_min_phase = 2;
+      [ Config( "Min. months for a mission to be trasferred to deep space slot." ) ]
+      public byte deep_space_min_turn = 6;
+
       [ Config( "[Built-In]" ) ]
       [ Config( "How many deep space mission slot does Deep Space Network provide.  Default 1." ) ]
       public byte deep_space_network_slot = 1;
