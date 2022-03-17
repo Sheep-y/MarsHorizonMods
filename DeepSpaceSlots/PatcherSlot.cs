@@ -131,8 +131,14 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       private static void ReAddMissions ( PlannedMissionsScreen __instance, RectTransform ___installationsParent, SimplePooler<PlannedMissionsScreenToggle> ___installations ) { try {
          var header = ___installationsParent.GetComponentInChildren< TMPro.TextMeshProUGUI >();
          if ( header != null ) {
-            var txt = MarsHorizonMod.Localise( deepSpaceMissions.Count == 0 ? "Installations" : "MissionControl_Ongoing_Title" );
-            if ( deepSpaceMissions.Count > 0 ) txt += $" ({deepSpaceMissions.Count + ___installations.Count })";
+            var txt = MarsHorizonMod.Localise( deepSpaceMissionSlot== 0 ? "Installations" : "MissionControl_Ongoing_Title" );
+            var inst = ___installations.Count;
+            if ( deepSpaceMissionSlot > 0 ) {
+               if ( deepSpaceMissionSlot == deepSpaceMissions.Count )
+                  txt += $" ({deepSpaceMissions.Count + inst })";
+               else
+                  txt += $" ({deepSpaceMissions.Count + inst }/{ deepSpaceMissionSlot + inst })";
+            }
             header.text = txt;
          }
          if ( deepSpaceMissions.Count == 0 || ___installations == null ) return;
