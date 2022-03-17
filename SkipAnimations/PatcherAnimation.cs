@@ -16,20 +16,16 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
             if ( config.max_delay <= 0.5f ) {
                TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
-               //TryPatch( typeof( ClientViewer ).Method( "CleanupCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
                TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
                TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
             }
          }
          if ( config.remove_delays ) {
-            //TryPatch( typeof( HUDObjectiveList ), "_Refresh", prefix: nameof( RemoveWait_ObjectiveList ) );
             TryPatch( typeof( ConstructionCompleteScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
             TryPatch( typeof( LaunchDayScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
             TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", prefix: nameof( RemoveWait_WaitForSecondsSkippable ) );
             TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", prefix: nameof( RemoveWait_Tween ) );
             TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", prefix: nameof( RemoveWait_Tween ) );
-            //foreach ( var m in typeof( DOTweenModuleUI ).Methods().Where( e => e.Name.StartsWith( "DO" ) ) )
-            //   TryPatch( m, prefix: nameof( RemoveWait_TweenDo ) );
          }
          if ( config.max_screen_fade >= 0 )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
@@ -79,7 +75,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          __instance.maxDelay = config.max_delay;
       }
 
-      private static void RemoveWait_ObjectiveList ( ref float ___listAnimWait, ref float ___listHideExtendedTime ) => ___listAnimWait = ___listHideExtendedTime = 0;
       private static void RemoveWait_Blackout ( ref float ___tweenTime, ref float ___waitTime ) {
          if ( ___waitTime > config.max_screen_fade ) Fine( "Reduce {0}s screen fade to {1}.", ___waitTime, config.max_screen_fade );
          ___tweenTime = ___waitTime = config.max_screen_fade;
@@ -87,7 +82,6 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void RemoveWait_CompleteScreen ( ref float time ) => time = 0;
       private static void RemoveWait_WaitForSecondsSkippable ( ref float seconds ) => seconds = 0;
       private static void RemoveWait_Tween ( ref float interval ) => interval = 0;
-      private static void RemoveWait_TweenDo ( ref float duration ) => duration = 0f;
       #endregion
 
       private static void SpeedUpLaunch ( ref float ___skipSpeedUp, ref bool ___canSkipTween ) { ___canSkipTween = true; ___skipSpeedUp = 100f; }
