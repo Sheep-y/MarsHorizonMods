@@ -11,9 +11,10 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
    internal class PatcherSlot : ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecaleMissionSlots ) );
-         TryPatch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecaleMissionSlots ) );
-         TryPatch( typeof( MissionSummary ), "Setup", postfix: nameof( RecaleAfterPhase ) );
+         TryPatch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecalcMissionSlots ) );
+         TryPatch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecalcMissionSlots ) );
+         TryPatch( typeof( MissionSummary ), "Setup", postfix: nameof( RecalcAfterPhase ) ); // Refresh after mission phase change
+         TryPatch( typeof( ClientViewer ), "SetAgency", postfix: nameof( RecalcAgencySlots ) ); // Refresh after load game
          TryPatch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
          if ( TryPatch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
             TryPatch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
@@ -103,12 +104,13 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          return result;
       } catch ( Exception x ) { return Err( x, 0 ); } }
 
-      private static void RecaleMissionSlots ( AstroViewElement __instance ) => RecaleMissions( __instance.agency );
-      private static void RecaleAfterPhase ( Mission mission ) => RecaleMissions( mission.agency );
+      private static void RecalcMissionSlots ( AstroViewElement __instance ) => RecaleMissions( __instance.agency );
+      private static void RecalcAfterPhase ( Mission mission ) => RecaleMissions( mission.agency );
+      private static void RecalcAgencySlots ( Agency a ) => RecaleMissions( a );
 
       private static void RecaleMissions ( Agency agency ) { try {
          deepSpaceMissions.Clear();
-         if ( agency.isAI ) { deepSpaceMissionSlot = 0; return; }
+         if ( agency?.isAI != false ) { deepSpaceMissionSlot = 0; return; }
          var remoteMissions = GetCurrentDeepSpaceMissions( agency );
          deepSpaceMissionSlot = GetDeepSpaceMissionSlots( agency );
          Fine( "Deep space missions: {0}, Deep space slots: {1}", remoteMissions.Count(), deepSpaceMissionSlot );
