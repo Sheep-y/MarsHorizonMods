@@ -29,6 +29,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          me = this;
          TryPatch( typeof( Controller ), "OnSystemLanguageChanged", postfix: nameof( DynamicPatch ) );
          TryPatch( typeof( UserSettings ), "SetLanguage", postfix: nameof( DynamicPatch ) );
+         me.TryPatch( typeof( MaterialReferenceManager ), "AddFontAssetInternal", postfix: nameof( LogFont ) );
       }
 
       private static ModPatch patchZh, patchFont;
@@ -40,6 +41,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             if ( patchZh == null ) {
                patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
                patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
+               foreach ( var f in allTMPFs ) FixFont( f );
             }
             LoadFonts();
          } else if ( patchZh != null ) {
@@ -66,6 +68,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
       private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
+      private static readonly HashSet< TMP_FontAsset > allTMPFs = new HashSet< TMP_FontAsset >();
       private static TMP_FontAsset lastTMPF;
 
       private static void ToZht ( ref string text ) { try {
@@ -76,30 +79,39 @@ namespace ZyMod.MarsHorizon.Zhant {
             LCMapString( LOCALE_SYSTEM_DEFAULT, LCMAP_TRADITIONAL_CHINESE, text, text.Length, zht, zht.Length );
             zht = ZhtTweaks( zht );
          }
-         Fine( "{0} => {1} ({2} chars)", text, zht, zht.Length );
+         Fine( "{0} => {1}", text, zht );
          zhs2zht.Add( text, text = zht );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void LogFont ( TMP_FontAsset fontAsset ) { try {
+         if ( allTMPFs.Contains( fontAsset ) ) return;
+         Info( "Catch {0}", fontAsset.name );
+         allTMPFs.Add( fontAsset );
+         if ( zhtTMPFs.Count > 0 ) FixFont( fontAsset );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void ZhtFont ( UIViewState state ) { try {
          Fine( "Finding font assets in view state" );
-         foreach ( var entry in state.entries ) {
+         foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
             if ( entry?.@object == null ) continue;
             //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Fine( "> TXT", text.name ?? text.text, text.font );
-            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) ) {
-               var f = text.font;
-               if ( f == lastTMPF || fixedTMPFs.Contains( f ) ) continue;
-               fixedTMPFs.Add( lastTMPF = f );
-               foreach ( var fb in f.fallbackFontAssetTable )
-               if ( fb.name.StartsWith( "NotoSansCJKsc-" ) ) {
-                  var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
-                  if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
-                     Info( "Adding {0} as fallback of {1}.", tc.name, fb.name );
-                     f.fallbackFontAssetTable.Add( tc );
-                  } else
-                     Warn( "Cannot find font variation {0} from {1}.", variation, fb.name );
-               }
-            }
+            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) ) FixFont( text.font );
          }
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void FixFont ( TMP_FontAsset fontAsset ) { try {
+         if ( fontAsset == lastTMPF || fixedTMPFs.Contains( fontAsset ) ) return;
+         fixedTMPFs.Add( lastTMPF = fontAsset );
+         foreach ( var fb in fontAsset.fallbackFontAssetTable )
+            if ( fb.name.StartsWith( "NotoSansCJKsc-" ) ) {
+               var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+               if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
+                  Info( "Adding {0} as fallback of {1}.", tc.name, fb.name );
+                  fontAsset.fallbackFontAssetTable.Add( tc );
+                  break;
+               } else
+                  Warn( "Cannot find font variation {0} from {1}.", variation, fb.name );
+            }
       } catch ( Exception x ) { Err( x ); } }
 
       private static readonly string[] tweaks = new string[]{
