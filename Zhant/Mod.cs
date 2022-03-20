@@ -39,6 +39,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( locale == "zh_cn" ) {
             if ( patchZh == null ) {
                patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
+               patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
             }
             LoadFonts();
          } else if ( patchZh != null ) {
@@ -49,13 +50,13 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { Err( x ); } } }
 
       private static void LoadFonts () {
-         if ( zhs2zht.Count != 0 || zhtFonts.Count != 0 ) return;
+         if ( zhs2zht.Count != 0 || zhtTMPFs.Count != 0 ) return;
          foreach ( var v in new string[] { "Regular", "Medium", "Bold" } ) try {
-            var f = Path.Combine( ModDir, $"NotoSansHK-{v}.otf" );
+            string fn = $"NotoSansHK-{v}", f = Path.Combine( ModDir, $"{fn}.otf" );
             if ( File.Exists( f ) ) {
                Info( "Loading {0}", f );
-               zhtFonts[ v ] = new Font( f );
-               zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( zhtFonts[ v ] );
+               zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ) );
+               zhtTMPFs[ v ].name = fn;
             } else
                Warn( "Font {0} not found.", f );
          } catch ( Exception x ) { Err( x ); }
@@ -63,13 +64,13 @@ namespace ZyMod.MarsHorizon.Zhant {
       }
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
-      private static readonly Dictionary< string, Font > zhtFonts = new Dictionary< string, Font >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
-      
+      private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
+      private static TMP_FontAsset lastTMPF;
+
       private static void ToZht ( ref string text ) { try {
          if ( string.IsNullOrEmpty( text ) ) return;
          if ( zhs2zht.TryGetValue( text, out string zht ) ) { text = zht; return; }
-         if ( text == "简体中文" ) zht = "中文";
          else {
             zht = new string( ' ', text.Length );
             LCMapString( LOCALE_SYSTEM_DEFAULT, LCMAP_TRADITIONAL_CHINESE, text, text.Length, zht, zht.Length );
@@ -77,6 +78,28 @@ namespace ZyMod.MarsHorizon.Zhant {
          }
          Fine( "{0} => {1} ({2} chars)", text, zht, zht.Length );
          zhs2zht.Add( text, text = zht );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void ZhtFont ( UIViewState state ) { try {
+         Fine( "Finding font assets in view state" );
+         foreach ( var entry in state.entries ) {
+            if ( entry?.@object == null ) continue;
+            //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Fine( "> TXT", text.name ?? text.text, text.font );
+            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) ) {
+               var f = text.font;
+               if ( f == lastTMPF || fixedTMPFs.Contains( f ) ) continue;
+               fixedTMPFs.Add( lastTMPF = f );
+               foreach ( var fb in f.fallbackFontAssetTable )
+               if ( fb.name.StartsWith( "NotoSansCJKsc-" ) ) {
+                  var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+                  if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
+                     Info( "Adding {0} as fallback of {1}.", tc.name, fb.name );
+                     f.fallbackFontAssetTable.Add( tc );
+                  } else
+                     Warn( "Cannot find font variation {0} from {1}.", variation, fb.name );
+               }
+            }
+         }
       } catch ( Exception x ) { Err( x ); } }
 
       private static readonly string[] tweaks = new string[]{
@@ -101,6 +124,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          switch ( txt ) {
             case "跳過當前月" : return "下一月";
             case "跳到事件" : return "下一事件";
+            case "簡體中文" : return "中文";
          }
          for ( var i = 0 ; i < tweaks.Length ; i += 2 )
             //if ( txt.Contains( tweaks[ i ][ 0 ] ) )
