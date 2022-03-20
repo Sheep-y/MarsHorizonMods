@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Mod: Mission Control" )]
-[assembly: AssemblyDescription( "A Mars Horizon mod to change weight of new missions and milestone challenges" )]
+[assembly: AssemblyTitle( "Mod: Payload QA" )]
+[assembly: AssemblyDescription( "A Mars Horizon mod to enhance payload reliabilities" )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany( "Sheepy" )]
 [assembly: AssemblyProduct( "" )]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("094c42d0-2a2c-4333-b60a-d35dba9c3080")]
+[assembly: Guid("68b09c92-c9fc-44ab-832c-504594a5376f")]
 
 // Version information for an assembly consists of the following four values:
 //

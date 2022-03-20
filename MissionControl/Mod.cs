@@ -13,8 +13,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
          var config = ModPatcher.config;
          config.Load();
          new PatcherMissionSim().Apply();
-         if ( config.standalone_resolve_rng )
-            new PatcherAutoResolve().Apply();
          if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 || config.milestone_challenge_no_duplicate_reward )
             new PatcherMilestoneSim().Apply();
       }
@@ -44,8 +42,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float ai_request_mission_chance = -1;
       [ Config( "Use a standalone random number generator to decide new player missions.  Default True." ) ]
       public bool standalone_mission_rng = true;
-      [ Config( "Use a standalone random number generator to decide auto resolve.  Default True." ) ]
-      public bool standalone_resolve_rng = true;
 
       [ Config( "\r\n[Joint]" ) ]
       [ Config( "Section note: join mission happens only to player agency.  Does not affect AI." ) ]
@@ -82,11 +78,11 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config() ] public int moon_crewed_mission_weight = 10;
       [ Config() ] public int space_station_mission_weight = 10;
 
-      [ Config( "\r\n[Inner Planets]" ) ]
+      [ Config( "[Inner Planets]" ) ]
       [ Config() ] public int venus_mission_weight = 3;
       [ Config() ] public int mercury_mission_weight = 2;
 
-      [ Config( "\r\n[Outter Planets]" ) ]
+      [ Config( "[Outter Planets]" ) ]
       [ Config() ] public int mars_mission_weight = 5;
       [ Config() ] public int jupiter_mission_weight = 0;
       [ Config() ] public int saturn_mission_weight = 0;
@@ -94,7 +90,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config() ] public int neptune_mission_weight = 0;
       [ Config() ] public int pluto_mission_weight = 0;
 
-      [ Config( "\r\n[Others]" ) ]
+      [ Config( "[Others Destinations]" ) ]
       public int other_mission_weight = 0;
 
       [ Config( "\r\n" ) ]
