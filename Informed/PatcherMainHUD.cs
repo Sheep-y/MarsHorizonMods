@@ -55,7 +55,7 @@ namespace ZyMod.MarsHorizon.Informed {
          if ( ! IsActive( ___diplomacyOption ) &&
                __instance.client.simulation.CanAgencyGenerateJointMissionRequest( __instance.agency, out _ ) )
             i = 1;
-         SetInfoState( ___diplomacyOption, 1, "Hinting joint mission cooldown." );
+         SetInfoState( ___diplomacyOption, i, "Hinting joint mission cooldown." );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetInfoState ( SidebarOption opt, int active, string msg ) { try {
