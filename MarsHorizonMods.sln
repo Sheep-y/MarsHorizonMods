@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSpaceSlots", "DeepSpace
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayloadQA", "PayloadQA\PayloadQA.csproj", "{68B09C92-C9FC-44AB-832C-504594A5376F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhant", "Zhant\Zhant.csproj", "{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\Shared.projitems*{cc3f2d84-7515-4fe6-85b2-72713933dd4d}*SharedItemsImports = 13
@@ -44,6 +46,10 @@ Global
 		{68B09C92-C9FC-44AB-832C-504594A5376F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68B09C92-C9FC-44AB-832C-504594A5376F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68B09C92-C9FC-44AB-832C-504594A5376F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

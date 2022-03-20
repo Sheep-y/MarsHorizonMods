@@ -12,7 +12,10 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
-         new PatcherAutoResolve().Apply();
+         if ( config.payload_specialise_auto_bonus > 0 || config.payload_power_auto_bonus > 0 || config.payload_power_auto_bonus_crit > 0 || config.standalone_resolve_rng )
+            new PatcherAutoResolve().Apply();
+         if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 )
+            new PatcherMinigame().Apply();
       }
    }
 
@@ -28,11 +31,17 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       public byte payload_power_auto_bonus = 0;
       [ Config( "Auto-resolve bonus crit success chance provided by power variant payload.  Set to 0 to disable." ) ]
       public byte payload_power_auto_bonus_crit = 10;
-      [ Config( "Use a standalone random number generator to decide auto resolve.  Default True." ) ]
+      [ Config( "Use a standalone random number generator to auto resolve.  Default True." ) ]
       public bool standalone_resolve_rng = true;
+
+      [ Config( "\r\n[Mini-game]" ) ]
+      [ Config( "Base critical success chance.  Game default at 0.1 for 10%.  Set to -1 to not change." ) ]
+      public float minigame_base_crit = 0;
+      [ Config( "Crit chance as proportional to payload reliability.  Mod default 0.2 for 20%, e.g. 50% payload reliability = 10% crit." ) ]
+      public float minigame_porportion_crit = 0.2f;
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200304;
+      public int config_version = 20200320;
    }
 }
