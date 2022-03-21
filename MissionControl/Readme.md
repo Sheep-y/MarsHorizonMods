@@ -6,6 +6,9 @@
 This is an unofficial mod of Mars Horizon (2020 game).
 It adjust mission weightings, tweak milestone challenge requirement and rewards, and replace the RNG used to generate and auto resolve missions.
 
+The default configuration gives you a greater freedom to do non-Earth planet milestones,
+since they have a much reduced chance to be selected for request missions.
+
 
 # Installation #
 

@@ -73,26 +73,26 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
       [ Config( "\r\n[Earth and Moon]" ) ]
       [ Config( "Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
-      [ Config() ] public int earth_uncrewed_mission_weight = 30;
-      [ Config() ] public int earth_crewed_mission_weight = 20;
-      [ Config() ] public int moon_uncrewed_mission_weight = 20;
-      [ Config() ] public int moon_crewed_mission_weight = 10;
-      [ Config() ] public int space_station_mission_weight = 10;
+      [ Config() ] public int earth_uncrewed_mission_weight = 40;
+      [ Config() ] public int earth_crewed_mission_weight = 30;
+      [ Config() ] public int moon_uncrewed_mission_weight = 30;
+      [ Config() ] public int moon_crewed_mission_weight = 12;
+      [ Config() ] public int space_station_mission_weight = 20;
 
       [ Config( "[Inner Planets]" ) ]
-      [ Config() ] public int venus_mission_weight = 3;
-      [ Config() ] public int mercury_mission_weight = 2;
+      [ Config() ] public int venus_mission_weight = 6;
+      [ Config() ] public int mercury_mission_weight = 4;
+      [ Config() ] public int mars_mission_weight = 10;
 
       [ Config( "[Outter Planets]" ) ]
-      [ Config() ] public int mars_mission_weight = 5;
-      [ Config() ] public int jupiter_mission_weight = 0;
-      [ Config() ] public int saturn_mission_weight = 0;
-      [ Config() ] public int uranus_mission_weight = 0;
-      [ Config() ] public int neptune_mission_weight = 0;
-      [ Config() ] public int pluto_mission_weight = 0;
+      [ Config() ] public int jupiter_mission_weight = 1;
+      [ Config() ] public int saturn_mission_weight = 1;
+      [ Config() ] public int uranus_mission_weight = 1;
+      [ Config() ] public int neptune_mission_weight = 1;
+      [ Config() ] public int pluto_mission_weight = 1;
 
       [ Config( "[Others Destinations]" ) ]
-      public int other_mission_weight = 0;
+      public int other_mission_weight = 1;
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
