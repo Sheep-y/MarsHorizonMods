@@ -58,8 +58,9 @@ namespace ZyMod.MarsHorizon.Zhant {
          var f = Path.Combine( ModDir, $"{fn}.otf" );
          if ( File.Exists( f ) ) {
             Info( "Loading {0}", f );
-            zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ) );
-            zhtTMPFs[ v ].name = fn;
+            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), 24, 7, UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA_HINTED, 8192, 8192 );
+            tmpf.name = fn;
+            LogFont( tmpf );
             return true;
          }
          Info( "Not Found: {0}.", f );
@@ -116,6 +117,10 @@ namespace ZyMod.MarsHorizon.Zhant {
          }
       } catch ( Exception x ) { Err( x ); } }
 
+      private static void LogFont ( TMP_FontAsset fb ) {
+         Info( "Atlas {0}x{1}, padding {2}, render {3}, pop {4}", fb.atlasWidth, fb.atlasHeight, fb.atlasPadding, fb.atlasRenderMode, fb.atlasPopulationMode );
+      }
+
       private static string FindFontWeight ( TMP_FontAsset fontAsset, out int i ) { i = 0; try {
          var list = fontAsset?.fallbackFontAssetTable;
          if ( list == null || list.Count == 0 ) return null;
@@ -123,8 +128,10 @@ namespace ZyMod.MarsHorizon.Zhant {
             var fname = fb?.name;
             if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
             if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
-            if ( fname.StartsWith( "NotoSansCJKsc-" ) )
+            if ( fname.StartsWith( "NotoSansCJKsc-" ) ) {
+               LogFont( fb );
                return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+            }
          }
          return null;
       } catch ( Exception x ) { return Err< string >( x, null ); } }
