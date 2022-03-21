@@ -13,6 +13,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Zhant";
+      public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) => new PatcherL10N().Apply();
    }
 

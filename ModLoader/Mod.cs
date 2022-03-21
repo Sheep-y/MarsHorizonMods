@@ -9,9 +9,12 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.ModLoader {
 
-   public abstract class MarsHorizonModLoader : RootMod {
+   public class MarsHorizonModLoader : RootMod {
+      protected override string GetModName () => "ModLoader";
 
-      public static void Main () { try {
+      public static void Main () => new MarsHorizonModLoader().Initialize();
+
+      protected override void OnGameAssemblyLoaded ( Assembly game ) { try {
          Fine( "Detecting mod path." );
          var selfPath = GetPath( Assembly.GetExecutingAssembly() );
          var path = Path.GetDirectoryName( selfPath );

@@ -244,7 +244,7 @@ namespace ZyMod {
             foreach ( var c in e.GetComponents<UnityEngine.Component>() ) try {
                var typeName = TypeName( c );
                if ( c is UnityEngine.Transform cRect ) ;
-               else if ( c is UnityEngine.UI.Text txt ) Dump( output, "{0}...{1} {2}", prefix, typeName, txt.text );
+               else if ( c is UnityEngine.UI.Text txt ) Dump( output, "{0}...{1} {2} {3} {4}", prefix, typeName, txt.font, txt.fontSize, txt.text );
                else if ( c is UnityEngine.UI.Image img ) Dump( output, "{0}...{1} {2} {3}", prefix, typeName, img.sprite?.name ?? img.mainTexture?.name, img.type );
                //else if ( c is I2.Loc.Localize loc ) Dump( output, "{0}...{1} {2}", prefix, typeName, loc.mTerm );
                else if ( c is UnityEngine.UI.LayoutGroup layout ) Dump( output, "{0}...{1} Padding {2}", prefix, typeName, layout.padding );

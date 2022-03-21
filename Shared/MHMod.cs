@@ -9,25 +9,7 @@ using static ZyMod.ModHelpers;
 
 // Common base mod for Mars Horizon.  Find and initialize the correct class, set log and config path and name.
 namespace ZyMod.MarsHorizon {
-
    public abstract class MarsHorizonMod : RootMod {
-
-      public static void Main () { try {
-         foreach ( var t in GetTypes( Assembly.GetExecutingAssembly() ) ) {
-            if ( t.IsNotPublic || t.IsAbstract || ! t.IsSubclassOf( typeof( MarsHorizonMod ) ) ) continue;
-            var mod = Activator.CreateInstance( t ) as MarsHorizonMod;
-            mod.shouldLogAssembly = false;
-            mod.Initialize();
-            break;
-         }
-      } catch ( Exception x ) { Error( x ); } }
-
-      private static Type[] GetTypes ( Assembly asm ) { try {
-         return asm.GetTypes();
-      } catch ( ReflectionTypeLoadException x ) {
-         return x.Types;
-      } }
-
       protected override string GetAppDataDir () {
          var path = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
          if ( string.IsNullOrEmpty( path ) ) return null;
