@@ -3,7 +3,7 @@
 
 *Your personal Mars Horizon assistant.*
 
-This is an unofficial UI mod of the space agency management game Mars Horizon (2020).
+This is an unofficial UI mod of Mars Horizon (2020 game).
 It provides convenience access to information that are otherwise difficult to get or compare,
 such as payload options, launch windows, or total building synergies.
 

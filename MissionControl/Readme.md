@@ -3,7 +3,7 @@
 
 *No outer planet requests please, thank you.*
 
-This is an unofficial mechanic mod of the space agency management game Mars Horizon (2020).
+This is an unofficial mechanic mod of Mars Horizon (2020 game).
 It adjust mission weightings, tweak milestone challenge requirement and rewards, and replace the RNG used to generate and auto resolve missions.
 
 

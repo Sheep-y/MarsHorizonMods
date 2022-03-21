@@ -3,7 +3,7 @@
 
 *Mars Horizon on Steroid.*
 
-This is an unofficial UI mod of the space agency management game Mars Horizon (2020).
+This is an unofficial UI mod of Mars Horizon (2020 game).
 It reduces or eliminates many delays and screen fades, auto-skip normal launch and normal minigame actions, bypass seen cutscenes (reset on launch), and skips a few common cutscenes by default.
 
 **If the game UI became misaligned during mini-game, immediately save, quit, and relaunch.**

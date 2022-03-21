@@ -3,7 +3,7 @@
 
 *Secondary mission teams when you need them.*
 
-This is an unofficial mechanic mod of the space agency management game Mars Horizon (2020).
+This is an unofficial mechanic mod of Mars Horizon (2020 game).
 It unlocks additional deep space slots for long duration missions, freeing up slots for more missions to help maintain game pace.
 
 All old saves are compatible.
