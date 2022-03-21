@@ -1,5 +1,6 @@
 ﻿using Astronautica.View;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -7,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static ZyMod.ModHelpers;
 
@@ -81,6 +83,8 @@ namespace ZyMod.MarsHorizon.Zhant {
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
+      private static bool Co;
+
       private static void ZhtFont ( UIViewState state ) { try {
          Fine( "Finding font assets in view state" );
          foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
@@ -97,18 +101,27 @@ namespace ZyMod.MarsHorizon.Zhant {
          var list = fontAsset?.fallbackFontAssetTable;
          if ( list == null || list.Count == 0 || fixedTMPFs.Contains( fontAsset ) ) return;
          fixedTMPFs.Add( fontAsset );
-         for ( var i = 0 ; i < list.Count ; i++ ) { var fb = list[ i ];
-            if ( fb?.name?.StartsWith( "NotoSansCJKsc-" ) != true ) continue;
-            var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
-            if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
+         var weight = FindFontWeight( fontAsset, out var i );
+         if ( weight != null ) {
+            var fb = fontAsset.fallbackFontAssetTable[ i ];
+            if ( zhtTMPFs.TryGetValue( weight, out var tc ) ) {
                Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
                fontAsset.fallbackFontAssetTable.Insert( i, tc );
-               return;
             } else
-               Warn( "Cannot find font variation {0} from {1} for {2}.", variation, fb.name, fontAsset.name );
-         }
-         Fine( "Chinese fallback font not added for {0}.", fontAsset.name );
+               Warn( "Cannot find font variation {0} from {1} for {2}.", weight, fb.name, fontAsset.name );
+         } else
+            Info( "Chinese fallback font not added for {0}.", fontAsset.name );
       } catch ( Exception x ) { Err( x ); } }
+
+      private static string FindFontWeight ( TMP_FontAsset fontAsset, out int i ) { i = 0; try {
+         var list = fontAsset?.fallbackFontAssetTable;
+         if ( list == null || list.Count == 0 ) return null;
+         for ( ; i < list.Count ; i++ ) { var fb = list[ i ];
+            if ( fb?.name?.StartsWith( "NotoSansCJKsc-" ) != true ) continue;
+            return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+         }
+         return null;
+      } catch ( Exception x ) { return Err< string >( x, null ); } }
 
       private static readonly string[] tweaks = new string[]{
          "游戲", "遊戲",
@@ -119,6 +132,8 @@ namespace ZyMod.MarsHorizon.Zhant {
          "不適用", "不可使用",
          "適用於", "可以用於",
          "適用", "可以使用",
+         "没有任何有效任務", "没有任何進行中的任務",
+         "有效任務", "任務列表",
 
          "表面棲息地", "地面居所",
          "變軌彈道", "轉移航道",
