@@ -21,16 +21,14 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       internal void Apply () {
          me = this;
-         TryPatch( typeof( Controller ), "OnSystemLanguageChanged", postfix: nameof( DynamicPatch ) );
-         TryPatch( typeof( UserSettings ), "SetLanguage", postfix: nameof( DynamicPatch ) );
+         TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
       }
 
       private static ModPatch patchZh, patchFont;
 
-      private static void DynamicPatch () { lock ( me ) { try {
-         var locale = ScriptableObjectSingleton<Localisation>.instance.locale;
-         Info( "Locale is {0}", locale );
-         if ( locale == "zh_cn" ) {
+      private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
+         Info( "Locale is {0}", language );
+         if ( language == UserSettings.Language.Chinese ) {
             if ( patchZh == null ) {
                patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
                patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
@@ -44,7 +42,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { Err( x ); } } }
 
       private static void LoadFonts () {
-         if ( zhs2zht.Count != 0 || zhtTMPFs.Count != 0 ) return;
+         if ( zhtTMPFs.Count != 0 ) return;
          foreach ( var v in new string[] { "Regular", "Medium", "Bold" } ) try {
             string fn = $"NotoSansHK-{v}", f = Path.Combine( ModDir, $"{fn}.otf" );
             if ( File.Exists( f ) ) {
@@ -116,6 +114,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          "采樣", "採樣",
          "阿麗亞娜", "亞利安",
          "大力神", "泰坦",
+         "旅行者號", "航行者號",
       };
 
       private static string ZhtTweaks ( string txt ) {
