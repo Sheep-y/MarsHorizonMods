@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
@@ -59,7 +60,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             zhtTMPFs[ v ].name = fn;
             return true;
          }
-         Info( "Font {0} not found.", f );
+         Info( "Not Found: {0}.", f );
          return false;
       } catch ( Exception x ) { return Err( x, false ); } }
 
@@ -84,20 +85,20 @@ namespace ZyMod.MarsHorizon.Zhant {
          Fine( "Finding font assets in view state" );
          foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
             if ( entry?.@object == null ) continue;
-            //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Fine( "> TXT", text.name ?? text.text, text.font );
-            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) )
-               if ( text.font != lastTMPF )
+            //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Info( "> TXT", text.name ?? text.text, text.font );
+            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) ) {
+               if ( text.font != null && text.font != lastTMPF )
                   FixFont( lastTMPF = text.font );
+            }
          }
       } catch ( Exception x ) { Err( x ); } }
 
       private static void FixFont ( TMP_FontAsset fontAsset ) { try {
-         if ( fixedTMPFs.Contains( fontAsset ) ) return;
+         var list = fontAsset?.fallbackFontAssetTable;
+         if ( list == null || list.Count == 0 || fixedTMPFs.Contains( fontAsset ) ) return;
          fixedTMPFs.Add( fontAsset );
-         var list = fontAsset.fallbackFontAssetTable;
-         if ( list == null || list.Count == 0 ) return;
          for ( var i = 0 ; i < list.Count ; i++ ) { var fb = list[ i ];
-            if ( ! fb.name.StartsWith( "NotoSansCJKsc-" ) ) continue;
+            if ( fb?.name?.StartsWith( "NotoSansCJKsc-" ) != true ) continue;
             var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
             if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
                Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
@@ -112,14 +113,26 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static readonly string[] tweaks = new string[]{
          "游戲", "遊戲",
 
+         "適用獎勵", "獎勵",
+         "適用期限已至", "期限已至",
+         "所有適用的研究", "的所有研究",
+         "不適用", "不可使用",
+         "適用於", "可以用於",
+         "適用", "可以使用",
+
+         "表面棲息地", "地面居所",
+         "變軌彈道", "轉移航道",
+         "準備狀態", "技術指標",
+         "中途操控", "中途軌道調整",
+
          "最后", "最後",
          "并", "並",
          "进", "進",
          "于", "於",
          "剩余", "剩餘",
-         "加載遊戲", "載入遊戲",
+         "加載", "載入",
          "有效載荷", "酬載",
-         "正在登錄", "載入",
+         "正在登錄", "載入", // ^
          "菜單", "選單",
          "采集", "採集",
          "采樣", "採樣",
@@ -129,14 +142,24 @@ namespace ZyMod.MarsHorizon.Zhant {
       };
 
       private static string ZhtTweaks ( string txt ) {
+         for ( var i = 0 ; i < tweaks.Length ; i += 2 )
+            //if ( txt.Contains( tweaks[ i ][ 0 ] ) )
+              txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
          switch ( txt ) {
             case "跳過當前月" : return "下一月";
             case "跳到事件" : return "下一事件";
             case "簡體中文" : return "中文";
+            case "在 Discord 上<br>加入我們！" : return "加入我們的<br>Discord！";
+            case "{Name_{buildingId}}待完成" : return "{Name_{buildingId}}完成";
+            case "{agency}已完成{{mission}}的{phase}階段" : return "{agency}已完成{{mission}}的階段{phase}";
+            case "新的聯合任務適用於{Name_Body_{body}} ！" : return "有新的{Name_Body_{body}}聯合任務";
+            case "新的請求任務適用於{Name_Body_{body}} ！" : return "有新的{Name_Body_{body}}請求任務";
+            case "{agency}下個月將會推出{{mission}}！" : return "{agency}將於下個月發射{{mission}}！";
+            case "{{mission}}預備下一階段！" : return "{{mission}}的下一階段已就緒！";
+            case "{Name_{buildingId}}已完成" : return "{Name_{buildingId}}建造完畢";
+            case "{payload}已完成" : return "{payload}建造完畢";
+            case "{vehicle}已完成" : return "{vehicle}建造完畢";
          }
-         for ( var i = 0 ; i < tweaks.Length ; i += 2 )
-            //if ( txt.Contains( tweaks[ i ][ 0 ] ) )
-              txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
          return txt;
       }
 
