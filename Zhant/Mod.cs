@@ -44,17 +44,24 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static void LoadFonts () {
          if ( zhtTMPFs.Count != 0 ) return;
-         foreach ( var v in new string[] { "Regular", "Medium", "Bold" } ) try {
-            string fn = $"NotoSansHK-{v}", f = Path.Combine( ModDir, $"{fn}.otf" );
-            if ( File.Exists( f ) ) {
-               Info( "Loading {0}", f );
-               zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ) );
-               zhtTMPFs[ v ].name = fn;
-            } else
-               Warn( "Font {0} not found.", f );
-         } catch ( Exception x ) { Err( x ); }
-         TMP_Settings.fallbackFontAssets.Add( zhtTMPFs[ "Medium" ] );
+         foreach ( var v in new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" } )  {
+            if ( ! LoadFont( $"NotoSansTC-{v}", v ) )
+               LoadFont( $"NotoSansHK-{v}", v );
+         }
+         TMP_Settings.fallbackFontAssets.Insert( 0, zhtTMPFs[ "Medium" ] );
       }
+
+      private static bool LoadFont ( string fn, string v ) { try {
+         var f = Path.Combine( ModDir, $"{fn}.otf" );
+         if ( File.Exists( f ) ) {
+            Info( "Loading {0}", f );
+            zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ) );
+            zhtTMPFs[ v ].name = fn;
+            return true;
+         }
+         Info( "Font {0} not found.", f );
+         return false;
+      } catch ( Exception x ) { return Err( x, false ); } }
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
@@ -87,16 +94,18 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void FixFont ( TMP_FontAsset fontAsset ) { try {
          if ( fixedTMPFs.Contains( fontAsset ) ) return;
          fixedTMPFs.Add( fontAsset );
-         foreach ( var fb in fontAsset.fallbackFontAssetTable )
+         var list = fontAsset.fallbackFontAssetTable;
+         for ( var i = 0 ; i < list.Count ; i++ ) { var fb = list[ i ];
             if ( fb.name.StartsWith( "NotoSansCJKsc-" ) ) {
                var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
                if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
                   Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
-                  fontAsset.fallbackFontAssetTable.Add( tc );
+                  fontAsset.fallbackFontAssetTable.Insert( i, tc );
                   break;
                } else
                   Warn( "Cannot find font variation {0} from {1} for {2}.", variation, fb.name, fontAsset.name );
             }
+         }
       } catch ( Exception x ) { Err( x ); } }
 
       private static readonly string[] tweaks = new string[]{
