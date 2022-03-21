@@ -95,17 +95,18 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( fixedTMPFs.Contains( fontAsset ) ) return;
          fixedTMPFs.Add( fontAsset );
          var list = fontAsset.fallbackFontAssetTable;
+         if ( list == null || list.Count == 0 ) return;
          for ( var i = 0 ; i < list.Count ; i++ ) { var fb = list[ i ];
-            if ( fb.name.StartsWith( "NotoSansCJKsc-" ) ) {
-               var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
-               if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
-                  Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
-                  fontAsset.fallbackFontAssetTable.Insert( i, tc );
-                  break;
-               } else
-                  Warn( "Cannot find font variation {0} from {1} for {2}.", variation, fb.name, fontAsset.name );
-            }
+            if ( ! fb.name.StartsWith( "NotoSansCJKsc-" ) ) continue;
+            var variation = fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+            if ( zhtTMPFs.TryGetValue( variation, out var tc ) ) {
+               Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
+               fontAsset.fallbackFontAssetTable.Insert( i, tc );
+               return;
+            } else
+               Warn( "Cannot find font variation {0} from {1} for {2}.", variation, fb.name, fontAsset.name );
          }
+         Fine( "Chinese fallback font not added for {0}.", fontAsset.name );
       } catch ( Exception x ) { Err( x ); } }
 
       private static readonly string[] tweaks = new string[]{
