@@ -3,7 +3,7 @@
 
 *Your personal Mars Horizon assistant.*
 
-This is an unofficial UI mod of Mars Horizon (2020 game).
+This is an unofficial mod of Mars Horizon (2020 game).
 It provides convenience access to information that are otherwise difficult to get or compare,
 such as payload options, launch windows, or total building synergies.
 
@@ -11,7 +11,7 @@ such as payload options, launch windows, or total building synergies.
 # Installation #
 
 1. Setup Mars Horizon Mod Loader.
-2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip or similiar tools.
+2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
 3. Extract (Drag and Drop) `MH_Informed.dll` into the game's `Mods` folder.
 4. Launch the game and enjoy.
 
@@ -78,7 +78,7 @@ You may want to google how to reveal file extensions for good.
 # Compatibility #
 
 The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
-but should be otherwise compatible with Steam and Epic (Windows only).
+but should be compatible with Steam and Epic on Windows/Wine/Proton.
 All game languages are supported.
 
 This mod does not change save games or game files.
@@ -86,8 +86,6 @@ This mod does not change save games or game files.
 Due to the number of screen it mods and the number of information it pulls,
 each non-minor game updates have a considerable chance of breaking something.
 Good luck!
-
-This mod is compatible with my other mods: Deep Space Slots, Mission Control, Payload QA, Skip Animation, and Zhant.
 
 
 # Troubleshoot #
@@ -107,8 +105,8 @@ Please follow mod loader's troubleshoot section.
 
 If you get the log but mod is still not working, read the mod log and/or game log (`Player.log`).
 
-Errors normally have "Error" or "Exception" in the message, and are usually logged differently from normal messages.
-If you do find errors, chances are it will need to be fixed by a programmer modder.  Mod is open source.
+Errors normally have "Error" or "Exception" in the message.
+If you do find errors, you usually need a programmer.
 Resetting the config may help, though.  Which brings us to...
 
 ## Check Mod Config
@@ -131,6 +129,4 @@ The mod does not modify game files, so there is no need to Verify Files.
 
 # License #
 
-GPL v3.  Bundled libraries are either MIT or public domain.
-
-The src folder contains source code and licenses for legality.
+GPL v3.  The src folder contains source code and license.

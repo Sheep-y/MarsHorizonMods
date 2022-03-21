@@ -3,7 +3,7 @@
 
 *Secondary mission teams when you need them.*
 
-This is an unofficial mechanic mod of Mars Horizon (2020 game).
+This is an unofficial mod of Mars Horizon (2020 game).
 It unlocks additional deep space slots for long duration missions, freeing up slots for more missions to help maintain game pace.
 
 All old saves are compatible.
@@ -13,7 +13,7 @@ New saves made with this mod will still work when mod is disabled.
 # Installation #
 
 1. Setup Mars Horizon Mod Loader.
-2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip or similiar tools.
+2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
 3. Extract (Drag and Drop) `MH_DeepSpaceSlots.dll` into the game's `Mods` folder.
 4. Launch the game and enjoy.
 
@@ -26,20 +26,21 @@ Up to 3 deep space slots can be unlocked by these actions:
 2. Construct the Space Science Library building. (Era 3 reward research)
 3. Construct the Deep Space Network building.
 
-Once unlocked, missions that meet these requirements will be automatically moved to the deep space network slots, below modular space station (if any).
+Once unlocked, missions that meet the following requirements will be automatically
+moved to the deep space network slots, below modular space station (if any).
 
-1. Take at least 30 months to complete, over 3 phases or more.
+1. Take at least 30 months to complete, and has at least 3 phases.
 2. At least 6 months and 2 phases have passed since launch.
 
-This means, new deep space missions will not be transferred immediately (as your operators run tests, calculations, calibrations, softwared patches.)
-For some missions with a long phases 2, it can take years for the mission to transfer.
+This means, new deep space missions will not be transferred immediately.
+A mission with a long phases 2 can occupy a normal slot for years.
 
 The conditions are configurable (see below).
 
-The slot granted by The Grand Tour is permanent and can be used by other deep space missions, even if the tour fails at a later stage.
-The slot granted by buildings will be gone if the buildings are removed.
+The slot unlocked by The Grand Tour is permanent and can be used by other deep space missions, even if the tour later fails.
+The slots unlocked by buildings will be gone if the buildings are cleared.
 
-A UI scale of 86% or less is required to fit all three slots on the screen without overlapps.
+On a 1920x1080 screen, a UI scale of 86% or less is required to fit all three slots on the screen.
 
 
 # Configuration #
@@ -58,15 +59,13 @@ You may want to google how to reveal file extensions for good.
 # Compatibility #
 
 The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
-but should be otherwise compatible with Steam and Epic (Windows only).
+but should be compatible with Steam and Epic on Windows/Wine/Proton.
 All game languages are supported.
 
 This mod does not change save games or game files.
 If a save is made with mission(s) on the deep space slots, and is later loaded without the mod,
 all missions will still be up and running. But you won't be able to launch new mission until the number of missions drops back to vanilla level.
 The same also happens if the mod config is changed leading to less missions to be transferred.
-
-This mod is compatible with my other mods: Deep Space Slots, Informed, Mission Control, Payload QA, Skip Animation, and Zhant.
 
 
 
@@ -87,8 +86,8 @@ Please follow mod loader's troubleshoot section.
 
 If you get the log but mod is still not working, read the mod log and/or game log (`Player.log`).
 
-Errors normally have "Error" or "Exception" in the message, and are usually logged differently from normal messages.
-If you do find errors, chances are it will need to be fixed by a programmer modder.  Mod is open source.
+Errors normally have "Error" or "Exception" in the message.
+If you do find errors, you usually need a programmer.
 Resetting the config may help, though.  Which brings us to...
 
 ## Check Mod Config
@@ -111,6 +110,4 @@ The mod does not modify game files, so there is no need to Verify Files.
 
 # License #
 
-GPL v3.  Bundled libraries are either MIT or public domain.
-
-The src folder contains source code and licenses for legality.
+GPL v3.  The src folder contains source code and license.

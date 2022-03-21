@@ -3,7 +3,7 @@
 
 *Mars Horizon on Steroid.*
 
-This is an unofficial UI mod of Mars Horizon (2020 game).
+This is an unofficial mod of Mars Horizon (2020 game).
 It reduces or eliminates many delays and screen fades, auto-skip normal launch and normal minigame actions, bypass seen cutscenes (reset on launch), and skips a few common cutscenes by default.
 
 **If the game UI became misaligned during mini-game, immediately save, quit, and relaunch.**
@@ -15,7 +15,7 @@ The game may also crash during mini-game, but it's something that also happens o
 # Installation #
 
 1. Setup Mars Horizon Mod Loader.
-2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip or similiar tools.
+2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
 3. Extract (Drag and Drop) `MH_SkipAnimations.dll` into the game's `Mods` folder.
 4. Launch the game and enjoy.
 
@@ -101,16 +101,14 @@ You may want to google how to reveal file extensions for good.
 # Compatibility #
 
 The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
-but should be otherwise compatible with Steam and Epic (Windows only).
+but should be compatible with Steam and Epic on Windows/Wine/Proton.
 All game languages are supported.
 
 This mod does not change save games or game files.
 
 Due to the number of screen it mods and the number of information it pulls,
-each non-minor game updates have a considerable chance of breaking something.
+each non-minor game updates have a good chance of breaking something.
 Good luck!
-
-This mod is compatible with my other mods: Deep Space Slots, Informed, Mission Control, Payload QA, and Zhant.
 
 
 # Troubleshoot #
@@ -130,8 +128,8 @@ Please follow mod loader's troubleshoot section.
 
 If you get the log but mod is still not working, read the mod log and/or game log (`Player.log`).
 
-Errors normally have "Error" or "Exception" in the message, and are usually logged differently from normal messages.
-If you do find errors, chances are it will need to be fixed by a programmer modder.  Mod is open source.
+Errors normally have "Error" or "Exception" in the messag.
+If you do find errors, you usually need a programmer.
 Resetting the config may help, though.  Which brings us to...
 
 ## Check Mod Config
@@ -154,6 +152,4 @@ The mod does not modify game files, so there is no need to Verify Files.
 
 # License #
 
-GPL v3.  Bundled libraries are either MIT or public domain.
-
-The src folder contains source code and licenses for legality.
+GPL v3.  The src folder contains complete source code and license.

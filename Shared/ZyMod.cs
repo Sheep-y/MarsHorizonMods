@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,8 +8,12 @@ using System.Reflection.Emit;
 using System.Text;
 using static System.Diagnostics.TraceLevel;
 using static System.Reflection.BindingFlags;
-using static HarmonyLib.HarmonyPatchType;
 using System.Collections;
+
+#if ! NoPatch
+using HarmonyLib;
+using static HarmonyLib.HarmonyPatchType;
+#endif
 
 // Sheepy's "Universal" skeleton mod and tools.  No depency other than Harmony2 / HarmonyX.
 // Bootstrap, Background Logging, Roundtrip Config, Reflection, Manual Patcher with Unpatch. Reasonably well unit tested.
@@ -51,8 +54,10 @@ namespace ZyMod {
       private void GameLoaded ( Assembly asm ) { try {
          ModHelpers.Info( "Target assembly loaded." );
          OnGameAssemblyLoaded( asm );
+         #if ! NoPatch
          var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
          ModHelpers.Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+         #endif
       } catch ( Exception ex ) { ModHelpers.Error( ex ); } }
 
       private static string _AppDataDir;
@@ -103,6 +108,7 @@ namespace ZyMod {
       public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
 
+      #if ! NoPatch
       private static MethodInfo GetILs, EnumMoveNext;
       // Find the instructions of a method.  Return null on failure.  TODO: Does not work on HarmonyX
       public static IEnumerable< CodeInstruction > GetCodes ( this MethodBase subject ) {
@@ -125,6 +131,7 @@ namespace ZyMod {
          var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
          return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", new Type[0] );
       }
+      #endif
 
       #if ! NoConfig
       public static bool TryParse ( Type valueType, string val, out object parsed, bool logWarnings = true ) { parsed = null; try {
@@ -390,6 +397,7 @@ namespace ZyMod {
    }
    #endif
 
+   #if ! NoPatch
    public class Patcher { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
       protected static readonly object sync = new object();
       public Harmony harmony { get; private set; }
@@ -445,6 +453,7 @@ namespace ZyMod {
          return new HarmonyMethod( GetType().GetMethod( name, Public | NonPublic | Static ) ?? throw new NullReferenceException( $"static method {name} not found" ) );
       }
    }
+   #endif
 
    // Thread safe logger.  Buffer and write in background thread unless interval is set to 0.
    // Common usages: Log an Exception (will ignore duplicates), Log a formatted string with params, Log multiple objects (in one call and on one line).

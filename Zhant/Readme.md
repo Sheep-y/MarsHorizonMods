@@ -2,85 +2,72 @@
 ## Mars Horizon 正體中文補丁 ##
 
 This is an unofficial translation of Mars Horizon (2020 game).
-It converts the Simplified Chinese language into Traditional Chinese.
-Original translation mistakes are corrected whenever I can.
+It converts Simplified Chinese into Traditional Chinese.
+
 
 # 安裝 #
 
-1. 從 GitHub 或 NexusMods 下載最近版。用 7-zip 或類似軟件解壓。
-
-2. 如果遊戲正在運行，先離開遊戲。
-
-3. 解壓後，將 `version.dll`, `doorstop_config.ini`, 及 `Mods` 目錄搬到遊戲的根目錄。
-
-4. 如有其他外掛，你可能需要覆蓋其中的一些檔案。如果其他外掛是我寫的(Sheepy)，可以安心覆蓋。
-
-5. 啓動遊戲，並將遊戲語言設定成 简体中文。補丁會在遊戲載入中文數據時激活，轉換文字並載入額外字型。
-
-本補丁沒有任何特殊要求。src 目錄裡有源碼和使用授權協議，一般不需要閱讀。
+1. 安裝 Mars Horizon Mod Loader。將內容解壓到遊戲根目錄就可以。
+2. 從 GitHub 或 NexusMods 下載本補丁的最近版。用 7-zip 或類似軟件打開。
+3. 將 `MH_Zhant.dll` 和三個 NotoSans 字型擋案拖放到遊戲的 `Mods` 目錄。（共四個檔案）
+4. 啓動遊戲，將遊戲語言切換到中文即可。
 
 
-# 遊戲相容性 #
+# 相容性 #
 
-本補丁於 Mars Horizon 的 1.4.1 GOG.com 版本上開發及測試。
-理論上支援所有 Microsoft .Net 平台，即支援 Steam 及 Epic，只要是視窗版.
-本補丁使用 LCMapString Win32 API 進行初步的簡繁轉換，再在必要時進行少量手工調整。
+本補丁於 Mars Horizon 的 1.4.1 GOG.com 版本上開發及測試，
+理應支援 微軟視窗/Wine/Proton 下的 Steam 及 Epic。
+本補丁使用 LCMapString Win32 API 進行初步的簡繁轉換，再在必要時進行額外調整。
 
-本補丁不修改遊戲檔案及存檔，但如果你在使用補丁期間修改了載具的名稱，名稱中的部分中文字可能會在移除補丁後無法顯示。
+本補丁不修改遊戲檔案及存檔。但如果你在使用補丁期間修改了載具的名稱，部分中文字可能在移除補丁後無法顯示。
 存檔本身依然完好無缺，能正常運作。
 
-
-# 外掛相容性 #
-
-本補丁支援我寫的其他 Mars Horizon 外掛。由於它們使用相同的修改工具，安裝時需要覆蓋一些檔案。
-
-If this mod is installed last, it may be loaded as the first mod (as directed by `doorstop_config.ini`).
-In this case, it will load all `MH_*.dll` in same folder and call the first `public static Main()`.
-
-When you rename or disable a mod, please make sure `doorstop_config.ini` still points to a valid mod.
+本補丁相容於我做的其他 Mars Horizon 外掛，它們會顯示正體中文。
 
 
-# Troubleshoot #
+# 排錯 #
 
-If the mod doesn't work, there are a few things you can try:
+如果有問題，可以試一下排錯：
 
-## Check Mod Is Loaded
+## 缺字 ##
 
-Find `Zhant.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+如果顯示正體中文，但部分文字無法顯示，一般是字型缺失的問題。
+可以到以下官網下載 NotoSans 正體中文字型（普通/香港皆可），解壓到 Mods 目錄。
+注意 otf 檔案要直接放在 Mods 裡，不能放子目錄。
 
-If the log exists, delete it and re-launch the game.
+https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 
-If the log does not exists, or is not recreated after relaunch, the mod is not loaded at all.
-
-Please check that `version.dll` exists at game folder,
-and that `doorstop_config.ini` in the same folder is pointing to the right dll and path.
-When in doubt, reinstall this mod and overwrite the files.
-
-Double-clicking `doorstop_config` should open the file in notepad, and the line `targetAssembly` is the first mod to be loaded.
-Any other mods will be depending on it loading them.
-
-## Check Mod Errors
-
-If you get the log but mod is still not working, read the mod log.
-Errors in this mods are contained, so they may not break the game, but will be recorded in mod log.
-
-Errors normally have "Error" or "Exception" in the message, and are usually logged differently from normal messages.
-If you do find errors, chances are it will need to be fixed by a programmer modder.  Mod is open source.
+遊戲只使用 Regular, Medium, Bold 三種字重，其餘可刪。
+不過沒刪的話，額外的字重也會照樣載入，以防萬一。
 
 
-# Uninstall #
+## 確認補丁掛載 ##
 
-To remove the mod, rename or delete `MH_Zhant.dll` from the `Mods` folder under game root.
+瀏覽 `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`，尋找 `Zhant.log`。
 
-If you are not using other mods, you may also remove `doorstop_config.ini` and `version.dll` from game root.
+如檔案存在，請刪除後重啓遊戲。
+如檔案不存在，或者重啓後依然不存在，那補丁沒有被掛載。
+請確保 Mod Loader 正常運作（上述目錄有 `ModLoader.log`）﹐並且本補丁位處 Mods 目錄而不是根目錄。
 
-If you are using other mods, please make sure `doorstop_config.ini` points to an existing mod, or refer to that mod's instructions.
-When in doubt, overwrite with the ini from that mod.
+## 檢查補丁報錯 ##
 
-You may also want to remove the `src` folder, if exists, which is distributed with the mod for legality.
-The mod does not modify game files, so there is no need to Verify Files.
+如果檔案存在，請打開看看。
+有錯誤的話會被紀錄，搜尋 "Error" 或 "Exception" 可以找到。
+
+如果真的有錯誤，那大概要編程處理。補丁是開源的。
 
 
-# License #
+# 反安裝 #
 
-GPL v3.  Bundled libraries are either MIT or public domain; licenses in src folder.
+從遊戲的 `Mods` 目錄中刪除 `MH_Zhant.dll` 和所有 `NotoSans` 檔案。
+
+如果你沒有使用其他外掛，也可以反安裝包括 Mod Loader 在內的所有東西。
+也就是刪除遊戲目錄下的 `doorstop_config.ini`, `version.dll`, 和 `Mods` 目錄。
+
+本補丁不修改遊戲檔案，無復驗證修復。
+
+
+# 授權 #
+
+GPL v3.  附錄的字型採用 SIL OFL v1.1 授權。
+src 目錄含有源碼和授權聲明。
