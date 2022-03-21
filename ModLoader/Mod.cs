@@ -19,7 +19,9 @@ namespace ZyMod.MarsHorizon.ModLoader {
          var selfPath = GetPath( Assembly.GetExecutingAssembly() );
          var path = Path.GetDirectoryName( selfPath );
          Info( "Scanning \"{0}\" for Mars Horizon mods (MH_*.dll)", path );
-         foreach ( var f in Directory.GetFiles( path, "MH_*.dll" ) ) try {
+         var files = Directory.GetFiles( path, "MH_*.dll" );
+         Array.Sort( files );
+         foreach ( var f in files ) try {
             if ( f == selfPath ) continue;
             Info( "Loading {0}", f );
             var asm = Assembly.LoadFile( f );
