@@ -1,6 +1,5 @@
 ﻿using Astronautica.View;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -8,8 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.TextCore.LowLevel;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
@@ -51,16 +49,16 @@ namespace ZyMod.MarsHorizon.Zhant {
             if ( ! LoadFont( $"NotoSansTC-{v}", v ) )
                LoadFont( $"NotoSansHK-{v}", v );
          }
-         TMP_Settings.fallbackFontAssets.Insert( 0, zhtTMPFs[ "Medium" ] );
+         TMP_Settings.fallbackFontAssets.Add( zhtTMPFs[ "Medium" ] );
       }
 
       private static bool LoadFont ( string fn, string v ) { try {
          var f = Path.Combine( ModDir, $"{fn}.otf" );
          if ( File.Exists( f ) ) {
             Info( "Loading {0}", f );
-            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), 24, 7, UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA_HINTED, 8192, 8192 );
+            var size = v == "Bold" || v == "Black" ? 80 : 40;
+            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), size, size / 10, GlyphRenderMode.SDFAA_HINTED, 8192, 8192 );
             tmpf.name = fn;
-            LogFont( tmpf );
             return true;
          }
          Info( "Not Found: {0}.", f );
@@ -69,6 +67,8 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
+      private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
+      private static TMP_FontAsset lastTMPF;
 
       private static void ToZht ( ref string text ) { try {
          if ( string.IsNullOrEmpty( text ) ) return;
@@ -82,44 +82,27 @@ namespace ZyMod.MarsHorizon.Zhant {
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static bool Co;
-
       private static void ZhtFont ( UIViewState state ) { try {
          Fine( "Finding font assets in view state" );
          foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
             if ( entry?.@object == null ) continue;
             //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Info( "> TXT", text.name ?? text.text, text.font );
             foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) )
-               FixFont( text );
-         }
-         if ( ! Co ) {
-            Co = true;
-            Controller.Instance.StartCoroutine( FixAllFonts() );
+               if ( text.font != null && text.font != lastTMPF )
+                  FixFont( lastTMPF = text.font );
          }
       } catch ( Exception x ) { Err( x ); } }
 
-      private static IEnumerator FixAllFonts () {
-         while ( true ) {
-            yield return new WaitForSecondsRealtime( 3 );
-            foreach ( var root in SceneManager.GetActiveScene().GetRootGameObjects() )
-               foreach ( var text in root.GetComponentsInChildren< TMP_Text >() )
-                  FixFont( text );
-         }
-      }
-
-      private static void FixFont ( TMP_Text text ) { try {
-         var font = text?.font;
-         if ( font == null || zhtTMPFs.ContainsValue( font ) ) return;
-         var weight = FindFontWeight( font, out _ );
+      private static void FixFont ( TMP_FontAsset font ) { try {
+         if ( font == null || fixedTMPFs.Contains( font ) ) return;
+         fixedTMPFs.Add( font );
+         var weight = FindFontWeight( font, out var i );
          if ( weight != null && zhtTMPFs.TryGetValue( weight, out var tc ) ) {
-            Info( "Replacing {1} with {0}.", tc.name, font.name );
-            text.font = tc;
+            var fb = font.fallbackFontAssetTable;
+            Info( "Adding {0} as fallback for {1} of {2}.", tc.name, fb[ i ].name, font.name );
+            fb.Insert( i + 1, tc );
          }
       } catch ( Exception x ) { Err( x ); } }
-
-      private static void LogFont ( TMP_FontAsset fb ) {
-         Info( "Atlas {0}x{1}, padding {2}, render {3}, pop {4}", fb.atlasWidth, fb.atlasHeight, fb.atlasPadding, fb.atlasRenderMode, fb.atlasPopulationMode );
-      }
 
       private static string FindFontWeight ( TMP_FontAsset fontAsset, out int i ) { i = 0; try {
          var list = fontAsset?.fallbackFontAssetTable;
@@ -128,10 +111,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             var fname = fb?.name;
             if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
             if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
-            if ( fname.StartsWith( "NotoSansCJKsc-" ) ) {
-               LogFont( fb );
+            if ( fname.StartsWith( "NotoSansCJKsc-" ) )
                return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
-            }
          }
          return null;
       } catch ( Exception x ) { return Err< string >( x, null ); } }
@@ -153,7 +134,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          "準備狀態", "技術指標",
          "中途操控", "中途軌道調整",
 
-         "最后", "最後",
+         "后", "後",
          "并", "並",
          "进", "進",
          "于", "於",

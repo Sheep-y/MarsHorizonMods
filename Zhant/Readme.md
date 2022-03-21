@@ -31,15 +31,17 @@ It converts Simplified Chinese into Traditional Chinese.
 
 ## 缺字 ##
 
-如果顯示正體中文，但部分文字無法顯示，一般是字型缺失的問題。
+如果顯示正體中文，但大量文字無法顯示，一般是字型缺失的問題。
 可以到以下官網下載 NotoSans 正體中文字型（普通/香港皆可），解壓到 Mods 目錄。
-注意 otf 檔案要直接放在 Mods 裡，不能放子目錄。
+注意 otf 檔案要直接放在 Mods 目錄裡，不能放子目錄。
 
 https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 
 遊戲只使用 Regular, Medium, Bold 三種字重，其餘可刪。
-不過沒刪的話，額外的字重也會照樣載入，以防萬一。
+不過沒刪的話，額外的字重也會照樣載入記憶體，以防萬一。
 
+也有一種情況是一開始沒有問題﹐但一段時間後漸漸出現缺字，包括本來能顯示的字。
+這意味著渲染過的中文字太多，塞爆了字型的素材圖。萬一真的遇上，只要重啓遊戲就會重設素材。
 
 ## 確認補丁掛載 ##
 
