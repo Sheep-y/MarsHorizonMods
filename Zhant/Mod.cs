@@ -68,8 +68,6 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
-      private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
-      private static TMP_FontAsset lastTMPF;
 
       private static void ToZht ( ref string text ) { try {
          if ( string.IsNullOrEmpty( text ) ) return;
@@ -90,35 +88,43 @@ namespace ZyMod.MarsHorizon.Zhant {
          foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
             if ( entry?.@object == null ) continue;
             //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Info( "> TXT", text.name ?? text.text, text.font );
-            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) ) {
-               if ( text.font != null && text.font != lastTMPF )
-                  FixFont( lastTMPF = text.font );
-            }
+            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) )
+               FixFont( text );
+         }
+         if ( ! Co ) {
+            Co = true;
+            Controller.Instance.StartCoroutine( FixAllFonts() );
          }
       } catch ( Exception x ) { Err( x ); } }
 
-      private static void FixFont ( TMP_FontAsset fontAsset ) { try {
-         var list = fontAsset?.fallbackFontAssetTable;
-         if ( list == null || list.Count == 0 || fixedTMPFs.Contains( fontAsset ) ) return;
-         fixedTMPFs.Add( fontAsset );
-         var weight = FindFontWeight( fontAsset, out var i );
-         if ( weight != null ) {
-            var fb = fontAsset.fallbackFontAssetTable[ i ];
-            if ( zhtTMPFs.TryGetValue( weight, out var tc ) ) {
-               Info( "Adding {0} as fallback of {1} for {2}.", tc.name, fb.name, fontAsset.name );
-               fontAsset.fallbackFontAssetTable.Insert( i, tc );
-            } else
-               Warn( "Cannot find font variation {0} from {1} for {2}.", weight, fb.name, fontAsset.name );
-         } else
-            Info( "Chinese fallback font not added for {0}.", fontAsset.name );
+      private static IEnumerator FixAllFonts () {
+         while ( true ) {
+            yield return new WaitForSecondsRealtime( 3 );
+            foreach ( var root in SceneManager.GetActiveScene().GetRootGameObjects() )
+               foreach ( var text in root.GetComponentsInChildren< TMP_Text >() )
+                  FixFont( text );
+         }
+      }
+
+      private static void FixFont ( TMP_Text text ) { try {
+         var font = text?.font;
+         if ( font == null || zhtTMPFs.ContainsValue( font ) ) return;
+         var weight = FindFontWeight( font, out _ );
+         if ( weight != null && zhtTMPFs.TryGetValue( weight, out var tc ) ) {
+            Info( "Replacing {1} with {0}.", tc.name, font.name );
+            text.font = tc;
+         }
       } catch ( Exception x ) { Err( x ); } }
 
       private static string FindFontWeight ( TMP_FontAsset fontAsset, out int i ) { i = 0; try {
          var list = fontAsset?.fallbackFontAssetTable;
          if ( list == null || list.Count == 0 ) return null;
          for ( ; i < list.Count ; i++ ) { var fb = list[ i ];
-            if ( fb?.name?.StartsWith( "NotoSansCJKsc-" ) != true ) continue;
-            return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+            var fname = fb?.name;
+            if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
+            if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
+            if ( fname.StartsWith( "NotoSansCJKsc-" ) )
+               return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
          }
          return null;
       } catch ( Exception x ) { return Err< string >( x, null ); } }
