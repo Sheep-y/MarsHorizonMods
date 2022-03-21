@@ -18,6 +18,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       }
 
       private static float OriginalPayloadCritChance = float.NaN;
+      private static float LastReliability = float.NaN, LastCritChance;
 
       private static void SetReliabilityBar () { try {
          SetReliability( ClientViewer.GetViewElement<MissionGameplayScreen>().MissionSim.GetPayloadReliability() / 100f );
@@ -25,9 +26,14 @@ namespace ZyMod.MarsHorizon.PayloadQA {
 
       private static void SetReliability ( float payloadReliability ) {
          if ( float.IsNaN( OriginalPayloadCritChance ) ) OriginalPayloadCritChance = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
-         var crit = config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability;
-         if ( crit > payloadReliability ) crit = payloadReliability;
-         Fine( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
+         var crit = LastCritChance;
+         if ( LastReliability != payloadReliability ) {
+            crit = config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability;
+            if ( crit > payloadReliability ) crit = payloadReliability;
+            Fine( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
+            LastReliability = payloadReliability;
+            LastCritChance = crit;
+         }
          Data.instance.rules.missionGameplayRules.positiveEventOccurrence = crit;
       }
 
