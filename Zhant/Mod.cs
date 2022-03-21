@@ -97,10 +97,13 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( font == null || fixedTMPFs.Contains( font ) ) return;
          fixedTMPFs.Add( font );
          var weight = FindFontWeight( font, out var i );
-         if ( weight != null && zhtTMPFs.TryGetValue( weight, out var tc ) ) {
-            var fb = font.fallbackFontAssetTable;
-            Info( "Adding {0} as fallback for {1} of {2}.", tc.name, fb[ i ].name, font.name );
-            fb.Insert( i + 1, tc );
+         if ( weight != null ) {
+            if ( zhtTMPFs.TryGetValue( weight, out var tc ) ) {
+               var fb = font.fallbackFontAssetTable;
+               Info( "Adding {0} as fallback for {1} of {2}.", tc.name, fb[ i ].name, font.name );
+               fb.Insert( i + 1, tc );
+            } else
+               Warn( "Font variation not found: {0}", weight );
          }
       } catch ( Exception x ) { Err( x ); } }
 
@@ -141,7 +144,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          "剩余", "剩餘",
          "加載", "載入",
          "有效載荷", "酬載",
-         "正在登錄", "載入", // ^
+         "正在登錄", "載入",
          "菜單", "選單",
          "采集", "採集",
          "采樣", "採樣",
@@ -152,8 +155,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static string ZhtTweaks ( string txt ) {
          for ( var i = 0 ; i < tweaks.Length ; i += 2 )
-            //if ( txt.Contains( tweaks[ i ][ 0 ] ) )
-              txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
+           txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
          switch ( txt ) {
             case "跳過當前月" : return "下一月";
             case "跳到事件" : return "下一事件";
