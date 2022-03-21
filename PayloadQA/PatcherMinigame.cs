@@ -3,30 +3,38 @@ using Astronautica.View;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.PayloadQA {
 
    internal class PatcherMinigame: ModPatcher {
       internal void Apply () {
-         if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 )
-            TryPatch( typeof( MissionGameplaySimulation ), "GetPayloadActionChances", postfix: nameof( SetBasePayloadReliability ) );
+         if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 ) {
+            TryPatch( typeof( MissionGameplayModuleElement ), "SetReliabilityBar", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
+            TryPatch( typeof( MissionGameplaySimulation ), "GetPayloadActionChances", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
+            TryPatch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
+         }
       }
 
-      private static float BaseReliabilityDiff = float.NaN;
+      private static float OriginalPayloadCritChance = float.NaN;
 
-      private static void SetBasePayloadReliability ( ref Tuple< float, float > __result, float payloadReliability ) { try {
-         if ( float.IsNaN( BaseReliabilityDiff ) ) {
-            var orig = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
-            BaseReliabilityDiff = config.minigame_base_crit - orig;
-            Info( "Default base payload crit chance = {0:P}.  Modded base crit chacne = {1:P}.  Difference = {2:P}", orig, config.minigame_base_crit, BaseReliabilityDiff );
-         }
-         float oldNonCrit = __result.Item1, oldFail = __result.Item2;
-         float newNonCrit = oldNonCrit, newFail = oldFail + BaseReliabilityDiff;
-         if ( config.minigame_porportion_crit > 0 ) oldNonCrit += payloadReliability * config.minigame_porportion_crit;
-         Fine( "Fail chance {0:P} => {1:P}, Crit chance {2:P} => {3:P}", oldFail, newFail, 1 - oldNonCrit, 1 - newNonCrit );
-         if ( oldNonCrit == newNonCrit && oldFail == newFail ) return;
-         __result = new Tuple< float, float > ( newNonCrit, newFail );
+      private static void SetReliabilityBar () { try {
+         SetReliability( ClientViewer.GetViewElement<MissionGameplayScreen>().MissionSim.GetPayloadReliability() / 100f );
       } catch ( Exception x ) { Err( x ); } }
+
+      private static void SetReliability ( float payloadReliability ) {
+         if ( float.IsNaN( OriginalPayloadCritChance ) ) OriginalPayloadCritChance = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
+         var crit = config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability;
+         if ( crit > payloadReliability ) crit = payloadReliability;
+         Fine( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
+         Data.instance.rules.missionGameplayRules.positiveEventOccurrence = crit;
+      }
+
+      private static void RevertReliability () { try {
+         if ( ! float.IsNaN( OriginalPayloadCritChance ) )
+            Data.instance.rules.missionGameplayRules.positiveEventOccurrence = OriginalPayloadCritChance;
+      } catch ( Exception x ) { Err( x ); } }
+
    }
 }
