@@ -1,63 +1,38 @@
 # Zhant #
-## A mod of Mars Horizon ##
+## Mars Horizon 正體中文補丁 ##
 
-*Because Simplified Chinese is not our Chinese*
+This is an unofficial translation of Mars Horizon (2020 game).
+It converts the Simplified Chinese language into Traditional Chinese.
+Original translation mistakes are corrected whenever I can.
 
-This is an unofficial UI mod of the space agency management game Mars Horizon (2020).
-It converts the Simplified Chinese language into Traditional Chinese, while tweaking the translations here and there.
+# 安裝 #
 
-Games that are not set to Chinese should not be affected.  The additional fonts won't even load in that case.
+1. 從 GitHub 或 NexusMods 下載最近版。用 7-zip 或類似軟件解壓。
 
-This mod does not change saves or game mechanics.
+2. 如果遊戲正在運行，先離開遊戲。
 
+3. 解壓後，將 `version.dll`, `doorstop_config.ini`, 及 `Mods` 目錄搬到遊戲的根目錄。
 
-# Behaviour #
+4. 如有其他外掛，你可能需要覆蓋其中的一些檔案。如果其他外掛是我寫的(Sheepy)，可以安心覆蓋。
 
-When installed, and when the game is set to Chinese, this mod will translate all Simplified Chinese into Traditional Chinese.
-In additional, new fallback fonts will be loaded to support the new characters.
+5. 啓動遊戲，並將遊戲語言設定成 简体中文。補丁會在遊戲載入中文數據時激活，轉換文字並載入額外字型。
 
-When the game is set to non-Chinese, it should do nothing other than to wait for game language changes.
-
-Unlike most of my mods, this mod is not configurable.
-
-
-# Installation #
-
-1. Download latest release from GitHub or NexusMods.  Extract with 7-zip or similar tools.
-
-2. Exit game if it is running.
-
-3. Copy or move `version.dll`, `doorstop_config.ini`, and the `Mods` folder into game's root folder.
-
-4. If you have other mods, you may need to overwrite some files.  If the other mods are from me (Sheepy), you can safely overwrite them.
-
-5. That is all.  Launch the game and enjoy.
-
-The mod has no special requirements.  It runs as part of the game.
-The src folder contains source code and licenses.
+本補丁沒有任何特殊要求。src 目錄裡有源碼和使用授權協議，一般不需要閱讀。
 
 
-# Game Compatibility #
+# 遊戲相容性 #
 
-The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
-It works only on the Microsoft .Net build of the game, i.e. on Windows or Wine,
-but should be otherwise compatible with Steam and Epic.
+本補丁於 Mars Horizon 的 1.4.1 GOG.com 版本上開發及測試。
+理論上支援所有 Microsoft .Net 平台，即支援 Steam 及 Epic，只要是視窗版.
+本補丁使用 LCMapString Win32 API 進行初步的簡繁轉換，再在必要時進行少量手工調整。
 
-The mod depends on the LCMapString Win32 API for basic translation.
-So if it doesn't work on Wine, that may be the reason.
-
-This mod does not change save games or game files, but if you modify vehicle names and save them,
-the traditional chinese characters may fail to display when the mod is deactivated.
-The save would still works normally.
-
-If the game natively support Traditional Chinese in the future,
-the mod would still be activated when it is set to Simplified Chinese, but not on Traditional.
+本補丁不修改遊戲檔案及存檔，但如果你在使用補丁期間修改了載具的名稱，名稱中的部分中文字可能會在移除補丁後無法顯示。
+存檔本身依然完好無缺，能正常運作。
 
 
-# Mod Compatibility #
+# 外掛相容性 #
 
-This mod is compatible with my other mods: Deep Space Slots, Mission Control, PayloadQA, and Skip Animations.
-They use the same modding tools, so you will need to overwrite some files.
+本補丁支援我寫的其他 Mars Horizon 外掛。由於它們使用相同的修改工具，安裝時需要覆蓋一些檔案。
 
 If this mod is installed last, it may be loaded as the first mod (as directed by `doorstop_config.ini`).
 In this case, it will load all `MH_*.dll` in same folder and call the first `public static Main()`.
