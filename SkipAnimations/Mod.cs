@@ -18,7 +18,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             new PatcherCinematic().Apply();
          if ( config.max_delay >= 0 || config.remove_delays || config.max_screen_fade >= 0 || config.skip_mission_intro ||
-               config.fast_launch || config.fast_mission || config.fast_mission_result || config.swoosh_speed > 0 )
+               config.fast_launch || config.fast_mission || config.fast_mission_result )
             new PatcherAnimation().Apply();
          if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
             new PatcherBypass().Apply();
@@ -29,7 +29,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       internal static readonly Config config = new Config();
    }
 
-   public class Config : IniConfig {
+   internal class Config : IniConfig {
       [ Config( "\r\n[Cinematic]" ) ]
       [ Config( "Skip intro.  Default True." ) ]
       public bool skip_intro = true;
@@ -43,7 +43,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable.  A low delay will cause UI deform on mini-game." ) ]
+      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable." ) ]
       public float max_delay = 0.2f;
       [ Config( "Max screen fading duration.  Set to -1 to disable." ) ]
       public float max_screen_fade = 0.1f;
@@ -57,8 +57,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public bool fast_mission = true;
       [ Config( "Speed up mini-game report animations.  Default True." ) ]
       public bool fast_mission_result = true;
-      [ Config( "Mini-game resource swoosh speed.  Set to 0 or -1 to disable." ) ]
-      public float swoosh_speed = 10f;
+      [ Config( "Mini-game resource swoosh speed.  Set to 1, 0, or -1 to disable." ) ]
+      public float swoosh_speed = 2f;
 
       [ Config( "\r\n[Bypass]" ) ]
       [ Config( "Bypass full screen notifications (construction complete and launch ready).  Default True." ) ]
@@ -76,23 +76,25 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200223;
 
-      internal HashSet< string > SkipCinematics { get; } = new HashSet< string >();
+      internal readonly HashSet< string > SkipCinematics = new HashSet< string >();
 
       public override void Load ( object subject, string path ) { try {
          base.Load( subject, path );
          if ( string.Equals( skip_cinematics, "default", StringComparison.InvariantCultureIgnoreCase ) ) {
             skip_cinematics = new Config().skip_cinematics;
-            Task.Run( () => { lock ( SkipCinematics ) Save(); } );
+            Task.Run( Save );
          }
          lock ( SkipCinematics ) {
             SkipCinematics.Clear();
-            if ( skip_cinematics != null )
+            if ( ! string.IsNullOrEmpty( skip_cinematics ) )
                foreach ( var e in new StringReader( skip_cinematics ).ReadCsvRow() )
                   if ( ! string.IsNullOrWhiteSpace( e ) )
                      SkipCinematics.Add( e.Trim() );
             Info( "{0} cinematic(s) has been seen and will be skipped.", SkipCinematics.Count );
          }
       } catch ( Exception x ) { Err( x ); } }
+
+      public override void Save ( object subject, string path ) { lock ( SkipCinematics ) base.Save( subject, path ); }
 
       internal void AddCinematic ( string name ) { try {
          lock ( SkipCinematics ) {

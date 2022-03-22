@@ -35,7 +35,7 @@ namespace ZyMod.MarsHorizon.Informed {
       internal static Simulation simulation => activeClient.simulation;
    }
 
-   public class Config : IniConfig {
+   internal class Config : IniConfig {
       [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default True." ) ]
       public bool show_base_bonus = true;
       [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]

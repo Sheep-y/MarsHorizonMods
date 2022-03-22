@@ -24,7 +24,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       internal static readonly Config config = new Config();
    }
 
-   public class Config : IniConfig {
+   internal class Config : IniConfig {
       [ Config( "\r\n[Auto-Resolve]" ) ]
       [ Config( "Auto-resolve bonus success chance provided by specialized payload (nav, comm etc).  Set to 0 to disable." ) ]
       public byte payload_specialise_auto_bonus = 10;

@@ -20,7 +20,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       internal static Simulation simulation => Controller.Instance?.activeClient.simulation;
    }
 
-   public class Config : IniConfig {
+   internal class Config : IniConfig {
       [ Config( "[Qualification]" ) ]
       [ Config( "As the number of mission destination may increase in the future, " ) ]
       [ Config( "Min. total duration (months) for a mission to be qualifed as deep space." ) ]

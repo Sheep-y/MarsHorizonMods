@@ -23,7 +23,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       internal static readonly Config config = new Config();
    }
 
-   public class Config : IniConfig {
+   internal class Config : IniConfig {
       [ Config( "Apply milestone challenge filtes and mission weight change to player only, and not to AI.  Default True." ) ]
       public bool change_only_player_agency = true;
 
