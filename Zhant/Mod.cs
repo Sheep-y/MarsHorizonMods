@@ -1,13 +1,6 @@
-﻿using Astronautica.View;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using TMPro;
-using UnityEngine;
-using UnityEngine.TextCore.LowLevel;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
@@ -15,168 +8,50 @@ namespace ZyMod.MarsHorizon.Zhant {
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Zhant";
       public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
-      protected override void OnGameAssemblyLoaded ( Assembly game ) => new PatcherL10N().Apply();
+      protected override void OnGameAssemblyLoaded ( Assembly game ) {
+         ModPatcher.config.Load();
+         new PatcherL10N().Apply();
+      }
    }
 
-   internal class PatcherL10N : Patcher {
-      private static PatcherL10N me;
-
-      internal void Apply () {
-         me = this;
-         TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
-      }
-
-      private static ModPatch patchZh, patchFont;
-
-      private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
-         Info( "Locale is {0}", language );
-         if ( language == UserSettings.Language.Chinese ) {
-            if ( patchZh == null ) {
-               patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
-               patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
-            }
-            LoadFonts();
-         } else if ( patchZh != null ) {
-            patchZh?.Unpatch();
-            patchFont?.Unpatch();
-            patchZh = patchFont = null;
-         }
-      } catch ( Exception x ) { Err( x ); } } }
-
-      private static void LoadFonts () {
-         if ( zhtTMPFs.Count != 0 ) return;
-         foreach ( var v in new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" } )  {
-            if ( ! LoadFont( $"NotoSansTC-{v}", v ) )
-               LoadFont( $"NotoSansHK-{v}", v );
-         }
-         TMP_Settings.fallbackFontAssets.Add( zhtTMPFs[ "Medium" ] );
-      }
-
-      private static bool LoadFont ( string fn, string v ) { try {
-         var f = Path.Combine( ModDir, $"{fn}.otf" );
-         if ( File.Exists( f ) ) {
-            Info( "Loading {0}", f );
-            var size = v == "Bold" || v == "Black" ? 80 : 40;
-            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), size, size / 10, GlyphRenderMode.SDFAA_HINTED, 8192, 8192 );
-            tmpf.name = fn;
-            return true;
-         }
-         Info( "Not Found: {0}.", f );
-         return false;
-      } catch ( Exception x ) { return Err( x, false ); } }
-
-      private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
-      private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
-      private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
-      private static TMP_FontAsset lastTMPF;
-
-      private static void ToZht ( ref string text ) { try {
-         if ( string.IsNullOrEmpty( text ) ) return;
-         if ( zhs2zht.TryGetValue( text, out string zht ) ) { text = zht; return; }
-         else {
-            zht = new string( ' ', text.Length );
-            LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, zht, zht.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
-            zht = ZhtTweaks( zht );
-         }
-         Fine( "{0} => {1}", text, zht );
-         zhs2zht.Add( text, text = zht );
-      } catch ( Exception x ) { Err( x ); } }
-
-      private static void ZhtFont ( UIViewState state ) { try {
-         Fine( "Finding font assets in view state" );
-         foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
-            if ( entry?.@object == null ) continue;
-            //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Info( "> TXT", text.name ?? text.text, text.font );
-            foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) )
-               if ( text.font != null && text.font != lastTMPF )
-                  FixFont( lastTMPF = text.font );
-         }
-      } catch ( Exception x ) { Err( x ); } }
-
-      private static void FixFont ( TMP_FontAsset font ) { try {
-         if ( font == null || fixedTMPFs.Contains( font ) ) return;
-         fixedTMPFs.Add( font );
-         var weight = FindFontWeight( font, out var i );
-         if ( weight != null ) {
-            if ( zhtTMPFs.TryGetValue( weight, out var tc ) ) {
-               var fb = font.fallbackFontAssetTable;
-               Info( "Adding {0} as fallback for {1} of {2}.", tc.name, fb[ i ].name, font.name );
-               fb.Insert( i + 1, tc );
-            } else
-               Warn( "Font variation not found: {0}", weight );
-         }
-      } catch ( Exception x ) { Err( x ); } }
-
-      private static string FindFontWeight ( TMP_FontAsset fontAsset, out int i ) { i = 0; try {
-         var list = fontAsset?.fallbackFontAssetTable;
-         if ( list == null || list.Count == 0 ) return null;
-         for ( ; i < list.Count ; i++ ) { var fb = list[ i ];
-            var fname = fb?.name;
-            if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
-            if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
-            if ( fname.StartsWith( "NotoSansCJKsc-" ) )
-               return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
-         }
-         return null;
-      } catch ( Exception x ) { return Err< string >( x, null ); } }
-
-      private static readonly string[] tweaks = new string[]{
-         "游戲", "遊戲",
-
-         "適用獎勵", "獎勵",
-         "適用期限已至", "期限已至",
-         "所有適用的研究", "的所有研究",
-         "不適用", "不可使用",
-         "適用於", "可以用於",
-         "適用", "可以使用",
-         "没有任何有效任務", "没有任何進行中的任務",
-         "有效任務", "任務列表",
-
-         "表面棲息地", "地面居所",
-         "變軌彈道", "轉移航道",
-         "準備狀態", "技術指標",
-         "中途操控", "中途軌道調整",
-
-         "后", "後",
-         "并", "並",
-         "进", "進",
-         "于", "於",
-         "剩余", "剩餘",
-         "加載", "載入",
-         "有效載荷", "酬載",
-         "正在登錄", "載入",
-         "菜單", "選單",
-         "采集", "採集",
-         "采樣", "採樣",
-         "阿麗亞娜", "亞利安",
-         "大力神", "泰坦",
-         "旅行者號", "航行者號",
-      };
-
-      private static string ZhtTweaks ( string txt ) {
-         for ( var i = 0 ; i < tweaks.Length ; i += 2 )
-           txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
-         switch ( txt ) {
-            case "跳過當前月" : return "下一月";
-            case "跳到事件" : return "下一事件";
-            case "簡體中文" : return "中文";
-            case "在 Discord 上<br>加入我們！" : return "加入我們的<br>Discord！";
-            case "{Name_{buildingId}}待完成" : return "{Name_{buildingId}}完成";
-            case "{agency}已完成{{mission}}的{phase}階段" : return "{agency}已完成{{mission}}的階段{phase}";
-            case "新的聯合任務適用於{Name_Body_{body}} ！" : return "有新的{Name_Body_{body}}聯合任務";
-            case "新的請求任務適用於{Name_Body_{body}} ！" : return "有新的{Name_Body_{body}}請求任務";
-            case "{agency}下個月將會推出{{mission}}！" : return "{agency}將於下個月發射{{mission}}！";
-            case "{{mission}}預備下一階段！" : return "{{mission}}的下一階段已就緒！";
-            case "{Name_{buildingId}}已完成" : return "{Name_{buildingId}}建造完畢";
-            case "{payload}已完成" : return "{payload}建造完畢";
-            case "{vehicle}已完成" : return "{vehicle}建造完畢";
-         }
-         return txt;
-      }
-
-      [ DllImport( "kernel32", CharSet = CharSet.Unicode, SetLastError = true ) ]
-      private static extern int LCMapStringEx ( string lpLocaleName, uint dwMapFlags, string lpSrcStr, int cchSrc, [Out] string lpDestStr, int cchDest, IntPtr lpVersionInformation, IntPtr lpReserved, IntPtr sortHandle );
-      private const int LCMAP_SIMPLIFIED_CHINESE = 0x02000000;
-      private const int LCMAP_TRADITIONAL_CHINESE = 0x04000000;
+   internal class ModPatcher : Patcher {
+      internal static readonly Config config = new Config();
    }
+
+   internal class Config : IniConfig {
+      [ Config( "\r\n[字型]" ) ]
+      [ Config( "字型檔案目錄及名稱。預設 NotoSans??-*.otf。" ) ]
+      public string font= "NotoSans??-*.otf";
+      [ Config( "相對於簡體字型的位置。-1 為正體優先，0 為取代，1 為簡體優先。預設 1，因為簡體字型有預先渲染，顯示速度快，雖然渲染質素會有細微差異。" ) ]
+      public int tc_index = 1;
+
+      [ Config( "\r\n[渲染]" ) ]
+      [ Config( "SDF 素材地圖高度。過小會容易溢出導致缺字，過大則降低效能。預設 8192。" ) ]
+      public uint atlas_height = 8192;
+      [ Config( "SDF 素材地圖寬度。同上" ) ]
+      public uint atlas_width = 8192;
+      [ Config( "正常字型渲染大小。越大越精緻，速度越慢。預設 40。" ) ]
+      public uint sample_size_normal = 40;
+      [ Config( "粗體字型渲染大小。同上。預設 80。" ) ]
+      public uint sample_size_bold = 80;
+      [ Config( "渲染間距比率。過小會出現字框，過大浪費素材。預設 0.1 即 10%。" ) ]
+      public float padding_ratio = 0.1f;
+
+      [ Config( "\r\n" ) ]
+      [ Config( "本設定檔的版本號。敬請勿動。" ) ]
+      public int config_version = 20200322;
+
+      public override void Load ( object subject, string path ) {
+         base.Load( subject, path );
+         if ( ! ( subject is Config conf ) || string.IsNullOrEmpty( font ) ) return;
+         conf.tc_index = Math.Max( -1, Math.Min( conf.tc_index, 1 ) );
+         conf.atlas_height = Math.Max( 512, conf.atlas_height );
+         conf.atlas_width = Math.Max( 512, conf.atlas_width );
+         conf.sample_size_bold = Math.Max( 8, conf.atlas_width );
+         conf.sample_size_normal = Math.Max( 8, conf.atlas_width );
+         if ( ! Rational( conf.padding_ratio ) || conf.padding_ratio < 0 )
+            conf.padding_ratio = 0.1f;
+      }
+   }
+
 }

@@ -87,7 +87,8 @@ namespace ZyMod {
       public static void Warn  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Warning, msg, arg );
       public static void Info  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Info, msg, arg );
       public static void Fine  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Verbose, msg, arg );
-      public static bool Non0 ( float val ) => val != 0 && ! float.IsNaN( val ) && ! float.IsInfinity( val );
+      public static bool Non0 ( float val ) => val != 0 && Rational( val );
+      public static bool Rational ( float val ) => ! float.IsNaN( val ) && ! float.IsInfinity( val );
       public static bool IsFound ( string path ) { if ( File.Exists( path ) ) return true; Warn( "Not Found: {0}", path ); return false; }
       public static bool IsFound ( string path, out string found ) { found = path; return IsFound( path ); }
 
