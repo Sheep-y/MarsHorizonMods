@@ -15,7 +15,10 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       internal void Apply () {
          me = this;
-         TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
+         if ( config.dynamic_patch )
+            TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
+         else
+            ApplyZhPatches();
       }
 
       private static ModPatch patchZh, patchFont;
@@ -24,11 +27,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
          Info( "Locale is {0}", language );
          if ( language == UserSettings.Language.Chinese ) {
-            if ( patchZh == null ) {
-               patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
-               patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
-            }
-            LoadFonts();
+            if ( patchZh == null ) ApplyZhPatches();
          } else if ( patchZh != null ) {
             patchZh?.Unpatch();
             patchFont?.Unpatch();
@@ -36,9 +35,14 @@ namespace ZyMod.MarsHorizon.Zhant {
          }
       } catch ( Exception x ) { Err( x ); } } }
 
+      private static void ApplyZhPatches () {
+         patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
+         patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( ZhtFont ) );
+         LoadFonts();
+      }
+
       private static void LoadFonts () {
          if ( zhtTMPFs.Count != 0 ) return;
-         // TODO: Replace with config.font
          foreach ( var v in new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" } ) {
             if ( !LoadFont( $"NotoSansTC-{v}", v ) )
                LoadFont( $"NotoSansHK-{v}", v );
@@ -126,8 +130,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             var fname = fb?.name;
             if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
             if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
-            if ( fname.StartsWith( "NotoSansCJKsc-" ) )
-               return fb.name.Substring( "NotoSansCJKsc-".Length ).Split( ' ' )[0];
+            if ( fname.StartsWith( SC_prefix ) )
+               return fb.name.Substring( SC_prefix.Length ).Split( ' ' )[0];
          }
          return null;
       } catch ( Exception x ) { return Err< string >( x, null ); } }

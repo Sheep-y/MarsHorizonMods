@@ -20,10 +20,10 @@ namespace ZyMod.MarsHorizon.Zhant {
 
    internal class Config : IniConfig {
       [ Config( "\r\n[字型]" ) ]
-      [ Config( "字型檔案目錄及名稱。預設 NotoSans??-*.otf。" ) ]
-      public string font= "NotoSans??-*.otf";
       [ Config( "相對於簡體字型的位置。-1 為正體優先，0 為取代，1 為簡體優先。預設 1，因為簡體字型有預先渲染，顯示速度快，雖然渲染質素會有細微差異。" ) ]
       public int tc_index = 1;
+      [ Config( "是否在偵察到使用中文時才載入。設成 False 的話會無視遊戲的語言設定，恒常轉換所有語言。預設 True。" ) ]
+      public bool dynamic_patch = true;
 
       [ Config( "\r\n[渲染]" ) ]
       [ Config( "SDF 素材地圖高度。過小會容易溢出導致缺字，過大則降低效能。預設 8192。" ) ]
@@ -43,7 +43,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       public override void Load ( object subject, string path ) {
          base.Load( subject, path );
-         if ( ! ( subject is Config conf ) || string.IsNullOrEmpty( font ) ) return;
+         if ( ! ( subject is Config conf ) ) return;
          conf.tc_index = Math.Max( -1, Math.Min( conf.tc_index, 1 ) );
          conf.atlas_height = Math.Max( 512, conf.atlas_height );
          conf.atlas_width = Math.Max( 512, conf.atlas_width );
