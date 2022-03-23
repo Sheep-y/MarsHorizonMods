@@ -66,7 +66,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             case  0 : fb[ sc_index ] = tc; return;
             case -1 : fb.Insert( sc_index, tc ); return;
             case  1 :
-            default : fb.Insert( sc_index + 1, tc ); return;
+            default : fb.Add( tc ); return;
          }
       }
 
@@ -92,12 +92,10 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void ToZht ( ref string text ) { try {
          if ( string.IsNullOrEmpty( text ) ) return;
          if ( zhs2zht.TryGetValue( text, out string zht ) ) { text = zht; return; }
-         else {
-            zht = new string( ' ', text.Length );
-            LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, zht, zht.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
-            zht = ZhtTweaks( zht );
-         }
-         Fine( "{0} => {1}", text, zht );
+         var raw = new string( ' ', text.Length );
+         LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, raw, raw.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
+         zht = ZhtTweaks( raw );
+         Fine( "{0} => {raw} => {1}", text, raw, zht );
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -139,19 +137,26 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static readonly string[] tweaks = new string[]{
          "游戲", "遊戲",
 
+         "獎金", "額外",
          "適用獎勵", "獎勵",
          "適用期限已至", "期限已至",
          "所有適用的研究", "的所有研究",
          "不適用", "不可使用",
          "適用於", "可以用於",
          "適用", "可以使用",
+         "獎勵", "回報",
+         "完成回報", "完成獎勵",
+         "額外：", "額外獎勵：",
+
          "没有任何有效任務", "没有任何進行中的任務",
          "有效任務", "任務列表",
-
          "表面棲息地", "地面居所",
          "變軌彈道", "轉移航道",
          "準備狀態", "技術指標",
          "中途操控", "中途軌道調整",
+         "上下文動作", "情景動作",
+         "試驗飛行員", "試飛員",
+         "模塊空間站的增加，", "模塊空間站的擴充，",
 
          "后", "後",
          "并", "並",
@@ -161,6 +166,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          "筑", "築",
          "剩余", "剩餘",
          "加載", "載入",
+         "明了", "明瞭",
          "有效載荷", "酬載",
          "正在登錄", "載入",
          "菜單", "選單",
@@ -186,6 +192,32 @@ namespace ZyMod.MarsHorizon.Zhant {
             case "{Name_{buildingId}}已完成" : return "{Name_{buildingId}}建造完畢";
             case "{payload}已完成" : return "{payload}建造完畢";
             case "{vehicle}已完成" : return "{vehicle}建造完畢";
+            case "上下文" : return "過去、現在、未來";
+            case "雙薪" : return "心靈手巧";
+            case "已公開" : return "公眾關注";
+            case "點擊跳過" : return "任意鍵跳過";
+            case "點擊忽略" : return "任意鍵關閉";
+
+            case "高效架構" : return "高效建造";
+            case "經濟架構" : return "廉價建造";
+            case "經濟裝配" : return "廉價裝配";
+            case "經濟施工" : return "廉價施工";
+            case "團隊玩家" : return "團隊精神";
+            case "運營專家" : return "行動專家";
+            case "未知實體" : return "無名小子";
+            case "水星項目" : return "水星計劃";
+            case "永不言敗" : return "輸不起";
+            case "空間補貼" : return "宇航資助";
+            case "擴展專業知識" : return "擴展專家";
+            case "彈性的工作方式" : return "彈性作業";
+            case "並非因為輕而易舉" : return "知難而行";
+            case "薪資適中的宇航員" : return "廉價宇航員";
+            case "發射水平 I" : return "發射能手 I";
+            case "發射水平 II" : return "發射能手 II";
+            case "原型機有效載荷 I" : return "實驗性酬載 I";
+            case "原型機有效載荷 II" : return "實驗性酬載 II";
+            case "揮發性助推器 I" : return "易爆燃料 I";
+            case "揮發性助推器 II" : return "易爆燃料 II";
          }
          for ( var i = 0 ; i < tweaks.Length ; i += 2 )
            txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
