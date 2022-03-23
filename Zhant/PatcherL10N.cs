@@ -44,43 +44,33 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void LoadFonts () {
          if ( zhtTMPFs.Count != 0 ) return;
          foreach ( var v in new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" } ) {
-            if ( !LoadFont( $"NotoSansTC-{v}", v ) )
-               LoadFont( $"NotoSansHK-{v}", v );
+            if ( ! LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
+                 || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) )
+               Info( "{0} font loaded", v );
          }
          if ( zhtTMPFs.Count == 0 ) return;
          var weight = FindFontWeight( TMP_Settings.fallbackFontAssets, out var i ) ?? "Medium";
          if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) tc = zhtTMPFs.First().Value;
-         AddToFallback( tc, TMP_Settings.fallbackFontAssets, i, "global fallback" );
+         AddToFallback( tc, TMP_Settings.fallbackFontAssets, "global fallback" );
       }
 
-      private static void AddToFallback ( TMP_FontAsset tc, List<TMP_FontAsset> fb, int sc_index, string fname ) {
+      private static void AddToFallback ( TMP_FontAsset tc, List<TMP_FontAsset> fb, string fname ) {
          if ( tc == null || fb == null ) return;
-         if ( sc_index < 0 ) {
-            Info( "SC not found; adding {0} toward the {1} of {2}.", tc.name, config.tc_index > 0 ? "end" : "start", fname );
-            if ( config.tc_index > 0 ) fb.Add( tc );
-            else fb.Insert( 0, tc );
-            return;
-         }
-         Info( "Inserting {0} at pos {1} of {2} for {3}.", tc.name, config.tc_index, fb[ sc_index ].name, fname );
-         switch ( config.tc_index ) {
-            case  0 : fb[ sc_index ] = tc; return;
-            case -1 : fb.Insert( sc_index, tc ); return;
-            case  1 :
-            default : fb.Add( tc ); return;
-         }
+         Info( "Inserting {0} at end of {1}.", tc.name, fname );
+         fb.Add( tc ); return;
       }
 
       private static bool LoadFont ( string fn, string v ) { try {
          var f = Path.Combine( ModDir, $"{fn}.otf" );
          if ( File.Exists( f ) ) {
-            Info( "Loading {0}", f );
+            Fine( "Loading {0}", f );
             var size = (int) ( v == "Bold" || v == "Black" ? config.sample_size_bold : config.sample_size_normal );
             var padding = (int) Math.Ceiling( size * config.padding_ratio );
             var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), size, padding, GlyphRenderMode.SDFAA_HINTED, (int) config.atlas_width, (int) config.atlas_height );
             tmpf.name = fn;
             return true;
          }
-         Info( "Not Found: {0}.", f );
+         Fine( "Not Found: {0}.", f );
          return false;
       } catch ( Exception x ) { return Err( x, false ); } }
 
@@ -95,7 +85,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          var raw = new string( ' ', text.Length );
          LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, raw, raw.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
          zht = ZhtTweaks( raw );
-         Fine( "{0} => {raw} => {1}", text, raw, zht );
+         Fine( "{0} => {1} => {2}", text, raw, zht );
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -114,12 +104,15 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( font == null || fixedTMPFs.Contains( font ) ) return;
          fixedTMPFs.Add( font );
          var weight = FindFontWeight( font.fallbackFontAssetTable, out var i );
-         if ( weight != null ) {
-            if ( zhtTMPFs.TryGetValue( weight, out var tc ) )
-               AddToFallback( tc, font.fallbackFontAssetTable, i, font.name );
-            else
-               Warn( "Font variation not found: {0}", weight );
+         if ( weight == null ) return;
+         if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) {
+            if ( ! zhtTMPFs.TryGetValue( "Medium", out tc ) ) {
+               Warn( "Font variation {0} not loaded.  TC fallback not added to {1}", weight, font.name );
+               return;
+            } else
+               Warn( "Font variation {0} not loaded, replacing with Medium.", weight );
          }
+         AddToFallback( tc, font.fallbackFontAssetTable, font.name );
       } catch ( Exception x ) { Err( x ); } }
 
       private static string FindFontWeight ( List< TMP_FontAsset > list, out int i ) { i = -1; try {
