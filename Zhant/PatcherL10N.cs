@@ -52,29 +52,28 @@ namespace ZyMod.MarsHorizon.Zhant {
          var weight = FindFontWeight( TMP_Settings.fallbackFontAssets, out var i ) ?? "Medium";
          if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) tc = zhtTMPFs.First().Value;
          AddToFallback( tc, TMP_Settings.fallbackFontAssets, "global fallback" );
+         var has_fallback = false;
          foreach ( var file in fallback_fonts ) {
             if ( ! LoadFont( file, file ) ) continue;
-            fallbacks.Add( zhtTMPFs[ file ] );
+            has_fallback = true;
             AddToFallback( zhtTMPFs[ file ], TMP_Settings.fallbackFontAssets, "global fallback" );
          }
-         if ( fallbacks.Count == 0 )
-            Warn( "Fallback font(s) not found.  Checked: ", fallback_fonts );
+         if ( ! has_fallback ) Warn( "Fallback font(s) not found.  Checked: ", fallback_fonts );
       }
 
-      private static void AddToFallback ( TMP_FontAsset tc, List<TMP_FontAsset> fb, string fname ) {
-         if ( tc == null || fb == null ) return;
-         Info( "Inserting {0} at end of {1}.", tc.name, fname );
-         fb.Add( tc ); return;
+      private static void AddToFallback ( TMP_FontAsset font, List<TMP_FontAsset> fb, string fname ) {
+         if ( font == null || fb == null ) return;
+         Info( "Inserting {0} at end of {1}.", font.name, fname );
+         fb.Add( font );
       }
 
       private static bool LoadFont ( string fn, string v ) { try {
-         var f = Path.Combine( ModDir, $"{fn}.otf" );
+         var f = Path.Combine( ModDir, fn.EndsWith( ".ttf" ) ? fn : $"{fn}.otf" );
          if ( File.Exists( f ) ) {
             var size = (int) ( v == "Bold" || v == "Black" ? config.sample_size_bold : config.sample_size_normal );
             var padding = (int) Math.Ceiling( size * config.padding_ratio );
             Info( "Loading {0}, size {1}, padding {2}.", f, size, padding );
-            var font = new Font( f );
-            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( font, size, padding, GlyphRenderMode.SDFAA, (int) config.atlas_width, (int) config.atlas_height );
+            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), size, padding, GlyphRenderMode.SDFAA_HINTED, (int) config.atlas_width, (int) config.atlas_height );
             tmpf.name = fn;
             return true;
          }
@@ -84,7 +83,6 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
-      private static readonly List< TMP_FontAsset > fallbacks = new List< TMP_FontAsset >();
       private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
       private static TMP_FontAsset lastTMPF;
 
@@ -94,7 +92,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          var raw = new string( ' ', text.Length );
          LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, raw, raw.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
          zht = ZhtTweaks( raw );
-         Fine( "{0} => {1} => {2}", text, raw, raw == zht ? null : zht );
+         Fine( "{3} {0} => {1} => {2}", text, raw, raw == zht ? null : zht, text.Length );
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -102,7 +100,6 @@ namespace ZyMod.MarsHorizon.Zhant {
          Fine( "Finding font assets in view state" );
          foreach ( var entry in state.entries ) { // Is there a better way to find all TMP fonts?
             if ( entry?.@object == null ) continue;
-            //foreach ( var text in entry.@object.GetComponentsInChildren< Text >( true ) ) Info( "> TXT", text.name ?? text.text, text.font );
             foreach ( var text in entry.@object.GetComponentsInChildren< TMP_Text >( true ) )
                if ( text.font != null && text.font != lastTMPF )
                   FixFont( lastTMPF = text.font );
@@ -124,8 +121,6 @@ namespace ZyMod.MarsHorizon.Zhant {
             //font.fallbackFontAssetTable[ i ] = tc;
             AddToFallback( tc, font.fallbackFontAssetTable, font.name );
          }
-         foreach ( var f in fallbacks )
-            AddToFallback( f, font.fallbackFontAssetTable, font.name );
       } catch ( Exception x ) { Err( x ); } }
 
       private static string FindFontWeight ( List< TMP_FontAsset > list, out int i ) { i = -1; try {
@@ -142,6 +137,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly string[] tweaks = new string[]{
          "游戲", "遊戲",
+         "游客", "遊客",
 
          "獎金", "額外",
          "適用獎勵", "獎勵",
@@ -171,15 +167,18 @@ namespace ZyMod.MarsHorizon.Zhant {
          "于", "於",
          "愿", "願",
          "筑", "築",
+         "丟失", "失去",
          "剩余", "剩餘",
          "加載", "載入",
          "明了", "明瞭",
          "菜單", "選單",
          "采集", "採集",
          "采樣", "採樣",
+         "采用", "採用",
          "有效載荷", "酬載",
          "正在登錄", "載入",
          "阿麗亞娜", "亞利安",
+         "你是否確定", "是否",
          "大力神", "泰坦",
          "旅行者號", "航行者號",
       };
@@ -205,6 +204,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             case "點擊跳過" : return "任意鍵跳過";
             case "點擊忽略" : return "任意鍵關閉";
 
+            case "維修費用" : return "恒常開支";
             case "高效架構" : return "高效建造";
             case "經濟架構" : return "廉價建造";
             case "經濟裝配" : return "廉價裝配";
@@ -225,6 +225,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             case "原型機有效載荷 II" : return "實驗性酬載 II";
             case "揮發性助推器 I" : return "易爆燃料 I";
             case "揮發性助推器 II" : return "易爆燃料 II";
+
+            case "失敗的任務支持懲罰加倍" : return "任務失敗的支持度懲罰翻倍";
          }
          for ( var i = 0 ; i < tweaks.Length ; i += 2 )
            txt = txt.Replace( tweaks[ i ], tweaks[ i + 1 ] );
