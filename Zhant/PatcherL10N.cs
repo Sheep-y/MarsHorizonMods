@@ -23,6 +23,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static ModPatch patchZh, patchFont;
       private const string SC_prefix = "NotoSansCJKsc-";
+      private static readonly string[] fallback_fonts = new string[]{ "TW-Sung.ttf", "HanaMinA.ttf", "HanaMinB.ttf", "CODE2000.TTF", "unifont.ttf" };
 
       private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
          Info( "Locale is {0}", language );
@@ -44,14 +45,20 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void LoadFonts () {
          if ( zhtTMPFs.Count != 0 ) return;
          foreach ( var v in new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" } ) {
-            if ( ! LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
-                 || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) )
-               Info( "{0} font loaded", v );
+            if ( ! ( LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
+                 || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) ) );
          }
          if ( zhtTMPFs.Count == 0 ) return;
          var weight = FindFontWeight( TMP_Settings.fallbackFontAssets, out var i ) ?? "Medium";
          if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) tc = zhtTMPFs.First().Value;
          AddToFallback( tc, TMP_Settings.fallbackFontAssets, "global fallback" );
+         foreach ( var file in fallback_fonts ) {
+            if ( ! LoadFont( file, file ) ) continue;
+            fallbacks.Add( zhtTMPFs[ file ] );
+            AddToFallback( zhtTMPFs[ file ], TMP_Settings.fallbackFontAssets, "global fallback" );
+         }
+         if ( fallbacks.Count == 0 )
+            Warn( "Fallback font(s) not found.  Checked: ", fallback_fonts );
       }
 
       private static void AddToFallback ( TMP_FontAsset tc, List<TMP_FontAsset> fb, string fname ) {
@@ -63,10 +70,11 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static bool LoadFont ( string fn, string v ) { try {
          var f = Path.Combine( ModDir, $"{fn}.otf" );
          if ( File.Exists( f ) ) {
-            Fine( "Loading {0}", f );
             var size = (int) ( v == "Bold" || v == "Black" ? config.sample_size_bold : config.sample_size_normal );
             var padding = (int) Math.Ceiling( size * config.padding_ratio );
-            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( new Font( f ), size, padding, GlyphRenderMode.SDFAA_HINTED, (int) config.atlas_width, (int) config.atlas_height );
+            Info( "Loading {0}, size {1}, padding {2}.", f, size, padding );
+            var font = new Font( f );
+            var tmpf = zhtTMPFs[ v ] = TMP_FontAsset.CreateFontAsset( font, size, padding, GlyphRenderMode.SDFAA, (int) config.atlas_width, (int) config.atlas_height );
             tmpf.name = fn;
             return true;
          }
@@ -76,6 +84,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
+      private static readonly List< TMP_FontAsset > fallbacks = new List< TMP_FontAsset >();
       private static readonly HashSet< TMP_FontAsset > fixedTMPFs = new HashSet< TMP_FontAsset >();
       private static TMP_FontAsset lastTMPF;
 
@@ -85,7 +94,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          var raw = new string( ' ', text.Length );
          LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, raw, raw.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
          zht = ZhtTweaks( raw );
-         Fine( "{0} => {1} => {2}", text, raw, zht );
+         Fine( "{0} => {1} => {2}", text, raw, raw == zht ? null : zht );
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
 
@@ -104,15 +113,19 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( font == null || fixedTMPFs.Contains( font ) ) return;
          fixedTMPFs.Add( font );
          var weight = FindFontWeight( font.fallbackFontAssetTable, out var i );
-         if ( weight == null ) return;
-         if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) {
-            if ( ! zhtTMPFs.TryGetValue( "Medium", out tc ) ) {
-               Warn( "Font variation {0} not loaded.  TC fallback not added to {1}", weight, font.name );
-               return;
-            } else
-               Warn( "Font variation {0} not loaded, replacing with Medium.", weight );
+         if ( weight != null ) {
+            if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) {
+               if ( ! zhtTMPFs.TryGetValue( "Medium", out tc ) ) {
+                  Warn( "Font variation {0} not loaded.  TC fallback not added to {1}", weight, font.name );
+                  return;
+               } else
+                  Warn( "Font variation {0} not loaded, replacing with Medium.", weight );
+            }
+            //font.fallbackFontAssetTable[ i ] = tc;
+            AddToFallback( tc, font.fallbackFontAssetTable, font.name );
          }
-         AddToFallback( tc, font.fallbackFontAssetTable, font.name );
+         foreach ( var f in fallbacks )
+            AddToFallback( f, font.fallbackFontAssetTable, font.name );
       } catch ( Exception x ) { Err( x ); } }
 
       private static string FindFontWeight ( List< TMP_FontAsset > list, out int i ) { i = -1; try {
@@ -149,6 +162,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          "中途操控", "中途軌道調整",
          "上下文動作", "情景動作",
          "試驗飛行員", "試飛員",
+         "航天地面指揮中心", "任務控制中心",
          "模塊空間站的增加，", "模塊空間站的擴充，",
 
          "后", "後",
@@ -160,11 +174,11 @@ namespace ZyMod.MarsHorizon.Zhant {
          "剩余", "剩餘",
          "加載", "載入",
          "明了", "明瞭",
-         "有效載荷", "酬載",
-         "正在登錄", "載入",
          "菜單", "選單",
          "采集", "採集",
          "采樣", "採樣",
+         "有效載荷", "酬載",
+         "正在登錄", "載入",
          "阿麗亞娜", "亞利安",
          "大力神", "泰坦",
          "旅行者號", "航行者號",
@@ -203,7 +217,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             case "空間補貼" : return "宇航資助";
             case "擴展專業知識" : return "擴展專家";
             case "彈性的工作方式" : return "彈性作業";
-            case "並非因為輕而易舉" : return "知難而行";
+            case "并非因為輕而易舉" : return "知難而行";
             case "薪資適中的宇航員" : return "廉價宇航員";
             case "發射水平 I" : return "發射能手 I";
             case "發射水平 II" : return "發射能手 II";

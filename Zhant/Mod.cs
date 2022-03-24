@@ -27,10 +27,10 @@ namespace ZyMod.MarsHorizon.Zhant {
       public uint atlas_height = 8192;
       [ Config( "SDF 素材地圖寬度。同上" ) ]
       public uint atlas_width = 8192;
-      [ Config( "正常字型渲染大小。越大越精緻，速度越慢。預設 40。" ) ]
-      public uint sample_size_normal = 40;
-      [ Config( "粗體字型渲染大小。同上。預設 80。" ) ]
-      public uint sample_size_bold = 80;
+      [ Config( "正常字型渲染大小。越大越精緻，但速度越慢，遊戲引擎越易放棄。預設 36。" ) ]
+      public uint sample_size_normal = 36;
+      [ Config( "粗體字型渲染大小。同上。預設 48。" ) ]
+      public uint sample_size_bold = 48;
       [ Config( "渲染間距比率。過小會出現字框，過大浪費素材。預設 0.1 即 10%。" ) ]
       public float padding_ratio = 0.1f;
 
