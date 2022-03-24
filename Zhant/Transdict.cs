@@ -1,21 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
    internal static class Transdict {
-      internal static readonly SortedDictionary< string, string > whole_text = new SortedDictionary<string, string>();
-      internal static string[] partial_text;
+      internal static readonly SortedDictionary< string, string > whole = new SortedDictionary<string, string>();
+      internal static string[] part;
+
+      internal const string VerPrefix = "// 版本號 ";
+      internal static string WholeCsv => Path.Combine( RootMod.AppDataDir, "Zhant-Dict-Whole.csv" );
+      internal static string PartCsv  => Path.Combine( RootMod.AppDataDir, "Zhant-Dict-Terms.csv" );
 
       internal static void LoadDicts () {
-         LoadDefaults();
+         whole.Clear();
+         if ( ! ReadCsv( WholeCsv, ReadWhole ) )
+            LoadWholeDefaults();
+
+         var list = new List< string >( 512 );
+         if ( ReadCsv( PartCsv, ( a, b ) => { list.Add( a ); list.Add( b ); } ) )
+            part = list.ToArray();
+         else
+            LoadPartDefaults();
       }
 
-      internal static void LoadDefaults () {
-         whole_text.Clear();
-         var whole = new string[] {
+      private static bool ReadCsv ( string csv, Action< string, string > OnRow, Action< int, int > CheckVersion = null ) {
+         if ( ! File.Exists( csv ) ) return false;
+         var buf = new StringBuilder();
+         int i = 0, ver = 0;
+         Info( "Reading {0}", csv );
+         using ( var r = new StreamReader( csv ) ) {
+            if ( ! r.TryReadCsvRow( out var row, buf ) ) return false;
+            var cells = row.Take( 3 ).ToArray();
+            if ( cells.Length <= 3 || cells[ 2 ].StartsWith( VerPrefix ) || ! int.TryParse( cells[ 2 ].Substring( VerPrefix.Length ), out ver ) )
+               return false;
+            while ( r.TryReadCsvRow( out row, buf ) ) {
+               i++;
+               cells = row.Take( 2 ).ToArray();
+               OnRow( cells[ 0 ], cells[ 1 ] );
+            }
+         }
+         Info( "{0} rows read, version {1}", i, ver );
+         CheckVersion?.Invoke( ver, i );
+         return true;
+      }
+
+      private static void ReadWhole ( string key, string val ) {
+         if ( ! whole.ContainsKey( key ) )
+            whole.Add( key, val );
+         else
+            Warn( "Ignoring duplicate key for whole text translation", key, val );
+      }
+
+      internal static void LoadWholeDefaults () {
+         Info( "Loading default whole text mappings." );
+         whole.Clear();
+         var list = new string[] {
             "跳過當前月",  "下一月",
             "跳到事件",  "下一事件",
             "簡體中文",  "中文",
@@ -59,10 +102,14 @@ namespace ZyMod.MarsHorizon.Zhant {
             "揮發性助推器 II",  "易爆燃料 II",
             "失敗的任務支持懲罰加倍",  "任務失敗的支持度懲罰翻倍",
          };
-         for ( var i = 0 ; i < whole.Length ; i += 2 )
-            whole_text.Add( whole[ i ], whole[ i + 1 ] );
+         for ( var i = 0 ; i < list.Length ; i += 2 )
+            whole.Add( list[ i ], list[ i + 1 ] );
+         WriteCsv( WholeCsv, "全文", list );
+      }
 
-         partial_text = new string[] {
+      internal static void LoadPartDefaults () {
+         Info( "Loading default term mappings." );
+         part = new string[] {
             "游戲", "遊戲",
             "游客", "遊客",
 
@@ -109,6 +156,18 @@ namespace ZyMod.MarsHorizon.Zhant {
             "大力神", "泰坦",
             "旅行者號", "航行者號",
          };
+         WriteCsv( PartCsv, "字詞", part );
       }
+
+      private static void WriteCsv ( string file, string header, string[] content ) { try {
+         using ( var w = new StreamWriter( file, false, Encoding.UTF8 ) ) {
+            w.WriteCsvLine( header, "替換成", "（版本號 " + new Config().config_version + "）" );
+            for ( var i = 0 ; i < content.Length ; i += 2 )
+               w.WriteCsvLine( content[ i ], content[ i + 1 ] );
+         }
+      } catch ( Exception x ) {
+         Error( x );
+         try { File.Delete( file ); } catch ( Exception ) { }
+      } }
    }
 }

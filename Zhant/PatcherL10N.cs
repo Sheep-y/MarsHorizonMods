@@ -47,8 +47,8 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void LoadFonts () {
          if ( zhtTMPFs.Count != 0 ) return;
          foreach ( var v in variations ) {
-            if ( ! ( LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
-                 || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) ) );
+            if ( LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
+                 || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) );
          }
          if ( zhtTMPFs.Count == 0 ) return;
          var weight = FindFontWeight( TMP_Settings.fallbackFontAssets, out var i ) ?? "Medium";
@@ -138,8 +138,8 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { return Err< string >( x, null ); } }
 
       private static string ZhtTweaks ( string txt ) {
-         if ( Transdict.whole_text.TryGetValue( txt, out var zht ) ) return zht;
-         var map = Transdict.partial_text;
+         if ( Transdict.whole.TryGetValue( txt, out var zht ) ) return zht;
+         var map = Transdict.part;
          for ( var i = 0 ; i < map.Length ; i += 2 )
            txt = txt.Replace( map[ i ], map[ i + 1 ] );
          return txt;
