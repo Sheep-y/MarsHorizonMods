@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.ModLoader {
@@ -15,6 +16,8 @@ namespace ZyMod.MarsHorizon.ModLoader {
       public static void Main () => new MarsHorizonModLoader().Initialize();
 
       protected override void OnGameAssemblyLoaded ( Assembly game ) { try {
+         // As of March 2022: Game version 1.4.1.0.  Unity version 2019.4.9f1.
+         Info( "Game version {0}.  Unity version {1}.", Application.version, Application.unityVersion );
          Fine( "Detecting mod path." );
          var selfPath = GetPath( Assembly.GetExecutingAssembly() );
          var path = Path.GetDirectoryName( selfPath );
