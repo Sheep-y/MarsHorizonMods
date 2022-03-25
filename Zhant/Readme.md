@@ -9,7 +9,7 @@ It converts Simplified Chinese into Traditional Chinese.
 
 1. 安裝 Mars Horizon Mod Loader。將內容解壓到遊戲根目錄就可以。
 2. 從 GitHub 或 NexusMods 下載本補丁的最近版。用 7-zip 或類似軟件打開。
-3. 將 `MH_Zhant.dll` 和三個 NotoSans 字型擋案拖放到遊戲的 `Mods` 目錄。（共四個檔案）
+3. 將 `MH_Zhant.dll`、三個 NotoSans 字型擋、及 unifont 字型檔 拖放到遊戲的 `Mods` 目錄。（共五個檔案）
 4. 啓動遊戲，將遊戲語言切換到中文即可。
 
 
@@ -17,10 +17,9 @@ It converts Simplified Chinese into Traditional Chinese.
 
 本補丁於 Mars Horizon 的 1.4.1 GOG.com 版本上開發及測試，
 理應支援 微軟視窗/Wine/Proton 下的 Steam 及 Epic。
-本補丁使用 LCMapString Win32 API 進行初步的簡繁轉換，再在必要時進行額外調整。
 
-本補丁不修改遊戲檔案及存檔。但如果你在使用補丁期間修改了載具的名稱，部分中文字可能在移除補丁後無法顯示。
-存檔本身依然完好無缺，能正常運作。
+本補丁不修改遊戲檔案及存檔。但如果你在使用補丁期間修改了載具或存檔名稱，部分中文字可能在移除補丁後無法顯示。
+存檔本身依然完好，能正常讀取及重命名。
 
 本補丁相容於我做的其他 Mars Horizon 外掛，它們會顯示正體中文。
 
@@ -61,7 +60,7 @@ https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 
 # 反安裝 #
 
-從遊戲的 `Mods` 目錄中刪除 `MH_Zhant.dll` 和所有 `NotoSans` 檔案。
+從遊戲的 `Mods` 目錄中刪除 `MH_Zhant.dll` 和所有字型檔案。
 
 如果你沒有使用其他外掛，也可以反安裝包括 Mod Loader 在內的所有東西。
 也就是刪除遊戲目錄下的 `doorstop_config.ini`, `version.dll`, 和 `Mods` 目錄。
@@ -71,5 +70,5 @@ https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 
 # 授權 #
 
-GPL v3.  附錄的字型採用 SIL OFL v1.1 授權。
+GPL v3.  字型皆採用 SIL OFL v1.1 授權。
 src 目錄含有源碼和授權聲明。

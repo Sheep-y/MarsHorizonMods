@@ -20,8 +20,8 @@ since they have a much reduced chance to be selected for request missions.
 
 # Default Mechanic #
 
-By default, this mod perform the following adjustments.
-The change only apply to new missions and challenges, not to existing ones.
+This mod provides the following features by default.
+They only apply to new missions and challenges, not to existing ones.
 
 ## New Mission Destinations ##
 
@@ -44,14 +44,14 @@ When a new mission is rolled:
 * Lucrative missions has a slightly higher base chance to come up.
 * The chance is further increased when no lucrative mission is active or being requested (joint or not).
 * The chance is noticably increased when you've finished all reasearches.
+* The roll is made from an independent RNG.
 
-The exact increment is complicated, since it depends on the weighting of other missions,
+The exact boost is complicated, and depends on the weighting of other missions,
 which varies by mission and can optionally be adjusted by this mod.
+In other words, doubling lucrative weight does not double its chance, ok?
 
-In other words, doubling the lucrative weight does not double its chance, ok?
-Note that the game will generate one mission type object for each weight.
-Wonderful design.
-So a large multiplier may cause the game to shutter on turn end and maybe even an Out Of Memory crash.
+As for RNG, it is because the chance of getting the same mission after loading a save is way too high.
+This is not a proof, but the game's space graphic system and messaging system both seems to reset the shared random seed.
 
 ## New Milestone Challenges ##
 
@@ -64,16 +64,6 @@ When a new milestone challenge is rolled:
 The mod can also be configured to exclude fund type rewards untill all tech rewards have been excluded.
 Just set `milestone_challenge_fund_multiplier` to zero or negative.
 
-## Auto Resolve ##
-
-* Mission's auto-resolve now rolls from a standalone .Net RNG.
-
-Objective experience aside, I don't have _proof_ that this game's RNG is bad,
-but the game's space graphic system and messaging system both seems to reset the shared random seed.
-
-.Net's RNG has its issues too, but should be good enough here.
-But if you'd rather not mess with it, the replacements can be disabled like other features.
-
 
 # Configuration #
 
@@ -83,9 +73,6 @@ i.e. %AppData%\..\LocalLow\Auroch Digital\Mars Horizon
 You can edit the ini file to adjust the number of slots and requirement of missions.
 You can also key slots to other buildings, missions, and/or researches, if you know their in-game id.
 Each setting have a short description that explains its effects.
-
-If you can't see file extensions, the one with a little gear in its icon is the config file.
-You may want to google how to reveal file extensions for good.
 
 
 # Compatibility #
@@ -133,7 +120,7 @@ the mod will recreate it with default values.
 To remove the mod, rename or delete `MH_MissionControl.dll` from the game's `Mods` folder.
 
 If you are not using other mods, you may also remove the mod loader.
-See the mod loader's instruction for details.
+Please refer to the mod loader's instructions.
 
 The mod does not modify game files, so there is no need to Verify Files.
 

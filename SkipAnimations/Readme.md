@@ -39,7 +39,7 @@ Yes.  We'd like to see James Webb added to the game.  With full unfold animation
 
 # Default Behaviour #
 
-This mod provides the following features.
+This mod provides the following features by default:
 
 ## Cinematic Skip ##
 
@@ -94,9 +94,6 @@ i.e. %AppData%\..\LocalLow\Auroch Digital\Mars Horizon
 You can edit the ini file to disable or adjust various features.
 Each setting have a short description that explains its effects.
 
-If you can't see file extensions, the one with a little gear in its icon is the config file.
-You may want to google how to reveal file extensions for good.
-
 
 # Compatibility #
 
@@ -145,7 +142,7 @@ the mod will recreate it with default values.
 To remove the mod, rename or delete `MH_SkipAnimations.dll` from the game's `Mods` folder.
 
 If you are not using other mods, you may also remove the mod loader.
-See the mod loader's instruction for details.
+Please refer to the mod loader's instructions.
 
 The mod does not modify game files, so there is no need to Verify Files.
 

@@ -20,7 +20,7 @@ New saves made with this mod will still work when mod is disabled.
 
 # Default Mechanic #
 
-Up to 3 deep space slots can be unlocked by these actions:
+By default, up to 3 deep space slots can be unlocked by these actions:
 
 1. Launch The Grand Tour milestone mission and reach at least phase 2.
 2. Construct the Space Science Library building. (Era 3 reward research)
@@ -51,9 +51,6 @@ i.e. %AppData%\..\LocalLow\Auroch Digital\Mars Horizon
 You can edit the ini file to adjust the number of slots and requirement of missions.
 You can also key slots to other buildings, missions, and/or researches, if you know their in-game id.
 Each setting have a short description that explains its effects.
-
-If you can't see file extensions, the one with a little gear in its icon is the config file.
-You may want to google how to reveal file extensions for good.
 
 
 # Compatibility #
@@ -103,7 +100,7 @@ the mod will recreate it with default values.
 To remove the mod, rename or delete `MH_DeepSpaceSlots.dll` from the game's `Mods` folder.
 
 If you are not using other mods, you may also remove the mod loader.
-See the mod loader's instruction for details.
+Please refer to the mod loader's instructions.
 
 The mod does not modify game files, so there is no need to Verify Files.
 
