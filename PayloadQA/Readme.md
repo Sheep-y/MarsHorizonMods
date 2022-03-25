@@ -12,7 +12,7 @@ and manual action crit rate by payload reliability.
 
 1. Setup Mars Horizon Mod Loader.
 2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
-3. Extract (Drag and Drop) `MH_SkipAnimations.dll` into the game's `Mods` folder.
+3. Extract (Drag and Drop) `MH_PayloadQA.dll` into the game's `Mods` folder.
 4. Launch the game and enjoy.
 
 
@@ -22,9 +22,10 @@ This mod provides the following features by default:
 
 ## Mission Auto-Resolve ##
 
-* Specialised payloads (Nav, Comm etc.) now enjoys improved auto-resolve success rate, but still lower than a normal payload.
-* Power payload retain the same success rate, but have improved critical success chance.
-* Auto-Resolve now rolls from a standalone RNG.
+* Specialised payloads (Nav, Comm, and Observe ) now enjoys improved auto-resolve success chance.
+* Extra crew beyond the min. requirement now improves auto-resolve success chance.
+* Power payload now improves auto-resolve outstanding chance.
+* Make auto-resolve rolls from a standalone RNG.
 
 ## Mission Mini-Game ##
 

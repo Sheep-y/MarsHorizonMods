@@ -30,7 +30,7 @@ When a new mission is rolled:
 * Earth and moon missions are heavily biased.
 * Mars, Venus, and Mercury missions have a smaller chance to come up, in this order.
 * Other destinations will not come up as request / joint missions.
-* The mission is rolled by a standalone .Net RNG.
+* Make new missions roll from a standalone RNG.
 
 The exact chance depends heavily on which milestone missions you have completed,
 since the game only draw from them.
