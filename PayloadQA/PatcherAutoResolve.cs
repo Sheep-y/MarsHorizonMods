@@ -16,31 +16,30 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          if ( config.standalone_resolve_rng )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
          TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
-            , postfix: config.special_payload_ar_bonus > 0 ? nameof( AddPayloadBonus ) : nameof( TrackPayload ) );
+            , postfix: config.special_payload_ar_bonus > 0 ? nameof( AddPayloadBonus ) : nameof( GetPayloadVariant ) );
          if ( config.power_payload_ar_crit > 0 )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
       }
 
       private static PayloadVariant.Type currentVariant;
 
-      private static Data.Payload GetPayloadVariant ( Mission mission, out PayloadVariant.Type variant ) {
-         variant = Crew;
+      private static void GetPayloadVariant ( Mission mission ) { try {
+         currentVariant = Crew;
          var payload = mission.payload;
-         if ( mission.template.IsSoundingRocking || payload == null ) return null;
+         if ( mission.template.IsSoundingRocking || payload == null ) return;
          var i = payload.variantIndex;
          var list = payload.variants;
-         if ( i < 0 || i >= list.Length ) return null;
-         variant = list[ i ].type;
-         return payload;
-      }
+         if ( i < 0 || i >= list.Length ) return;
+         currentVariant = list[ i ].type;
+      } catch ( Exception x ) { Err( x ); } }
 
       private static void AddPayloadBonus ( Mission mission, List< ValueModifier > modifiers, ref int __result ) { try {
-         var payload = GetPayloadVariant( mission, out currentVariant );
-         if ( payload == null ) return;
+         GetPayloadVariant( mission );
+         if ( mission.payload == null ) return;
          var bonus = GetPayloadBonus( mission, currentVariant );
          if ( bonus == 0 ) return;
          Info( "Adding {0}% to auto-resolve success rate for {1} payload.", bonus, currentVariant );
-         modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, payload.id, EPolarity.Positive, Agency.Type.None ) );
+         modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, mission.payload.id, EPolarity.Positive, Agency.Type.None ) );
          if ( __result >= 100 ) return;
          __result = Math.Min( 99, __result + bonus );
       } catch ( Exception x ) { Err( x ); } }
@@ -63,10 +62,6 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          }
          return result;
       }
-
-      private static void TrackPayload ( Mission mission ) { try {
-         GetPayloadVariant( mission, out currentVariant );
-      } catch ( Exception x ) { Err( x ); } }
 
       private static void AddCritBonus ( AutoresolveMission __instance, bool isMarsFinalMission, ref AutoresolveMission.EResult __result ) { try {
          if ( currentVariant != Power || isMarsFinalMission ) return;
