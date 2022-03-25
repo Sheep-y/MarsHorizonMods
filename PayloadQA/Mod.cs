@@ -13,7 +13,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();
-         if ( config.payload_specialise_auto_bonus > 0 || config.payload_power_auto_bonus > 0 || config.payload_power_auto_bonus_crit > 0 || config.standalone_resolve_rng )
+         if ( config.payload_specialise_auto_bonus > 0 || config.payload_extra_crew_auto_bonus > 0 || config.payload_power_auto_bonus > 0 || config.payload_power_auto_crit_bonus > 0 || config.standalone_resolve_rng )
             new PatcherAutoResolve().Apply();
          if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 )
             new PatcherMinigame().Apply();
@@ -26,12 +26,14 @@ namespace ZyMod.MarsHorizon.PayloadQA {
 
    internal class Config : IniConfig {
       [ Config( "\r\n[Auto-Resolve]" ) ]
-      [ Config( "Auto-resolve bonus success chance provided by specialized payload (nav, comm etc).  Set to 0 to disable." ) ]
+      [ Config( "Auto-resolve success chance bonus provided by specialized payload (nav, comm etc).  Set to 0 to disable." ) ]
       public byte payload_specialise_auto_bonus = 10;
-      [ Config( "Auto-resolve bonus success chance provided by power variant payload.  Set to 0 to disable." ) ]
+      [ Config( "Auto-resolve success chance bonus provided by each extra crew member.  Set to 0 to disable." ) ]
+      public byte payload_extra_crew_auto_bonus = 10;
+      [ Config( "Auto-resolve success chance bonus provided by power variant payload.  Set to 0 to disable." ) ]
       public byte payload_power_auto_bonus = 0;
-      [ Config( "Auto-resolve bonus crit success chance provided by power variant payload.  Set to 0 to disable." ) ]
-      public byte payload_power_auto_bonus_crit = 10;
+      [ Config( "Auto-resolve outstanding chance bonus provided by power variant payload.  Set to 0 to disable." ) ]
+      public byte payload_power_auto_crit_bonus = 10;
       [ Config( "Use a standalone random number generator to auto resolve.  Default True." ) ]
       public bool standalone_resolve_rng = true;
 

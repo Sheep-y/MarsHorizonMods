@@ -18,7 +18,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
             , postfix: config.payload_power_auto_bonus > 0 || config.payload_specialise_auto_bonus > 0
                ? nameof( AddPayloadBonus ) : nameof( TrackPayload ) );
-         if ( config.payload_power_auto_bonus_crit > 0 )
+         if ( config.payload_power_auto_crit_bonus > 0 )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
       }
 
@@ -47,16 +47,25 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       } catch ( Exception x ) { Err( x ); } }
 
       private static int GetPayloadBonus ( Mission mission, PayloadVariant.Type type ) {
-         Fine( "Mission payload is {0}", type );
+         Fine( "Mission payload is {0}.", type );
+         var result = 0;
          switch ( type ) {
             case Comms:
             case Navigation:
             case Observation:
-               return Math.Max( 0, (int) config.payload_specialise_auto_bonus );
+               result = Math.Max( 0, (int) config.payload_specialise_auto_bonus );
+               break;
             case Power :
-               return Math.Max( 0, (int) config.payload_power_auto_bonus );
+               result = Math.Max( 0, (int) config.payload_power_auto_bonus );
+               break;
          }
-         return 0;
+         if ( mission.CrewParticipated ) {
+            int crew = mission.participatingAstronauts?.Length ?? 0, min = mission.template.minCrew;
+            Fine( "Min crew {0}, assigned {1}.", min, crew );
+            if ( crew > min )
+               return Math.Max( 0, config.payload_extra_crew_auto_bonus * ( crew - min ) );
+         }
+         return result;
       }
 
       private static void TrackPayload ( Mission mission ) { try {
@@ -66,7 +75,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       private static void AddCritBonus ( AutoresolveMission __instance, bool isMarsFinalMission, ref AutoresolveMission.EResult __result ) { try {
          if ( currentVariant != Power || isMarsFinalMission ) return;
          var oldChance = __instance.OutstandingChance;
-         var newChance = Math.Min( 100 - __instance.FailureChance, oldChance + config.payload_power_auto_bonus_crit );
+         var newChance = Math.Min( 100 - __instance.FailureChance, oldChance + config.payload_power_auto_crit_bonus );
          Info( "Changing payload Outstanding chance from {0}% to {1}%.", oldChance, newChance );
          typeof( AutoresolveMission ).Property( "OutstandingChance" ).SetValue( __instance, newChance );
          if ( __result != AutoresolveMission.EResult.Success ) return;
