@@ -98,11 +98,12 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static void ShowLaunchCalendar () { try {
             if ( manager == null || buildTime < 0 || mission == null ) return;
+            if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
+            if ( ! cachedPre.Any() && ! cachedPost.Any() ) return;
             Fine( "Refreshing vehicle designer tooltips." );
-            if ( tooltipHeader != null ) tooltipHeader.tag = "Name_Body_" + mission.template.planetaryBody;
             FreeAll.Run( tooltipPooler );
             FreeAll.Run( warningTooltipPooler );
-            if ( cachedPre == null ) GetLaunchCalendar( out cachedPre, out cachedPost );
+            if ( tooltipHeader != null ) tooltipHeader.tag = "Name_Body_" + mission.template.planetaryBody;
             if ( cachedPre.Any() ) NewTooltip( "Building_Filter_UnderConstruction", "Title_Vehicle_Construction_Warning", string.Join( "\n", cachedPre ) );
             if ( cachedPost.Any() ) NewTooltip( "Calendar_LaunchWindow_Title", "TP_Calendar_1_Content", string.Join( "\n", cachedPost ) );
             Display.Run( manager, true, false );
@@ -120,20 +121,27 @@ namespace ZyMod.MarsHorizon.Informed {
          if ( buildTime < 0 ) return;
          var buf = new StringBuilder();
          var sim = simulation;
-         var agency = activeClient.agency;
-         var destination = mission.template.planetaryBody;
+         var agency = activeClient?.agency;
+         var destination = mission?.template?.planetaryBody ?? PlanetaryBody.None;
+         if ( sim == null || agency == null || destination == PlanetaryBody.None ) {
+            //Fine( "Unexpected state, cannot show launch window for vehicle: Sim = {0}, Agency = {1}, Mission = {2}, Planet = {3}", sim, agency, mission, destination );
+            return;
+         }
          int nowTurn = sim.universe.turn, doneTurn = nowTurn + buildTime;
          int fromTurn = Math.Max( doneTurn - config.launch_window_hint_before_ready + 1, nowTurn ), toTurn = doneTurn + config.launch_window_hint_after_ready;
          Info( "Current turn {0}, build time {1}.  Calculating launch window for {4} from {2} to {3}", nowTurn, buildTime, fromTurn, toTurn, destination );
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
-            Data.Date date = Data.instance.GetDate( i );
-            var prediction = sim.GetAgencyLaunchRecommendation( agency, win, i, null, new ConstructionTrait[] { mission.Payload.ConstructionTrait } );
-            string colour = config.invalid_colour;
+            Data.Date date = Data.instance?.GetDate( i );
+            if ( date == null ) continue;
+            var traits = new ConstructionTrait[] { mission.Payload?.ConstructionTrait };
+            var prediction = sim.GetAgencyLaunchRecommendation( agency, win, i, null, traits[ 0 ] == null ? new ConstructionTrait[0] : traits );
+            string colour = config.invalid_colour, txt = Localise( "Launch_Recommendation_" + prediction );
             if ( prediction == Data.LaunchRecommendation.SubOptimal ) colour = config.suboptimal_colour;
             else if ( prediction == Data.LaunchRecommendation.Optimal ) colour = config.optimal_colour;
+            else txt = Localise( "Launch_Recommendation_Unavailable" );
             if ( ! string.IsNullOrEmpty( colour ) ) buf.Append( "<color=" ).Append( colour ).Append( ">" );
-            buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " ).Append( prediction );
+            buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " ).Append( txt );
             if ( ! string.IsNullOrEmpty( colour ) ) buf.Append( "</color>" );
             if ( i <= doneTurn ) preList.Add( buf.ToString() ); else postList.Add( buf.ToString() );
             buf.Clear();
