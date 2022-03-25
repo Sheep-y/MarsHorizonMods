@@ -15,13 +15,14 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       internal void Apply () {
          if ( config.standalone_resolve_rng )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
-         if ( config.payload_power_auto_bonus > 0 || config.payload_specialise_auto_bonus > 0 )
-            TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" ), postfix: nameof( AddPayloadBonus ) );
-         if ( config.payload_power_auto_bonus_crit > 0 ) {
-            TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" ), postfix: nameof( TrackPayload ) );
+         TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
+            , postfix: config.payload_power_auto_bonus > 0 || config.payload_specialise_auto_bonus > 0
+               ? nameof( AddPayloadBonus ) : nameof( TrackPayload ) );
+         if ( config.payload_power_auto_bonus_crit > 0 )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
-         }
       }
+
+      private static PayloadVariant.Type currentVariant;
 
       private static Data.Payload GetPayloadVariant ( Mission mission, out PayloadVariant.Type variant ) {
          variant = Crew;
@@ -35,29 +36,28 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       }
 
       private static void AddPayloadBonus ( Mission mission, List< ValueModifier > modifiers, ref int __result ) { try {
-         var payload = GetPayloadVariant( mission, out var type );
+         var payload = GetPayloadVariant( mission, out currentVariant );
          if ( payload == null ) return;
-         var bonus = GetPayloadBonus( type );
+         var bonus = GetPayloadBonus( mission, currentVariant );
          if ( bonus == 0 ) return;
-         Info( "Adding {0}% to auto-resolve success rate for {1} payload.", bonus, type );
+         Info( "Adding {0}% to auto-resolve success rate for {1} payload.", bonus, currentVariant );
          modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, payload.id, EPolarity.Positive, Agency.Type.None ) );
          if ( __result >= 100 ) return;
          __result = Math.Min( 99, __result + bonus );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static int GetPayloadBonus ( PayloadVariant.Type type ) {
+      private static int GetPayloadBonus ( Mission mission, PayloadVariant.Type type ) {
+         Fine( "Mission payload is {0}", type );
          switch ( type ) {
             case Comms:
             case Navigation:
             case Observation:
                return Math.Max( 0, (int) config.payload_specialise_auto_bonus );
-            case Power:
+            case Power :
                return Math.Max( 0, (int) config.payload_power_auto_bonus );
          }
          return 0;
       }
-
-      private static PayloadVariant.Type currentVariant;
 
       private static void TrackPayload ( Mission mission ) { try {
          GetPayloadVariant( mission, out currentVariant );
@@ -67,11 +67,12 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          if ( currentVariant != Power || isMarsFinalMission ) return;
          var oldChance = __instance.OutstandingChance;
          var newChance = Math.Min( 100 - __instance.FailureChance, oldChance + config.payload_power_auto_bonus_crit );
+         Info( "Changing payload Outstanding chance from {0}% to {1}%.", oldChance, newChance );
          typeof( AutoresolveMission ).Property( "OutstandingChance" ).SetValue( __instance, newChance );
          if ( __result != AutoresolveMission.EResult.Success ) return;
          var reverseRoll = ( 1 - __instance.Roll ) * 100f;
-         if ( reverseRoll >= newChance ) {
-            Info( "Correcting auto-resolve roll {0} to Outstanding ({1}%) due to power bonus.", __instance.Roll, newChance );
+         if ( reverseRoll <= newChance ) {
+            Info( "Upgrading auto-resolve roll ({0:P}) to Outstanding ({1}%) due to power bonus.", __instance.Roll, newChance );
             __result = AutoresolveMission.EResult.OutstandingSuccess;
          }
       } catch ( Exception x ) { Err( x ); } }
@@ -86,7 +87,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void LogAutoResolve ( AutoresolveMission __instance ) { try {
-         Info( "Auto-resolve mission roll: {0:P2} => {1:P2}, Fail {2}%, Perfect {3}%", oldRoll, __instance.Roll, __instance.FailureChance, __instance.OutstandingChance );
+         Info( "Auto-resolve: Roll {0:P2} => {1:P2}, Fail {2}%, Outstanding {3}%", oldRoll, __instance.Roll, __instance.FailureChance, __instance.OutstandingChance );
       } catch ( Exception x ) { Err( x ); } }
    }
 }
