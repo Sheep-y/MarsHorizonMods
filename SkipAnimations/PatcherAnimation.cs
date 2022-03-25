@@ -37,13 +37,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          }
          if ( config.skip_mission_intro )
             TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", prefix: nameof( SkipPayloadDeploy ) );
-         if ( config.fast_mission ) {
-            TryPatch( typeof( MissionGameplayScreen ), "AstroInitialise", postfix: nameof( SpeedUpMission ) );
-            TryPatch( typeof( MissionGameplayScreen ), "ReliabilityRollAnim", prefix: nameof( SkipReliabilityFill ) );
-            TryPatch( typeof( MissionGameplayScene ), "PostInitialise", prefix: nameof( SpeedUpMissionEffects ) );
-            TryPatch( typeof( MissionGameplayScene ), "PlayScreenEffect", prefix: nameof( SpeedUpMissionScreenEffect ) );
-         }
-         if ( config.swoosh_speed > 0 )
+         if ( config.fast_mission )
+            TryPatch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", postfix: nameof( SkipReliabilityFill ) );
+         if ( config.swoosh_speed > 0 && config.swoosh_speed != 1 )
             TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
          if ( config.fast_mission_result ) {
             TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
@@ -94,18 +90,11 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       } catch ( Exception x ) { return Err( x, true ); } }
 
       #region Fast Mission
-      private static void SpeedUpMission ( MissionGameplayScreen __instance, ref float ___timelineSkipSpeedup, ref bool ___isSkippable, ref bool ___initialWait ) {
-         Fine( "Mission screen initiated." );
-         ___timelineSkipSpeedup = 50f;
-         ___isSkippable = true;
-         ___initialWait = false;
-         __instance.baseReliabilityRollSpeed = 20f;
-         __instance.skippedReliabilityRollSpeed = 20f;
-      }
-      private static void SpeedUpMissionEffects ( MissionGameplayScene __instance ) => typeof( MissionGameplayScene ).Field( "skipSpeed" ).SetValue( __instance, 1f );
+      private static void SkipReliabilityFill ( RectTransform ___rollArea, TextSetter ___reliabilityText, float ___reliabilityResultTargetValue ) { try {
+         ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue, 1f );
+         ___reliabilityText.text = ___reliabilityText.text.Replace( " 0%", Math.Round( ___reliabilityResultTargetValue * 100 ) + "%" );
+      } catch ( Exception x ) { Err( x ); } }
       private static void SpeedUpMissionSwoosh () => MissionGameplaySwooshEffect.swooshModifier = config.swoosh_speed;
-      private static void SpeedUpMissionScreenEffect ( MissionGameplayScreenEffect effect ) => effect.PlaybackSpeed = 20;
-      private static void SkipReliabilityFill ( RectTransform ___rollArea, float ___reliabilityResultTargetValue ) => ___rollArea.anchorMax = new Vector2( ___reliabilityResultTargetValue - 0.02f, 1f );
 
       private static IEnumerable< CodeInstruction > SpeedUpMissionSkip ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 5f, 50f, 1 );

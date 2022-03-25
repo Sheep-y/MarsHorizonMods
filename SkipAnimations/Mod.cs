@@ -44,7 +44,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       [ Config( "\r\n[Animation]" ) ]
       [ Config( "Cap assorted screen and action delays.  Set to -1 to disable." ) ]
-      public float max_delay = 0.2f;
+      public float max_delay = 0.4f;
       [ Config( "Max screen fading duration.  Set to -1 to disable." ) ]
       public float max_screen_fade = 0.1f;
       [ Config( "Remove or reduce assorted screen delays.  Default True." ) ]
