@@ -61,7 +61,7 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void SetInfoState ( SidebarOption opt, int active, string msg ) { try {
          if ( active < 0 ) active = 0;
          else Fine( msg, active );
-         opt.SetInfoActive( active );
+         if ( active > 0 ) opt.SetInfoActive( active );
          if ( icoInfo != null ) {
             GetIcon( opt ).sprite = active > 0 ? icoInfo : icoWarn;
             GetHighlight( opt ).color = active > 0 ? clrInfo : clrWarn;
@@ -72,7 +72,11 @@ namespace ZyMod.MarsHorizon.Informed {
          ___spacepediaOption.SetInfoActive( 0 );
       } catch ( Exception x ) { Err( x ); } }
 
-      private static bool IsActive ( SidebarOption opt ) => ( InfoIcon?.GetValue( opt ) is GameObject obj && obj.activeSelf );
+      private static bool IsActive ( SidebarOption opt ) {
+         var result = InfoIcon?.GetValue( opt ) is GameObject obj && obj.activeSelf;
+         Fine( "Solar System icon {0} is {1}", opt?.name, result ? "Active" : "Inactive" );
+         return result;
+      }
       private static Image GetIcon ( SidebarOption opt ) => opt.gameObject.GetComponentsInChildren< Image >( true ).First( e => e.sprite.name.StartsWith( "Spr_Icon_" ) );
       private static Image GetHighlight ( SidebarOption opt ) => opt.gameObject.GetComponentsInChildren< Image >( true ).First( e => e.sprite.name.EndsWith( "_Notification" ) );
    }

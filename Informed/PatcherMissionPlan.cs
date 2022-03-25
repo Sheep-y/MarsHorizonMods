@@ -31,6 +31,8 @@ namespace ZyMod.MarsHorizon.Informed {
       } ){ isRequestMission = true };
 
       private static void AddLaunchWindowButton ( MissionSelectSidebarScreen __instance, SimplePooler<MissionSelectSidebarGroup> ___missionGroupPooler ) { try {
+         var first_mission = __instance.agency.missions.FirstOrDefault();
+         if ( first_mission == null ) { Fine( "No mission.  Launch Window button not added." ); return; }
          Info( "Adding launch window button to {0} mission list.", MissionControl.PlanetaryBody );
          windowTemplate.template.planetaryBody = MissionControl.PlanetaryBody;
          var mission = new Mission( __instance.agency.missions.First() ){ guid = LaunchWindowGuid, launchTurn = 0, vehicle = new Vehicle(), templateInstance = windowTemplate, missionState = Mission.EState.Successful };
