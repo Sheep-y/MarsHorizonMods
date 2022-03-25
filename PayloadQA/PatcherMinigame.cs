@@ -3,7 +3,6 @@ using Astronautica.View;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.PayloadQA {
@@ -21,7 +20,9 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       private static float LastReliability = float.NaN, LastCritChance;
 
       private static void SetReliabilityBar () { try {
-         SetReliability( ClientViewer.GetViewElement<MissionGameplayScreen>().MissionSim.GetPayloadReliability() / 100f );
+         var mSim = ClientViewer.GetViewElement<MissionGameplayScreen>()?.MissionSim;
+         if ( mSim == null ) return;
+         SetReliability( mSim.GetPayloadReliability() / 100f );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetReliability ( float payloadReliability ) {
