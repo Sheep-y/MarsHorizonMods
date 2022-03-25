@@ -16,8 +16,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          if ( config.standalone_resolve_rng )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
          TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
-            , postfix: config.power_payload_ar_bonus > 0 || config.special_payload_ar_bonus > 0
-               ? nameof( AddPayloadBonus ) : nameof( TrackPayload ) );
+            , postfix: config.special_payload_ar_bonus > 0 ? nameof( AddPayloadBonus ) : nameof( TrackPayload ) );
          if ( config.power_payload_ar_crit > 0 )
             TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
       }
@@ -54,9 +53,6 @@ namespace ZyMod.MarsHorizon.PayloadQA {
             case Navigation:
             case Observation:
                result = Math.Max( 0, (int) config.special_payload_ar_bonus );
-               break;
-            case Power :
-               result = Math.Max( 0, (int) config.power_payload_ar_bonus );
                break;
          }
          if ( mission.CrewParticipated ) {
