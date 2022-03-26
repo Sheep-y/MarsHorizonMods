@@ -32,9 +32,11 @@ namespace ZyMod {
          lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
          try {
             Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
-            AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
             AppDomain.CurrentDomain.AssemblyLoad += AsmLoaded;
-            if ( shouldLogAssembly ) AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
+            if ( shouldLogAssembly ) {
+               AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
+               AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
+            }
             foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().ToArray() ) AsmLoaded( asm );
             ModHelpers.Info( "Mod Initiated" );
          } catch ( Exception ex ) {
