@@ -299,7 +299,7 @@ namespace ZyMod {
          if ( ! File.Exists( path ) ) {
             Save( subject, path );
          } else {
-            _Log( Info, "Loading {0} into {1}", path, new object[]{ subject.GetType().FullName } );
+            _Log( Info, "Loading {0} into {1}", path, subject.GetType().FullName );
             _ReadFile( subject, path );
          }
          foreach ( var prop in GetType().GetFields() ) _Log( Info, "Config {0} = {1}", prop.Name, prop.GetValue( this ) );
@@ -439,14 +439,17 @@ namespace ZyMod {
          return null;
       } }
 
-      internal void UnpatchAll () {
-         var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
+      internal virtual void UnpatchAll () {
          lock ( sync ) if ( harmony == null ) return;
-         m?.Run( harmony, harmony.Id );
+         var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
+         if ( m == null ) return;
+         ModHelpers.Info( "Unpatching all" );
+         m.Run( harmony, harmony.Id );
       }
       internal MethodInfo UnpatchAll ( MethodInfo orig ) {
          if ( orig == null ) return null;
          lock ( sync ) if ( harmony == null ) return orig;
+         ModHelpers.Info( "Unpatching {0}", orig );
          harmony.Unpatch( orig, All, harmony.Id );
          return null;
       }
@@ -464,7 +467,9 @@ namespace ZyMod {
       private TraceLevel _LogLevel = TraceLevel.Info;
       public TraceLevel LogLevel {
          get { lock ( buffer ) return _LogLevel; } // ReaderWriterLockSlim is tempting, but expected use case is 1 thread logging + 1 thread flushing.
-         set { lock ( buffer ) { _LogLevel = value;
+         set { lock ( buffer ) { 
+                  if ( _LogLevel == value ) return;
+                  _LogLevel = value;
                   if ( value == Off ) { flushTimer?.Stop(); buffer.Clear(); }
                   else flushTimer?.Start(); }  } }
       private string _TimeFormat = "HH:mm:ss.fff ";
@@ -518,7 +523,9 @@ namespace ZyMod {
          using ( TextWriter f = File.AppendText( LogPath ) ) foreach ( var line in buf ) f.WriteLine( line );
       } catch ( Exception ) { } }
 
-      private void Terminate ( object _, EventArgs __ ) { Flush(); LogLevel = Off; AppDomain.CurrentDomain.ProcessExit -= Terminate; }
+      public void Close () { Flush(); LogLevel = Off; AppDomain.CurrentDomain.ProcessExit -= Terminate; }
+
+      private void Terminate ( object _, EventArgs __ ) => Close();
 
       private readonly HashSet< string > knownErrors = new HashSet<string>(); // Known exceptions are ignored.  Modding is risky.
 
