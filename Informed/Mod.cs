@@ -10,7 +10,7 @@ namespace ZyMod.MarsHorizon.Informed {
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Informed";
-      public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
+      public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();

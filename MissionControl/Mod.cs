@@ -8,7 +8,7 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.MissionControl {
 
    public class Mod : MarsHorizonMod {
-      public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
+      public static void Main () => new Mod().Initialize();
       protected override string GetModName () => "MissionControl";
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;

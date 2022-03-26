@@ -9,7 +9,7 @@ namespace ZyMod.MarsHorizon.PayloadQA {
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "PayloadQA";
-      public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
+      public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
          config.Load();

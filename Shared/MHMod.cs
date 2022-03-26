@@ -10,6 +10,8 @@ using static ZyMod.ModHelpers;
 // Common base mod for Mars Horizon.  Find and initialize the correct class, set log and config path and name.
 namespace ZyMod.MarsHorizon {
    public abstract class MarsHorizonMod : RootMod {
+      protected MarsHorizonMod () => shouldLogAssembly = false;
+
       protected override string GetAppDataDir () {
          var path = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
          if ( string.IsNullOrEmpty( path ) ) return null;
