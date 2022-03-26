@@ -11,7 +11,8 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
    internal class PatcherCinematic : ModPatcher {
       internal void Apply () {
          if ( config.skip_intro )
-            TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );
+            //TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );
+            SkipSplash();
          if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
          if ( Environment.UserName == "Sheepy" )
@@ -21,7 +22,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       private static void SkipSplash () {
          Fine( "Waiting for splash screen." );
          Task.Run( async () => { try {
-            int delay = 8, wait_count = 15_000 / delay;
+            int delay = 8, wait_count = 30_000 / delay;
             while ( SplashScreen.isFinished && wait_count-- > 0 ) await Task.Delay( delay );
             Info( SplashScreen.isFinished ? "Splash screen skip timeout" : "Skipping splash screen." );
             SplashScreen.Stop( SplashScreen.StopBehavior.StopImmediate );
