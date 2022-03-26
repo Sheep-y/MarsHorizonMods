@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
@@ -137,12 +138,19 @@ namespace ZyMod.MarsHorizon.Zhant {
          return null;
       } catch ( Exception x ) { return Err< string >( x, null ); } }
 
+      private static readonly char[] charMap = new char[] {
+         '后','後',  '并','並',  '进','進',  '于','於',  '愿','願',  '筑','築',  '范','範',
+      };
+
       private static string ZhtTweaks ( string txt ) {
-         if ( Transdict.whole.TryGetValue( txt, out var zht ) ) return zht;
+         var buf = new StringBuilder( txt );
+         for ( var i = 0 ; i < charMap.Length ; i += 2 )
+            buf.Replace( charMap[ i ], charMap[ i + 1 ] );
+         if ( Transdict.whole.TryGetValue( buf.ToString(), out var zht ) ) return zht;
          var map = Transdict.part;
          for ( var i = 0 ; i < map.Length ; i += 2 )
-           txt = txt.Replace( map[ i ], map[ i + 1 ] );
-         return txt;
+            buf.Replace( map[ i ], map[ i + 1 ] );
+         return buf.ToString();
       }
 
       [ DllImport( "kernel32", CharSet = CharSet.Unicode, SetLastError = true ) ]
