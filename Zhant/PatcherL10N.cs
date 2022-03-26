@@ -16,10 +16,26 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       internal override void Apply () {
          me = this;
-         if ( config.dynamic_patch )
+         if ( config.dynamic_patch ) {
             TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
-         else
+            if ( Controller.Instance?.settings?.general?.language == UserSettings.Language.Chinese )
+               DynamicPatch( UserSettings.Language.Chinese );
+         } else
             ApplyZhPatches();
+      }
+
+      internal override void UnpatchAll () {
+         base.UnpatchAll();
+         patchZh = patchFont = null;
+      }
+
+      internal override void Unload () {
+         zhs2zht.Clear();
+         zhtTMPFs.Clear();
+         fixedTMPFs.Clear();
+         lastTMPF = null;
+         Transdict.whole.Clear();
+         Transdict.part = null;
       }
 
       private static ModPatch patchZh, patchFont;
@@ -30,7 +46,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
          Info( "Locale is {0}", language );
          if ( language == UserSettings.Language.Chinese ) {
-            if ( patchZh == null ) ApplyZhPatches();
+            ApplyZhPatches();
          } else if ( patchZh != null ) {
             patchZh?.Unpatch();
             patchFont?.Unpatch();
@@ -39,8 +55,10 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { Err( x ); } } }
 
       private static void ApplyZhPatches () {
-         patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
-         patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( SetZhtFont ) );
+         if ( patchZh == null )
+            patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
+         if ( patchFont == null )
+            patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( SetZhtFont ) );
          Transdict.LoadDicts();
          LoadFonts();
       }
@@ -51,21 +69,24 @@ namespace ZyMod.MarsHorizon.Zhant {
             if ( LoadFont( $"NotoSansCJKtc-{v}", v ) || LoadFont( $"NotoSansCJKhk-{v}", v )
                  || LoadFont( $"NotoSansTC-{v}", v ) || LoadFont( $"NotoSansHK-{v}", v ) );
          }
-         if ( zhtTMPFs.Count == 0 ) return;
-         var weight = FindFontWeight( TMP_Settings.fallbackFontAssets, out var i ) ?? "Medium";
-         if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) tc = zhtTMPFs.First().Value;
-         AddToFallback( tc, TMP_Settings.fallbackFontAssets, "global fallback" );
+         var fbList = TMP_Settings.fallbackFontAssets;
+         if ( zhtTMPFs.Count != 0 ) {
+            var weight = FindFontWeight( fbList, out var i ) ?? "Medium";
+            if ( ! zhtTMPFs.TryGetValue( weight, out var tc ) ) tc = zhtTMPFs.First().Value;
+            AddToFallback( tc, fbList, "global fallback" );
+         }
          var has_fallback = false;
          foreach ( var file in fallback_fonts ) {
             if ( ! LoadFont( file, file ) ) continue;
             has_fallback = true;
-            AddToFallback( zhtTMPFs[ file ], TMP_Settings.fallbackFontAssets, "global fallback" );
+            AddToFallback( zhtTMPFs[ file ], fbList, "global fallback" );
          }
          if ( ! has_fallback ) Info( "Fallback font(s) not found", fallback_fonts );
       }
 
       private static bool LoadFont ( string fn, string v ) { try {
-         var f = Path.Combine( ModDir, fn.EndsWith( ".ttf" ) ? fn : $"{fn}.otf" );
+         if ( zhtTMPFs.ContainsKey( v ) ) return true;
+         var f = Path.Combine( Mod.ModDir ?? ModHelpers.ModDir, fn.EndsWith( ".ttf" ) ? fn : $"{fn}.otf" );
          if ( File.Exists( f ) ) {
             var size = (int) ( Array.IndexOf( variations, v ) >= 0 && v != "Medium" && v != "Regular" ? config.sample_size_other : config.sample_size_normal );
             var padding = (int) Math.Ceiling( size * config.padding_ratio );
@@ -79,7 +100,11 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { return Err( x, false ); } }
 
       private static void AddToFallback ( TMP_FontAsset font, List<TMP_FontAsset> fb, string fname ) {
-         if ( font == null || fb == null ) return;
+         if ( font == null ) return;
+         if ( fb?.Any( e => e.name == font.name ) != false ) {
+            Info( "{1} is null or already contains {0}", fname, font.name );
+            return;
+         }
          Info( "Inserting {0} at end of {1}.", font.name, fname );
          fb.Add( font );
       }
@@ -94,7 +119,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          if ( zhs2zht.TryGetValue( text, out string zht ) ) { text = zht; return; }
          var raw = new string( ' ', text.Length );
          LCMapStringEx( "zh", LCMAP_TRADITIONAL_CHINESE, text, text.Length, raw, raw.Length, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
-         zht = ZhtTweaks( raw );
+         zht = ZhtTweaks( ref raw );
          Fine( "{3} {0} => {1} => {2}", text, raw, raw == zht ? null : zht, text.Length );
          zhs2zht.Add( text, text = zht );
       } catch ( Exception x ) { Err( x ); } }
@@ -128,24 +153,29 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static string FindFontWeight ( List< TMP_FontAsset > list, out int i ) { i = -1; try {
          if ( list == null || list.Count == 0 ) return null;
+         string result = null;
          for ( i = 0 ; i < list.Count ; i++ ) { var fb = list[ i ];
             var fname = fb?.name;
             if ( fname?.StartsWith( "NotoSans" ) != true ) continue;
-            if ( fname.StartsWith( "NotoSansHK-" ) || fname.StartsWith( "NotoSansTC-" ) ) return null;
+            if ( IsTC( fname ) ) return null;
             if ( fname.StartsWith( SC_prefix ) )
-               return fb.name.Substring( SC_prefix.Length ).Split( ' ' )[0];
+               result = fb.name.Substring( SC_prefix.Length ).Split( ' ' )[0];
          }
-         return null;
+         return result;
       } catch ( Exception x ) { return Err< string >( x, null ); } }
+
+      private static bool IsTC ( string name )
+         => name.StartsWith( "NotoSansCJKtc-" ) || name.StartsWith( "NotoSansCJKhk-" ) || name.StartsWith( "NotoSansTC-" ) || name.StartsWith( "NotoSansHK-" );
 
       private static readonly char[] charMap = new char[] {
          '后','後',  '并','並',  '进','進',  '于','於',  '愿','願',  '筑','築',  '范','範',
       };
 
-      private static string ZhtTweaks ( string txt ) {
+      private static string ZhtTweaks ( ref string txt ) {
          var buf = new StringBuilder( txt );
          for ( var i = 0 ; i < charMap.Length ; i += 2 )
             buf.Replace( charMap[ i ], charMap[ i + 1 ] );
+         txt = buf.ToString();
          if ( Transdict.whole.TryGetValue( buf.ToString(), out var zht ) ) return zht;
          var map = Transdict.part;
          for ( var i = 0 ; i < map.Length ; i += 2 )

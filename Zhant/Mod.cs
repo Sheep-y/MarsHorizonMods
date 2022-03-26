@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityModManagerNet;
@@ -10,18 +11,33 @@ namespace ZyMod.MarsHorizon.Zhant {
    [EnableReloading]
    public static class UMM_Mod {
       public static void Load ( UnityModManager.ModEntry modEntry ) {
-         Mod.Main();
+         var m = new Mod();
+         Mod.ModDir = modEntry.Path;
+         m.Initialize();
+         modEntry.OnToggle = OnOff;
          modEntry.OnUnload = Unload;
       }
+
+      private static bool OnOff ( UnityModManager.ModEntry modEntry, bool active ) {
+         Info( "UMM - Switching {0}.", active ? "On" : "Off" );
+         if ( ! active ) Mod.patchers.FirstOrDefault()?.UnpatchAll();
+         else foreach ( var p in Mod.patchers ) p.Apply();
+         return true;
+      }
+
       private static bool Unload ( UnityModManager.ModEntry _ ) { try {
-         foreach ( var p in Mod.patchers ) p.UnpatchAll();
+         Info( "UMM - Unload." );
+         Mod.patchers.FirstOrDefault()?.UnpatchAll();
+         foreach ( var p in Mod.patchers ) p.Unload();
+         RootMod.Log.Close();
          return true;
       } catch ( Exception x ) { return Err( x, false ); } }
    }
 
    public class Mod : MarsHorizonMod {
+      internal static string ModDir;
       protected override string GetModName () => "Zhant";
-      public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
+      public static void Main () => new Mod().Initialize();
       internal static readonly List< ModPatcher > patchers = new List< ModPatcher >();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          ModPatcher.config.Load();
@@ -33,6 +49,7 @@ namespace ZyMod.MarsHorizon.Zhant {
    internal abstract class ModPatcher : Patcher {
       internal static readonly Config config = new Config();
       internal abstract void Apply();
+      internal virtual void Unload() { }
    }
 
    internal class Config : IniConfig {
