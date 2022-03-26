@@ -65,8 +65,6 @@ namespace ZyMod.MarsHorizon.Zhant {
          whole.Clear();
          var list = new string[] {
             "正在登錄中...", "載入中……",
-            "跳過當前月",  "下一月",
-            "跳到事件",  "跳到下一事件",
             "簡體中文",  "中文",
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
             "{Name_{buildingId}}待完成",  "{Name_{buildingId}}完成",
@@ -121,12 +119,14 @@ namespace ZyMod.MarsHorizon.Zhant {
             "所有與科學相關的毗鄰建築獎金增加一倍", "與科學相關的建築物毗鄰效應全部翻倍",
 
             // Payload / Vehicle / Installation
+            "運載火箭檢查", "載具檢查",
             "由於發射條件不利，發射可靠性懲罰減半", "將發射條件不利導致的發射可靠性減半",
             "宇航員時段 +{strength}", "宇航員數量 +{strength}",
             "安裝", "設施",
             "完成此安裝以獲得以下獎勵", "完成此設施可得獲以下回報",
             "{Name_{building}}安裝已過期", "{Name_{building}}完成使命",
             "發射所需的{Building_Effect_{launchpad}}！", "需要{Building_Effect_{launchpad}}才能發射！",
+            "起動電源", "初始電力",
  
             // Training
             "基地科學獎勵", "基本科學回報",
@@ -139,6 +139,11 @@ namespace ZyMod.MarsHorizon.Zhant {
 
             // Mission
             "完成獎金將在下項工作開始時發放", "完成後的額外回報會累加到下項工作",
+            "在本回合中重置", "重置本回合的",
+            "{agency}已完成{{mission}}（{rank}）", "{agency}已達成{{mission}}（{rank}）",
+
+            // Other
+            "備用電源發電機", "備用發電機",
          };
          for ( var i = 0 ; i < list.Length ; i += 2 )
             whole.Add( list[ i ], list[ i + 1 ] );
@@ -162,7 +167,6 @@ namespace ZyMod.MarsHorizon.Zhant {
             "獎勵", "回報",
             "完成回報", "完成獎勵",
             "額外：", "額外獎勵：",
-            "維修", "經常性開支",
             "障礙物成本", "障礙物清除費",
             "無需成本", "無需花費",
             "研究成本", "研究所需點數",
@@ -171,6 +175,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             "酬載成本", "酬載建造費",
             "任務時段", "任務欄",
             "空閑時段", "閒置欄",
+            "可進行維修作業，並", "可以用來維護載具，並",
+            "維修", "經常性開支",
 
             "没有任何有效任務", "没有任何進行中的任務",
             "有效任務", "任務列表",
@@ -188,6 +194,9 @@ namespace ZyMod.MarsHorizon.Zhant {
             " 增加的", " 提升",
             " 改進的", " 升級",
             " 降低的", " 減低",
+            "電源", "電力",
+            "總是供應不足！", "總是不夠用！",
+            "預備發射！", "發射就緒！",
 
             "剩余", "剩餘",
             "明了", "明瞭",
