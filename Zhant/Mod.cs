@@ -1,21 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using UnityModManagerNet;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
 
+   [EnableReloading]
+   public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry modEntry ) {
+         Mod.Main();
+         modEntry.OnUnload = Unload;
+      }
+      private static bool Unload ( UnityModManager.ModEntry _ ) { try {
+         foreach ( var p in Mod.patchers ) p.UnpatchAll();
+         return true;
+      } catch ( Exception x ) { return Err( x, false ); } }
+   }
+
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Zhant";
       public static void Main () => new Mod { shouldLogAssembly = false }.Initialize();
+      internal static readonly List< ModPatcher > patchers = new List< ModPatcher >();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          ModPatcher.config.Load();
-         new PatcherL10N().Apply();
+         patchers.Add( new PatcherL10N() );
+         foreach ( var p in patchers ) p.Apply();
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : Patcher {
       internal static readonly Config config = new Config();
+      internal abstract void Apply();
    }
 
    internal class Config : IniConfig {

@@ -14,7 +14,7 @@ namespace ZyMod.MarsHorizon.Zhant {
    internal class PatcherL10N : ModPatcher {
       private static PatcherL10N me;
 
-      internal void Apply () {
+      internal override void Apply () {
          me = this;
          if ( config.dynamic_patch )
             TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );

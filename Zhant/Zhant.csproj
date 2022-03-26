@@ -66,6 +66,10 @@
       <HintPath>C:\Program Files (x86)\GOG Galaxy\Games\Mars Horizon\Mars Horizon_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityModManager">
+      <HintPath>C:\Users\Sheepy\Documents\My Games\UnityModManager\UnityModManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Shared\MHMod.cs">

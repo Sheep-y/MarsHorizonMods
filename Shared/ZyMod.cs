@@ -439,12 +439,12 @@ namespace ZyMod {
          return null;
       } }
 
-      protected void UnpatchAll () {
+      internal void UnpatchAll () {
          var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
          lock ( sync ) if ( harmony == null ) return;
          m?.Run( harmony, harmony.Id );
       }
-      protected MethodInfo UnpatchAll ( MethodInfo orig ) {
+      internal MethodInfo UnpatchAll ( MethodInfo orig ) {
          if ( orig == null ) return null;
          lock ( sync ) if ( harmony == null ) return orig;
          harmony.Unpatch( orig, All, harmony.Id );
