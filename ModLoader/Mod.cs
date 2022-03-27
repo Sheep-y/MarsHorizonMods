@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,11 @@ using UnityEngine;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.ModLoader {
+
+   [ BepInPlugin( "Zy.MarsHorizon.ModLoader", "Mod Loader (Sheepy)", "0.0.2022.0326" ) ]
+   public class Plugin : BaseUnityPlugin {
+      private void Awake() => new MarsHorizonModLoader().Initialize();
+   }
 
    public class MarsHorizonModLoader : RootMod {
       protected override string GetModName () => "ModLoader";
