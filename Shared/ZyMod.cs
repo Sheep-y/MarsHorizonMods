@@ -32,6 +32,7 @@ namespace ZyMod {
          lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
          try {
             Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
+#if ! NoBootstrap
             AppDomain.CurrentDomain.AssemblyLoad += AsmLoaded;
             if ( shouldLogAssembly ) {
                AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
@@ -55,6 +56,9 @@ namespace ZyMod {
 
       private void GameLoaded ( Assembly asm ) { try {
          ModHelpers.Info( "Target assembly loaded." );
+#else
+         var asm = AppDomain.CurrentDomain.GetAssemblies().First( e => ! IgnoreAssembly( e ) && IsTargetAssembly( e ) );
+#endif
          OnGameAssemblyLoaded( asm );
          #if ! NoPatch
          var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
@@ -110,6 +114,7 @@ namespace ZyMod {
       public static object TryRunStatic ( this MethodInfo func, params object[] args ) { try { return RunStatic( func, args ); } catch ( Exception x ) { return x; } }
       public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
+      public static Type[] ArrayTypeEmpty = new Type[0];
 
       #if ! NoPatch
       private static MethodInfo GetILs, EnumMoveNext;
@@ -120,7 +125,7 @@ namespace ZyMod {
          var list = GetILs?.TryRunStatic( null, subject ) as IList;
          var args = list?.GetType().GenericTypeArguments;
          if ( list == null || list.Count == 0 || args.Length == 0 ) return null;
-         var code = args[ 0 ].Method( "GetCodeInstruction", new Type[0] );
+         var code = args[ 0 ].Method( "GetCodeInstruction", ArrayTypeEmpty );
          return list.Cast<object>().Select( e => code?.Run( e ) as CodeInstruction );
       }
       // Find the MoveNext method of an iterator method.
@@ -132,7 +137,7 @@ namespace ZyMod {
             if ( EnumMoveNext != null ) return MoveNext( subject );
          }
          var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
-         return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", new Type[0] );
+         return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", ArrayTypeEmpty );
       }
       #endif
 

@@ -62,8 +62,8 @@ namespace ZyMod.MarsHorizon.Informed {
       private static SimplePooler< VehicleDesignerTooltip > tooltipPooler;
       private static SimplePooler< VehicleDesignerTooltip > warningTooltipPooler;
       private static readonly MethodInfo Display = typeof( VehicleDesignerTooltipManager ).Method( "Display", typeof( bool ), typeof( bool ) );
-      private static readonly MethodInfo FreeAll = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "FreeAll", new Type[0] );
-      private static readonly MethodInfo Get = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "Get", new Type[0] );
+      private static readonly MethodInfo FreeAll = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "FreeAll", ArrayTypeEmpty );
+      private static readonly MethodInfo Get = typeof( SimplePooler< VehicleDesignerTooltip > ).Method( "Get", ArrayTypeEmpty );
       private static readonly FieldInfo Tooltip = typeof( VehicleDesignerTooltip ).Field( "tooltip" );
 
       private static void TrackTooltip () { try {
