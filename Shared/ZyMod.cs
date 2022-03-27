@@ -26,7 +26,6 @@ namespace ZyMod {
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
       protected virtual bool IsTargetAssembly ( Assembly asm ) => asm.GetName().Name == "Assembly-CSharp"; // If overrode, OnGameAssemblyLoaded may be called mutliple times
-      protected bool shouldLogAssembly = true;
 
       public void Initialize () {
          lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
@@ -44,6 +43,7 @@ namespace ZyMod {
             ModHelpers.Error( ex.ToString() );
          }
       }
+      protected bool shouldLogAssembly = true;
 
       private void AsmLoaded ( object sender, AssemblyLoadEventArgs evt ) => AsmLoaded( evt.LoadedAssembly );
       private void AsmLoaded ( Assembly asm ) {
