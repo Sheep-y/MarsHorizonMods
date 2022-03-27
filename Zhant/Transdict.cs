@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
-   internal static class Transdict {
+   internal class Transdict : LogAccess {
       internal static readonly SortedDictionary< string, string > whole = new SortedDictionary<string, string>();
       internal static string[] part;
 

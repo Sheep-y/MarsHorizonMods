@@ -16,7 +16,7 @@ namespace ZyMod.MarsHorizon.Zhant {
    }
 
    [EnableReloading]
-   public static class UMM_Mod {
+   public class UMM_Mod : LogAccess {
       private static Mod mod;
 
       public static void Load ( UnityModManager.ModEntry modEntry ) {

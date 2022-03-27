@@ -18,29 +18,29 @@ using static HarmonyLib.HarmonyPatchType;
 // Sheepy's "Universal" skeleton mod and tools.  No depency other than Harmony2 / HarmonyX.
 // Bootstrap, Background Logging, Roundtrip Config, Reflection, Manual Patcher with Unpatch. Reasonably well unit tested.
 namespace ZyMod {
-   public abstract class RootMod {
+   using LogFunc = Action< TraceLevel, object, object[] >;
+
+   public abstract class RootMod : LogAccess {
       protected static readonly object sync = new object();
       private static RootMod instance;
-      public static ZyLogger Log { get; private set; }
-      internal static string ModName { get { lock ( sync ) return instance?.GetModName() ?? "ZyMod"; } }
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
       protected virtual bool IsTargetAssembly ( Assembly asm ) => asm.GetName().Name == "Assembly-CSharp"; // If overrode, OnGameAssemblyLoaded may be called mutliple times
 
       public void Initialize () {
-         lock ( sync ) { if ( instance != null ) { ModHelpers.Warn( "Mod already initialized" ); return; } instance = this; }
+         lock ( sync ) { if ( instance != null ) { Warn( "Mod already initialized" ); return; } instance = this; }
          try {
-            Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
+            SetModIO();
 #if ! NoBootstrap
             AppDomain.CurrentDomain.AssemblyLoad += AsmLoaded;
             if ( shouldLogAssembly ) {
-               AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => ModHelpers.Error( evt.ExceptionObject );
-               AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { ModHelpers.Fine( "Resolving {0}", evt.Name ); return null; };
+               AppDomain.CurrentDomain.UnhandledException += ( _, evt ) => Error( evt.ExceptionObject );
+               AppDomain.CurrentDomain.AssemblyResolve += ( _, evt ) => { Fine( "Resolving {0}", evt.Name ); return null; };
             }
             foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().ToArray() ) AsmLoaded( asm );
-            ModHelpers.Info( "Mod Initiated" );
+            Info( "Mod Initiated" );
          } catch ( Exception ex ) {
-            ModHelpers.Error( ex.ToString() );
+            Error( ex );
          }
       }
       protected bool shouldLogAssembly = true;
@@ -48,36 +48,41 @@ namespace ZyMod {
       private void AsmLoaded ( object sender, AssemblyLoadEventArgs evt ) => AsmLoaded( evt.LoadedAssembly );
       private void AsmLoaded ( Assembly asm ) {
          if ( IgnoreAssembly( asm ) ) return;
-         if ( shouldLogAssembly ) ModHelpers.Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
+         if ( shouldLogAssembly ) Fine( "DLL {0}, {1}", asm.FullName, asm.CodeBase );
          if ( ! IsTargetAssembly( asm ) ) return;
          GameLoaded( asm );
          if ( ! shouldLogAssembly ) AppDomain.CurrentDomain.AssemblyLoad -= AsmLoaded;
       }
 
       private void GameLoaded ( Assembly asm ) { try {
-         ModHelpers.Info( "Target assembly loaded." );
+         Info( "Target assembly loaded." );
 #else
          var asm = AppDomain.CurrentDomain.GetAssemblies().First( e => ! IgnoreAssembly( e ) && IsTargetAssembly( e ) );
 #endif
          OnGameAssemblyLoaded( asm );
          #if ! NoPatch
          var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
-         ModHelpers.Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+         Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
          #endif
-      } catch ( Exception ex ) { ModHelpers.Error( ex ); } }
+      } catch ( Exception ex ) { Error( ex ); } }
 
-      private static string _AppDataDir;
-      public static string AppDataDir { get {
-         if ( _AppDataDir != null ) return _AppDataDir;
-         lock ( sync ) { if ( instance == null ) return ""; _AppDataDir = instance.GetAppDataDir(); }
-         if ( string.IsNullOrEmpty( _AppDataDir ) ) return "";
-         try {
-            if ( ! Directory.Exists( _AppDataDir ) ) {
-               Directory.CreateDirectory( _AppDataDir );
-               if ( ! Directory.Exists( _AppDataDir ) ) _AppDataDir = "";
-            }
-         } catch ( Exception ) { _AppDataDir = ""; }
-         return _AppDataDir;
+      protected virtual void SetModIO () { lock ( sync ) {
+         if ( ModName == null ) ModName = GetModName() ?? "ZyMod";
+         if ( Logger == null ) {
+            if ( Log == null ) Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
+            Logger = Log.Write;
+         }
+         if ( AppDataDir == null ) {
+            AppDataDir = instance.GetAppDataDir();
+            if ( ModHelpers.IsBlank( AppDataDir ) )
+               AppDataDir = "";
+            else try {
+               if ( ! Directory.Exists( AppDataDir ) ) {
+                  Directory.CreateDirectory( AppDataDir );
+                  if ( ! Directory.Exists( AppDataDir ) ) AppDataDir = "";
+               }
+            } catch ( Exception ) { AppDataDir = ""; }
+         }
       } }
 
       // Override / Implement these to change mod name, log dir, what to do on Assembly-CSharp, and where patches are located by Modder.
@@ -87,16 +92,8 @@ namespace ZyMod {
    }
 
    public static class ModHelpers { // Assorted helpers
-      public static void Err ( object msg ) => Error( msg );
-      public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
-      public static void Error ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Error, msg, arg );
-      public static void Warn  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Warning, msg, arg );
-      public static void Info  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Info, msg, arg );
-      public static void Fine  ( object msg, params object[] arg ) => RootMod.Log?.Write( TraceLevel.Verbose, msg, arg );
       public static bool Non0 ( float val ) => val != 0 && Rational( val );
       public static bool Rational ( float val ) => ! float.IsNaN( val ) && ! float.IsInfinity( val );
-      public static bool IsFound ( string path ) { if ( File.Exists( path ) ) return true; Warn( "Not Found: {0}", path ); return false; }
-      public static bool IsFound ( string path, out string found ) { found = path; return IsFound( path ); }
 
       public static string ModPath => new Uri( Assembly.GetExecutingAssembly().CodeBase ).LocalPath;
       public static string ModDir => Path.GetDirectoryName( ModPath );
@@ -116,7 +113,6 @@ namespace ZyMod {
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static Type[] ArrayTypeEmpty = new Type[0];
 
-      #if ! NoPatch
       private static MethodInfo GetILs, EnumMoveNext;
       // Find the instructions of a method.  Return null on failure.  TODO: Does not work on HarmonyX
       public static IEnumerable< CodeInstruction > GetCodes ( this MethodBase subject ) {
@@ -139,10 +135,9 @@ namespace ZyMod {
          var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
          return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", ArrayTypeEmpty );
       }
-      #endif
 
       #if ! NoConfig
-      public static bool TryParse ( Type valueType, string val, out object parsed, bool logWarnings = true ) { parsed = null; try {
+      public static bool TryParse ( Type valueType, string val, out object parsed, LogFunc logger = null ) { parsed = null; try {
          if ( valueType == typeof( string ) ) { parsed = val; return true; }
          if ( IsBlank( val ) || val == "null" ) return ! ( valueType.IsValueType || valueType.IsEnum );
          switch ( valueType.FullName ) {
@@ -165,11 +160,14 @@ namespace ZyMod {
                break;
             default :
                if ( valueType.IsEnum ) { parsed = Enum.Parse( valueType, val ); break; }
-               if ( logWarnings ) Warn( new NotImplementedException( "Unsupported field type " + valueType.FullName ) );
+               logger?.Invoke( Warning, new NotImplementedException( "Unsupported field type " + valueType.FullName ), null );
                break;
          }
          return parsed != null;
-      } catch ( ArgumentException ) { if ( logWarnings ) Warn( "Invalid value for {0}: {1}", valueType.FullName, val ); return false; } }
+      } catch ( ArgumentException ) {
+         logger?.Invoke( Warning, "Invalid value for {0}: {1}", new object[]{ valueType.FullName, val } );
+         return false;
+      } }
       #endif
 
       #if ! NoCsv
@@ -291,9 +289,9 @@ namespace ZyMod {
    }
 
    #if ! NoConfig
-   public abstract class BaseConfig { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
+   public abstract class BaseConfig  : LogAccess { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
       protected virtual string GetFileExtension () => ".conf";
-      public virtual string GetDefaultPath () => Path.Combine( RootMod.AppDataDir, RootMod.ModName + GetFileExtension() );
+      public virtual string GetDefaultPath () => Path.Combine( AppDataDir, RootMod.ModName + GetFileExtension() );
 
       public void Load () => Load( this );
       public void Load ( string path ) => Load( this, path );
@@ -304,16 +302,16 @@ namespace ZyMod {
          if ( ! File.Exists( path ) ) {
             Save( subject, path );
          } else {
-            _Log( Info, "Loading {0} into {1}", path, subject.GetType().FullName );
+            Info( "Loading {0} into {1}", path, subject.GetType().FullName );
             _ReadFile( subject, path );
          }
-         foreach ( var prop in GetType().GetFields() ) _Log( Info, "Config {0} = {1}", prop.Name, prop.GetValue( this ) );
-      } catch ( Exception ex ) {  _Log( Warning, ex ); } }
+         foreach ( var prop in GetType().GetFields() ) Info( "Config {0} = {1}", prop.Name, prop.GetValue( this ) );
+      } catch ( Exception ex ) { Warn( ex ); } }
 
       protected abstract void _ReadFile ( object subject, string path );
       protected virtual bool _ReadField ( object subject, string name, out FieldInfo field ) {
          field = subject.GetType().GetField( name );
-         if ( field == null ) _Log( Warning, "Unknown field: {0}", name ); // Legacy fields are expected to be kept in config class as [Obsolete].
+         if ( field == null ) Warn( "Unknown field: {0}", name ); // Legacy fields are expected to be kept in config class as [Obsolete].
          return field != null && ! field.IsStatic && ! field.IsInitOnly && ! field.IsNotSerialized;
       }
       protected virtual void _SetField ( object subject, FieldInfo f, string val ) {
@@ -326,15 +324,15 @@ namespace ZyMod {
       public virtual void Save ( object subject, string path ) { try {
          if ( subject == null ) { File.Delete( path ); return; }
          var type = subject.GetType();
-         _Log( Info, "Writing {0} from {1}", path, type.FullName );
+         Info( "Writing {0} from {1}", path, type.FullName );
          using ( TextWriter tw = File.CreateText( path ) ) {
             _WriteData( tw, subject, type, subject, _GetComments( type ) );
             foreach ( var f in _ListFields( subject ) )
                _WriteData( tw, subject, f, f.GetValue( subject ), _GetComments( f ) );
             _WriteData( tw, subject, type, subject, null );
          }
-         _Log( Verbose, "{0} bytes written", (Func<string>) ( () => new FileInfo( path ).Length.ToString() ) );
-      } catch ( Exception ex ) { _Log( Warning, "Cannot create config file: {0}", ex ); } }
+         Fine( "{0} bytes written", (Func<string>) ( () => new FileInfo( path ).Length.ToString() ) );
+      } catch ( Exception ex ) { Warn( "Cannot create config file" ); Warn( ex ); } }
 
       protected virtual IEnumerable< string > _GetComments ( MemberInfo mem )
          => mem.GetCustomAttributes( true ).OfType< ConfigAttribute >().Where( e => ! ModHelpers.IsBlank( e?.Comment ) ).Select( e => e.Comment );
@@ -348,7 +346,6 @@ namespace ZyMod {
       }
       /* Called before writing a type (target is Type && comment != ""), when writing a field, and after writing a type (target is Type && comment = null) */
       protected abstract void _WriteData ( TextWriter f, object subject, MemberInfo target, object value, IEnumerable< string > comment );
-      protected virtual void _Log ( TraceLevel level, object msg, params object[] arg ) => RootMod.Log?.Write( level, msg, arg );
    }
 
    #if ! NoCsv
@@ -406,7 +403,7 @@ namespace ZyMod {
    #endif
 
    #if ! NoPatch
-   public class Patcher { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
+   public class Patcher : LogAccess { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
       protected static readonly object sync = new object();
       public Harmony harmony { get; private set; }
 
@@ -425,7 +422,7 @@ namespace ZyMod {
          Patch( type.Method( method ), prefix, postfix, transpiler );
       protected ModPatch Patch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
          lock ( sync ) if ( harmony == null ) harmony = new Harmony( RootMod.ModName );
-         ModHelpers.Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
+         Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
          var patch = new ModPatch( harmony ) { original = method, prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
          harmony.Patch( method, patch.prefix, patch.postfix, patch.transpiler );
          return patch;
@@ -434,13 +431,13 @@ namespace ZyMod {
       protected ModPatch TryPatch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) { try {
          return Patch( type.Method( method ), prefix, postfix, transpiler );
       } catch ( Exception ex ) {
-         ModHelpers.Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, ex );
+         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, ex );
          return null;
       } }
       protected ModPatch TryPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) { try {
          return Patch( method, prefix, postfix, transpiler );
       } catch ( Exception ex ) {
-         ModHelpers.Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", method?.DeclaringType, method?.Name, prefix, postfix, transpiler, ex );
+         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", method?.DeclaringType, method?.Name, prefix, postfix, transpiler, ex );
          return null;
       } }
 
@@ -448,13 +445,13 @@ namespace ZyMod {
          lock ( sync ) if ( harmony == null ) return;
          var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
          if ( m == null ) return;
-         ModHelpers.Info( "Unpatching all" );
+         Info( "Unpatching all" );
          m.Run( harmony, harmony.Id );
       }
       internal MethodInfo UnpatchAll ( MethodInfo orig ) {
          if ( orig == null ) return null;
          lock ( sync ) if ( harmony == null ) return orig;
-         ModHelpers.Info( "Unpatching {0}", orig );
+         Info( "Unpatching {0}", orig );
          harmony.Unpatch( orig, All, harmony.Id );
          return null;
       }
@@ -466,13 +463,25 @@ namespace ZyMod {
    }
    #endif
 
+   public class LogAccess {
+      public static string ModName, AppDataDir;
+      public static LogFunc Logger { get; set; }
+      public static ZyLogger Log;
+      public static void Err ( object msg ) => Error( msg );
+      public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
+      public static void Error ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Error, msg, arg );
+      public static void Warn  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Warning, msg, arg );
+      public static void Info  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Info, msg, arg );
+      public static void Fine  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Verbose, msg, arg );
+   }
+
    // Thread safe logger.  Buffer and write in background thread unless interval is set to 0.
    // Common usages: Log an Exception (will ignore duplicates), Log a formatted string with params, Log multiple objects (in one call and on one line).
    public class ZyLogger {
       private TraceLevel _LogLevel = TraceLevel.Info;
       public TraceLevel LogLevel {
          get { lock ( buffer ) return _LogLevel; } // ReaderWriterLockSlim is tempting, but expected use case is 1 thread logging + 1 thread flushing.
-         set { lock ( buffer ) { 
+         set { lock ( buffer ) {
                   if ( _LogLevel == value ) return;
                   _LogLevel = value;
                   if ( value == Off ) { flushTimer?.Stop(); buffer.Clear(); }
