@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,42 +9,51 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
 
+   [ BepInPlugin( "Zy.MarsHorizon.Zhant", "Traditional Chinese", "0.0.2022.0326" ) ]
+   public class Plugin : BaseUnityPlugin {
+      private void Awake() => new Mod().Initialize();
+      public void OnDestroy() => Mod.Unload();
+   }
+
    [EnableReloading]
    public static class UMM_Mod {
+      private static Mod mod;
+
       public static void Load ( UnityModManager.ModEntry modEntry ) {
-         var m = new Mod();
+         mod = new Mod();
          Mod.ModDir = modEntry.Path;
-         m.Initialize();
+         mod.Initialize();
          modEntry.OnToggle = OnOff;
-         modEntry.OnUnload = Unload;
+         modEntry.OnUnload = ( _ ) => Mod.Unload();
       }
 
       private static bool OnOff ( UnityModManager.ModEntry modEntry, bool active ) {
          Info( "UMM - Switching {0}.", active ? "On" : "Off" );
-         if ( ! active ) Mod.patchers.FirstOrDefault()?.UnpatchAll();
-         else foreach ( var p in Mod.patchers ) p.Apply();
+         if ( ! active ) Mod.patchers.Values.FirstOrDefault()?.UnpatchAll();
+         else Mod.Load();
          return true;
       }
-
-      private static bool Unload ( UnityModManager.ModEntry _ ) { try {
-         Info( "UMM - Unload." );
-         Mod.patchers.FirstOrDefault()?.UnpatchAll();
-         foreach ( var p in Mod.patchers ) p.Unload();
-         RootMod.Log.Close();
-         return true;
-      } catch ( Exception x ) { return Err( x, false ); } }
    }
 
    public class Mod : MarsHorizonMod {
       internal static string ModDir;
       protected override string GetModName () => "Zhant";
       public static void Main () => new Mod().Initialize();
-      internal static readonly List< ModPatcher > patchers = new List< ModPatcher >();
-      protected override void OnGameAssemblyLoaded ( Assembly game ) {
+      internal static readonly Dictionary< Type, ModPatcher > patchers = new Dictionary< Type, ModPatcher >();
+      protected override void OnGameAssemblyLoaded ( Assembly game ) => Load();
+      internal static void Load () {
          ModPatcher.config.Load();
-         patchers.Add( new PatcherL10N() );
-         foreach ( var p in patchers ) p.Apply();
+         if ( ! patchers.ContainsKey( typeof( PatcherL10N ) ) )
+            patchers.Add( typeof( PatcherL10N ), new PatcherL10N() );
+         foreach ( var p in patchers.Values ) p.Apply();
       }
+      internal static bool Unload () { try {
+         Info( "Unloading." );
+         patchers.Values.FirstOrDefault()?.UnpatchAll();
+         foreach ( var p in patchers.Values ) p.Unload();
+         Log.Close();
+         return true;
+      } catch ( Exception x ) { return Err( x, false ); } }
    }
 
    internal abstract class ModPatcher : Patcher {
