@@ -301,7 +301,7 @@ namespace ZyMod {
    #if ! NoConfig
    public abstract class BaseConfig  : ModComponent { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
       protected virtual string GetFileExtension () => ".conf";
-      public virtual string GetDefaultPath () => Path.Combine( AppDataDir, RootMod.ModName + GetFileExtension() );
+      public virtual string GetDefaultPath () => Path.Combine( AppDataDir, ModName + GetFileExtension() );
 
       public void Load () => Load( this );
       public void Load ( string path ) => Load( this, path );
@@ -418,8 +418,9 @@ namespace ZyMod {
 
       public class ModPatch {
          public readonly Harmony harmony;
-         public ModPatch ( Harmony patcher ) { harmony = patcher; }
-         public MethodBase original; public HarmonyMethod prefix, postfix, transpiler;
+         public readonly MethodBase original;
+         public ModPatch ( Harmony patcher, MethodBase orig ) { harmony = patcher; original = orig; }
+         public HarmonyMethod prefix, postfix, transpiler;
          public void Unpatch ( HarmonyPatchType type = All ) { lock ( sync ) {
             if ( prefix     != null && ( type == All || type == Prefix     ) ) { harmony.Unpatch( original, prefix.method     ); prefix     = null; }
             if ( postfix    != null && ( type == All || type == Postfix    ) ) { harmony.Unpatch( original, postfix.method    ); postfix    = null; }
@@ -430,21 +431,21 @@ namespace ZyMod {
       private ModPatch DoPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
          lock ( sync ) if ( harmony == null ) harmony = new Harmony( ModName );
          Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
-         var patch = new ModPatch( harmony ) { original = method, prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
+         var patch = new ModPatch( harmony, method ) { prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
          harmony.Patch( method, patch.prefix, patch.postfix, patch.transpiler );
          return patch;
       }
 
       protected ModPatch Patch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) { try {
          return DoPatch( type.Method( method ), prefix, postfix, transpiler );
-      } catch ( Exception ex ) {
-         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, ex );
+      } catch ( Exception x ) {
+         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, x );
          return null;
       } }
       protected ModPatch Patch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) { try {
          return DoPatch( method, prefix, postfix, transpiler );
-      } catch ( Exception ex ) {
-         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", method?.DeclaringType, method?.Name, prefix, postfix, transpiler, ex );
+      } catch ( Exception x ) {
+         Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", method?.DeclaringType, method?.Name, prefix, postfix, transpiler, x );
          return null;
       } }
 
@@ -499,7 +500,7 @@ namespace ZyMod {
             AppDomain.CurrentDomain.ProcessExit += Terminate;
          }
          if ( _LogLevel == Off ) { buffer.Clear(); return; }
-         buffer.Insert( 0, $"{DateTime.Now:u} {RootMod.ModName} initiated, log level {_LogLevel}, " + ( FlushInterval > 0 ? $"refresh every {FlushInterval}s." : "no buffer." ) );
+         buffer.Insert( 0, $"{DateTime.Now:u} {ModComponent.ModName} initiated, log level {_LogLevel}, " + ( FlushInterval > 0 ? $"refresh every {FlushInterval}s." : "no buffer." ) );
          Flush();
          flushTimer?.Start();
       } catch ( Exception ) { } }
@@ -533,9 +534,7 @@ namespace ZyMod {
          using ( TextWriter f = File.AppendText( LogPath ) ) foreach ( var line in buf ) f.WriteLine( line );
       } catch ( Exception ) { } }
 
-      public void Close () { Flush(); LogLevel = Off; AppDomain.CurrentDomain.ProcessExit -= Terminate; }
-
-      private void Terminate ( object _, EventArgs __ ) => Close();
+      private void Terminate ( object _, EventArgs __ ) { Flush(); LogLevel = Off; AppDomain.CurrentDomain.ProcessExit -= Terminate; }
 
       private readonly HashSet< string > knownErrors = new HashSet<string>(); // Known exceptions are ignored.  Modding is risky.
 

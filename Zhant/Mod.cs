@@ -48,7 +48,8 @@ namespace ZyMod.MarsHorizon.Zhant {
          Info( "Unloading." );
          patchers.Values.FirstOrDefault()?.UnpatchAll();
          foreach ( var p in patchers.Values ) p.Unload();
-         Log.Close();
+         Log.Flush();
+         Log.LogLevel = System.Diagnostics.TraceLevel.Off;
          return true;
       } catch ( Exception x ) { return Err( x, false ); } }
    }
