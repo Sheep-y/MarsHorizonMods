@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,7 +9,6 @@ using System.Reflection.Emit;
 using System.Text;
 using static System.Diagnostics.TraceLevel;
 using static System.Reflection.BindingFlags;
-using System.Collections;
 
 #if ! NoPatch
 using HarmonyLib;
@@ -16,12 +16,26 @@ using static HarmonyLib.HarmonyPatchType;
 #endif
 
 // Sheepy's "Universal" skeleton mod and tools.  No depency other than Harmony2 / HarmonyX.
-// Bootstrap, Background Logging, Roundtrip Config, Reflection, Manual Patcher with Unpatch. Reasonably well unit tested.
+// Bootstrap, Background Logging, Roundtrip Config, Reflection, Manual Patcher with Unpatch.
 namespace ZyMod {
    using LogFunc = Action< TraceLevel, object, object[] >;
 
-   public abstract class RootMod : LogAccess {
+   public class LogAccess {
       protected static readonly object sync = new object();
+      public static string ModName, ModPath, ModDir, AppDataDir;
+      public static LogFunc Logger { get; set; }
+      public static void Err ( object msg ) => Error( msg );
+      public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
+      public static void Error ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Error, msg, arg );
+      public static void Warn  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Warning, msg, arg );
+      public static void Info  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Info, msg, arg );
+      public static void Fine  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Verbose, msg, arg );
+      #if ! NoLog
+      public static ZyLogger Log;
+      #endif
+   }
+
+   public abstract class RootMod : LogAccess {
       private static RootMod instance;
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
@@ -68,10 +82,8 @@ namespace ZyMod {
 
       protected virtual void SetModIO () { lock ( sync ) {
          if ( ModName == null ) ModName = GetModName() ?? "ZyMod";
-         if ( Logger == null ) {
-            if ( Log == null ) Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
-            Logger = Log.Write;
-         }
+         if ( ModPath == null ) ModPath = new Uri( Assembly.GetExecutingAssembly().CodeBase ).LocalPath;
+         if ( ModDir == null ) ModDir = Path.GetDirectoryName( ModPath );
          if ( AppDataDir == null ) {
             AppDataDir = instance.GetAppDataDir();
             if ( ModHelpers.IsBlank( AppDataDir ) )
@@ -83,6 +95,12 @@ namespace ZyMod {
                }
             } catch ( Exception ) { AppDataDir = ""; }
          }
+         #if ! NoLog
+         if ( Logger == null ) {
+            if ( Log == null ) Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
+            Logger = Log.Write;
+         }
+         #endif
       } }
 
       // Override / Implement these to change mod name, log dir, what to do on Assembly-CSharp, and where patches are located by Modder.
@@ -94,9 +112,6 @@ namespace ZyMod {
    public static class ModHelpers { // Assorted helpers
       public static bool Non0 ( float val ) => val != 0 && Rational( val );
       public static bool Rational ( float val ) => ! float.IsNaN( val ) && ! float.IsInfinity( val );
-
-      public static string ModPath => new Uri( Assembly.GetExecutingAssembly().CodeBase ).LocalPath;
-      public static string ModDir => Path.GetDirectoryName( ModPath );
 
       public static IEnumerable< MethodInfo > Methods ( this Type type ) => type.GetMethods( Public | NonPublic | Instance | Static | DeclaredOnly ).Where( e => ! e.IsAbstract );
       public static IEnumerable< MethodInfo > Methods ( this Type type, string name ) => type.Methods().Where( e => e.Name == name );
@@ -113,6 +128,7 @@ namespace ZyMod {
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static Type[] ArrayTypeEmpty = new Type[0];
 
+      #if CIL
       private static MethodInfo GetILs, EnumMoveNext;
       // Find the instructions of a method.  Return null on failure.  TODO: Does not work on HarmonyX
       public static IEnumerable< CodeInstruction > GetCodes ( this MethodBase subject ) {
@@ -135,6 +151,7 @@ namespace ZyMod {
          var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
          return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", ArrayTypeEmpty );
       }
+      #endif
 
       #if ! NoConfig
       public static bool TryParse ( Type valueType, string val, out object parsed, LogFunc logger = null ) { parsed = null; try {
@@ -404,7 +421,6 @@ namespace ZyMod {
 
    #if ! NoPatch
    public class Patcher : LogAccess { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
-      protected static readonly object sync = new object();
       public Harmony harmony { get; private set; }
 
       public class ModPatch {
@@ -421,7 +437,7 @@ namespace ZyMod {
       protected ModPatch Patch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) =>
          Patch( type.Method( method ), prefix, postfix, transpiler );
       protected ModPatch Patch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
-         lock ( sync ) if ( harmony == null ) harmony = new Harmony( RootMod.ModName );
+         lock ( sync ) if ( harmony == null ) harmony = new Harmony( ModName );
          Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
          var patch = new ModPatch( harmony ) { original = method, prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
          harmony.Patch( method, patch.prefix, patch.postfix, patch.transpiler );
@@ -463,18 +479,7 @@ namespace ZyMod {
    }
    #endif
 
-   public class LogAccess {
-      public static string ModName, AppDataDir;
-      public static LogFunc Logger { get; set; }
-      public static ZyLogger Log;
-      public static void Err ( object msg ) => Error( msg );
-      public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
-      public static void Error ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Error, msg, arg );
-      public static void Warn  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Warning, msg, arg );
-      public static void Info  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Info, msg, arg );
-      public static void Fine  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Verbose, msg, arg );
-   }
-
+   #if ! NoLog
    // Thread safe logger.  Buffer and write in background thread unless interval is set to 0.
    // Common usages: Log an Exception (will ignore duplicates), Log a formatted string with params, Log multiple objects (in one call and on one line).
    public class ZyLogger {
@@ -577,4 +582,5 @@ namespace ZyMod {
          return tag + ( msg?.ToString() ?? "null" );
       }
    }
+   #endif
 }
