@@ -10,11 +10,6 @@ using UnityEngine;
 
 namespace ZyMod.MarsHorizon.ModLoader {
 
-   [ BepInPlugin( "Zy.MarsHorizon.ModLoader", "Mod Loader (Sheepy)", "0.0.2022.0326" ) ]
-   public class Plugin : BaseUnityPlugin {
-      private void Awake() => new MarsHorizonModLoader().Initialize();
-   }
-
    public class MarsHorizonModLoader : RootMod {
       protected override string GetModName () => "ModLoader";
 
@@ -27,15 +22,26 @@ namespace ZyMod.MarsHorizon.ModLoader {
          var selfPath = GetPath( Assembly.GetExecutingAssembly() );
          var path = Path.GetDirectoryName( selfPath );
          Info( "Scanning \"{0}\" for Mars Horizon mods (MH_*.dll)", path );
+         FindMods( selfPath, path, 0 );
+      } catch ( Exception x ) { Error( x ); } }
+
+      private static void FindMods ( string selfPath, string path, int depth ) {
+         if ( depth >= 3 ) return;
+
          var files = Directory.GetFiles( path, "MH_*.dll" );
          Array.Sort( files );
+         Fine( "Found {0} mod files in {1}", files.Length, path );
          foreach ( var f in files ) try {
             if ( f == selfPath ) continue;
             Info( "Loading {0}", f );
             var asm = Assembly.LoadFile( f );
             if ( asm != null ) LoadMarsHorizonMod( asm );
          } catch ( Exception x ) { Warn( x ); }
-      } catch ( Exception x ) { Error( x ); } }
+
+         files = Directory.GetDirectories( path );
+         Array.Sort( files );
+         foreach ( var f in files ) FindMods( selfPath, f, depth + 1 );
+      }
 
       private static Type[] GetTypes ( Assembly asm ) { try {
          return asm.GetTypes();
