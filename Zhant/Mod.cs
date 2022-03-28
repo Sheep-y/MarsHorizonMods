@@ -6,23 +6,21 @@ using System.Reflection;
 using System.Text;
 using UnityModManagerNet;
 using static ZyMod.ModHelpers;
+using static ZyMod.LogAccess;
 
 namespace ZyMod.MarsHorizon.Zhant {
 
    [ BepInPlugin( "Zy.MarsHorizon.Zhant", "Traditional Chinese", "0.0.2022.0326" ) ]
    public class Plugin : BaseUnityPlugin {
-      private void Awake() => new Mod().Initialize();
+      private void Awake() => Mod.Main();
       public void OnDestroy() => Mod.Unload();
    }
 
    [EnableReloading]
-   public class UMM_Mod : LogAccess {
-      private static Mod mod;
-
+   public static class UMM_Mod {
       public static void Load ( UnityModManager.ModEntry modEntry ) {
-         mod = new Mod();
-         Mod.ModDir = modEntry.Path;
-         mod.Initialize();
+         ModDir = modEntry.Path;
+         Mod.Main();
          modEntry.OnToggle = OnOff;
          modEntry.OnUnload = ( _ ) => Mod.Unload();
       }
@@ -36,7 +34,6 @@ namespace ZyMod.MarsHorizon.Zhant {
    }
 
    public class Mod : MarsHorizonMod {
-      internal static string ModDir;
       protected override string GetModName () => "Zhant";
       public static void Main () => new Mod().Initialize();
       internal static readonly Dictionary< Type, ModPatcher > patchers = new Dictionary< Type, ModPatcher >();
