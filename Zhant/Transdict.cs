@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using static ZyMod.LogAccess;
 
 namespace ZyMod.MarsHorizon.Zhant {
-   internal class Transdict : LogAccess {
+   internal class Transdict {
       internal static readonly SortedDictionary< string, string > whole = new SortedDictionary<string, string>();
       internal static string[] part;
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
 

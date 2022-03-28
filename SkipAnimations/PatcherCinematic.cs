@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine.Rendering;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 

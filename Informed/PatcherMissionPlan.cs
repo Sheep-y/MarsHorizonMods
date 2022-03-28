@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using UnityEngine.UI;
 using static Astronautica.Data;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Informed {
 

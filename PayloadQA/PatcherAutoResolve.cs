@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using static Astronautica.Model.PayloadVariation.PayloadVariant.Type;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.PayloadQA {
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using static ZyMod.ModHelpers;
 
 // Common base mod for Mars Horizon.  Find and initialize the correct class, set log and config path and name.
 namespace ZyMod.MarsHorizon {

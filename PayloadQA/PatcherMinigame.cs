@@ -3,7 +3,6 @@ using Astronautica.View;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.PayloadQA {
 

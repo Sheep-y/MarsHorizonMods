@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.ModLoader {
 

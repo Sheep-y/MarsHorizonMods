@@ -8,7 +8,6 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
    internal class PatcherL10N : ModPatcher {
@@ -86,7 +85,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static bool LoadFont ( string fn, string v ) { try {
          if ( zhtTMPFs.ContainsKey( v ) ) return true;
-         var f = Path.Combine( Mod.ModDir ?? ModHelpers.ModDir, fn.EndsWith( ".ttf" ) ? fn : $"{fn}.otf" );
+         var f = Path.Combine( ModDir, fn.EndsWith( ".ttf" ) ? fn : $"{fn}.otf" );
          if ( File.Exists( f ) ) {
             var size = (int) ( Array.IndexOf( variations, v ) >= 0 && v != "Medium" && v != "Regular" ? config.sample_size_other : config.sample_size_normal );
             var padding = (int) Math.Ceiling( size * config.padding_ratio );

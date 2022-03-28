@@ -1,7 +1,6 @@
 ﻿using Astronautica.View;
 using System;
 using System.Reflection;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 

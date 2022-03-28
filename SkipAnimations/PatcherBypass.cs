@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
