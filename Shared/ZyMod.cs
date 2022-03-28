@@ -20,7 +20,8 @@ using static HarmonyLib.HarmonyPatchType;
 namespace ZyMod {
    using LogFunc = Action< TraceLevel, object, object[] >;
 
-   public class LogAccess {
+   // All the important mod data in one place.  
+   public class ModComponent {
       protected static readonly object sync = new object();
       public static string ModName, ModPath, ModDir, AppDataDir;
       public static LogFunc Logger { get; set; }
@@ -35,7 +36,7 @@ namespace ZyMod {
       #endif
    }
 
-   public abstract class RootMod : LogAccess {
+   public abstract class RootMod : ModComponent {
       private static RootMod instance;
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
@@ -299,7 +300,7 @@ namespace ZyMod {
    }
 
    #if ! NoConfig
-   public abstract class BaseConfig  : LogAccess { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
+   public abstract class BaseConfig  : ModComponent { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
       protected virtual string GetFileExtension () => ".conf";
       public virtual string GetDefaultPath () => Path.Combine( AppDataDir, RootMod.ModName + GetFileExtension() );
 
@@ -325,7 +326,7 @@ namespace ZyMod {
          return field != null && ! field.IsStatic && ! field.IsInitOnly && ! field.IsNotSerialized;
       }
       protected virtual void _SetField ( object subject, FieldInfo f, string val ) {
-         if ( ModHelpers.TryParse( f.FieldType, val, out object parsed ) ) f.SetValue( subject, parsed );
+         if ( ModHelpers.TryParse( f.FieldType, val, out object parsed, Logger ) ) f.SetValue( subject, parsed );
       }
 
       public void Save () => Save( this );
@@ -413,7 +414,7 @@ namespace ZyMod {
    #endif
 
    #if ! NoPatch
-   public class Patcher : LogAccess { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
+   public class Patcher : ModComponent { // Patch classes may inherit from this class for manual patching.  You can still use Harmony.PatchAll, of course.
       public Harmony harmony { get; private set; }
 
       public class ModPatch {

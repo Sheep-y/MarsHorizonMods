@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using UnityModManagerNet;
 using static ZyMod.ModHelpers;
-using static ZyMod.LogAccess;
+using static ZyMod.ModComponent;
 
 namespace ZyMod.MarsHorizon.Zhant {
 
