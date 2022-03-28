@@ -158,16 +158,6 @@ namespace ZyMod {
          if ( valueType == typeof( string ) ) { parsed = val; return true; }
          if ( IsBlank( val ) || val == "null" ) return ! ( valueType.IsValueType || valueType.IsEnum );
          switch ( valueType.FullName ) {
-            case "System.SByte"   : if ( SByte .TryParse( val, out sbyte  bval ) ) parsed = bval; break;
-            case "System.Int16"   : if ( Int16 .TryParse( val, out short  sval ) ) parsed = sval; break;
-            case "System.Int32"   : if ( Int32 .TryParse( val, out int    ival ) ) parsed = ival; break;
-            case "System.Int64"   : if ( Int64 .TryParse( val, out long   lval ) ) parsed = lval; break;
-            case "System.Byte"    : if ( Byte  .TryParse( val, out byte   Bval ) ) parsed = Bval; break;
-            case "System.UInt16"  : if ( UInt16.TryParse( val, out ushort Sval ) ) parsed = Sval; break;
-            case "System.UInt32"  : if ( UInt32.TryParse( val, out uint   Ival ) ) parsed = Ival; break;
-            case "System.UInt64"  : if ( UInt64.TryParse( val, out ulong  Lval ) ) parsed = Lval; break;
-            case "System.Single"  : if ( Single.TryParse( val, out float  fval ) ) parsed = fval; break;
-            case "System.Double"  : if ( Double.TryParse( val, out double dval ) ) parsed = dval; break;
             case "System.Boolean" : switch ( val.ToLowerInvariant() ) {
                                     case "true" : case "yes" : case "1" : parsed = true ; break;
                                     case "false" : case "no" : case "0" : parsed = false; break;
@@ -176,7 +166,10 @@ namespace ZyMod {
                if ( DateTime.TryParse( val, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt ) ) parsed = dt;
                break;
             default :
-               if ( valueType.IsEnum ) { parsed = Enum.Parse( valueType, val ); break; }
+               if ( valueType.IsValueType ) try {
+                  parsed = Convert.ChangeType( val, valueType );
+                  return true;
+               } catch ( SystemException ) { return false; }
                logger?.Invoke( Warning, new NotImplementedException( "Unsupported field type " + valueType.FullName ), null );
                break;
          }
