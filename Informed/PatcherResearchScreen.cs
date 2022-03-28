@@ -11,8 +11,8 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherResearchScreen : ModPatcher {
       internal void Apply () {
          if ( config.show_supplement_in_booster_description ) {
-            TryPatch( typeof( TutorialTooltipStats ), "SetupResearchBooster", prefix: nameof( SetSupplementList ), postfix: nameof( ClearSupplementList ) );
-            TryPatch( typeof( TutorialTooltipStatItem ), "Set", postfix: nameof( AppendSupplementStats ) );
+            Patch( typeof( TutorialTooltipStats ), "SetupResearchBooster", prefix: nameof( SetSupplementList ), postfix: nameof( ClearSupplementList ) );
+            Patch( typeof( TutorialTooltipStatItem ), "Set", postfix: nameof( AppendSupplementStats ) );
          }
       }
 

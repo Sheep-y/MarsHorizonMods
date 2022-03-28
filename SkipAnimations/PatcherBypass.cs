@@ -13,19 +13,19 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
    internal class PatcherBypass : ModPatcher {
       internal void Apply () {
          if ( config.bypass_fullscreen_notices )
-            TryPatch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), prefix: nameof( BypassFullScreenNotices ) );
+            Patch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), prefix: nameof( BypassFullScreenNotices ) );
          if ( config.bypass_popups_notices )
-            TryPatch( typeof( ClientViewer ), "UpdateNotifications", prefix: nameof( BypassPopupNotices ) );
+            Patch( typeof( ClientViewer ), "UpdateNotifications", prefix: nameof( BypassPopupNotices ) );
          if ( config.auto_pass_normal_action )
-            TryPatch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
+            Patch( typeof( MissionGameplayScreen ), "SpawnEventPopup", postfix: nameof( BypassNormalAction ) );
          if ( config.auto_pass_normal_launch || config.auto_pass_empty_levelup ) {
             if ( tweenField == null || abortButton == null || autoResolveButton == null ) {
                Warn( "LaunchEventsScreen field not found.  tweenField = {0}, abortButton = {1}, autoResolveButton = {2}", tweenField, abortButton, autoResolveButton );
             } else {
                if ( config.auto_pass_normal_launch )
-                  TryPatch( typeof( LaunchEventsScreen ), "EndLaunchCinematics", postfix: nameof( BypassNormalLaunch ) );
+                  Patch( typeof( LaunchEventsScreen ), "EndLaunchCinematics", postfix: nameof( BypassNormalLaunch ) );
                if ( config.auto_pass_empty_levelup )
-                  TryPatch( typeof( LaunchEventsScreen ), "PartLevellingSequence", postfix: nameof( BypassNoLevelUp ) );
+                  Patch( typeof( LaunchEventsScreen ), "PartLevellingSequence", postfix: nameof( BypassNoLevelUp ) );
             }
          }
       }

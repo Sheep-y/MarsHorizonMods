@@ -13,11 +13,11 @@ namespace ZyMod.MarsHorizon.PayloadQA {
    internal class PatcherAutoResolve: ModPatcher {
       internal void Apply () {
          if ( config.standalone_resolve_rng )
-            TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
-         TryPatch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
+            Patch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
+         Patch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
             , postfix: config.special_payload_ar_bonus > 0 ? nameof( AddPayloadBonus ) : nameof( GetPayloadVariant ) );
          if ( config.power_payload_ar_crit > 0 )
-            TryPatch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
+            Patch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
       }
 
       private static PayloadVariant.Type currentVariant;

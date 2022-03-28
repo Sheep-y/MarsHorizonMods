@@ -17,16 +17,16 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherVehicleDesigner : ModPatcher {
       internal void Apply () {
          if ( config.show_contractor_effects_on_button && eVal != null ) {
-            TryPatch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
-            TryPatch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", prefix: nameof( TrackDesignerState ) );
-            TryPatch( typeof( ContractorListItem ), "GetName", postfix: nameof( AddContractorEffects ) );
+            Patch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
+            Patch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", prefix: nameof( TrackDesignerState ) );
+            Patch( typeof( ContractorListItem ), "GetName", postfix: nameof( AddContractorEffects ) );
          }
          if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 ) {
-            if ( TryPatch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null &&
-                 TryPatch( typeof( VehicleDesignerVehicleStats ), "RefreshCostTimeInfo", postfix: nameof( TrackMission ) ) != null ) {
+            if ( Patch( typeof( VehicleDesignerTooltipManager ), "Awake", postfix: nameof( TrackTooltip ) ) != null &&
+                 Patch( typeof( VehicleDesignerVehicleStats ), "RefreshCostTimeInfo", postfix: nameof( TrackMission ) ) != null ) {
                if ( config.always_show_launch_window )
-                  TryPatch( typeof( VehicleDesignerTooltipManager ), "Show", postfix: nameof( ShowLaunchCalendar ) );
-               TryPatch( typeof( VehicleDesignerTooltipManager ), "Hide", postfix: nameof( ShowLaunchCalendar ) );
+                  Patch( typeof( VehicleDesignerTooltipManager ), "Show", postfix: nameof( ShowLaunchCalendar ) );
+               Patch( typeof( VehicleDesignerTooltipManager ), "Hide", postfix: nameof( ShowLaunchCalendar ) );
             }
          }
       }

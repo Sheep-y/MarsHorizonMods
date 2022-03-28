@@ -10,14 +10,14 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
    internal class PatcherSlot : ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecalcMissionSlots ) );
-         TryPatch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecalcMissionSlots ) );
-         TryPatch( typeof( MissionSummary ), "Setup", postfix: nameof( RecalcAfterPhase ) ); // Refresh after mission phase change
-         TryPatch( typeof( ClientViewer ), "SetAgency", postfix: nameof( RecalcAgencySlots ) ); // Refresh after load game
-         TryPatch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
-         if ( TryPatch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
-            TryPatch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
-         TryPatch( typeof( Simulation ).Methods( "CanAgencyDestroyBuilding" ).FirstOrDefault( e => e.GetParameters().Length >= 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
+         Patch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecalcMissionSlots ) );
+         Patch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecalcMissionSlots ) );
+         Patch( typeof( MissionSummary ), "Setup", postfix: nameof( RecalcAfterPhase ) ); // Refresh after mission phase change
+         Patch( typeof( ClientViewer ), "SetAgency", postfix: nameof( RecalcAgencySlots ) ); // Refresh after load game
+         Patch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
+         if ( Patch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
+            Patch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
+         Patch( typeof( Simulation ).Methods( "CanAgencyDestroyBuilding" ).FirstOrDefault( e => e.GetParameters().Length >= 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
       }
 
       private static readonly HashSet< Mission > deepSpaceMissions = new HashSet< Mission >();

@@ -16,7 +16,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       internal override void Apply () {
          me = this;
          if ( config.dynamic_patch ) {
-            TryPatch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
+            Patch( typeof( UserSettings ), "SetLanguage", prefix: nameof( DynamicPatch ) );
             if ( Controller.Instance?.settings?.general?.language == UserSettings.Language.Chinese )
                DynamicPatch( UserSettings.Language.Chinese );
          } else
@@ -55,9 +55,9 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static void ApplyZhPatches () {
          if ( patchZh == null )
-            patchZh = me.TryPatch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
+            patchZh = me.Patch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
          if ( patchFont == null )
-            patchFont = me.TryPatch( typeof( UIStateController ), "SetViewState", postfix: nameof( SetZhtFont ) );
+            patchFont = me.Patch( typeof( UIStateController ), "SetViewState", postfix: nameof( SetZhtFont ) );
          Transdict.LoadDicts();
          LoadFonts();
       }

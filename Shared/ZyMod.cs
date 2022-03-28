@@ -120,7 +120,6 @@ namespace ZyMod {
       public static MethodInfo Method ( this Type type, string name ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static MethodInfo Method ( this Type type, string name, params Type[] types ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly, null, types ?? Type.EmptyTypes, null );
       public static MethodInfo TryMethod ( this Type type, string name ) { try { return Method( type, name ); } catch ( Exception ) { return null; } }
-      public static MethodInfo TryMethod ( this Type type, string name, params Type[] types ) { try { return Method( type, name, types ); } catch ( Exception ) { return null; } }
       public static object Run ( this MethodInfo func, object self, params object[] args ) => func.Invoke( self, args );
       public static object RunStatic ( this MethodInfo func, params object[] args ) => func.Invoke( null, args );
       public static object TryRun ( this MethodInfo func, object self, params object[] args ) { try { return Run( func, self, args ); } catch ( Exception x ) { return x; } }
@@ -428,9 +427,7 @@ namespace ZyMod {
          } }
       };
 
-      protected ModPatch Patch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) =>
-         Patch( type.Method( method ), prefix, postfix, transpiler );
-      protected ModPatch Patch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
+      private ModPatch DoPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
          lock ( sync ) if ( harmony == null ) harmony = new Harmony( ModName );
          Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
          var patch = new ModPatch( harmony ) { original = method, prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
@@ -438,14 +435,14 @@ namespace ZyMod {
          return patch;
       }
 
-      protected ModPatch TryPatch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) { try {
-         return Patch( type.Method( method ), prefix, postfix, transpiler );
+      protected ModPatch Patch ( Type type, string method, string prefix = null, string postfix = null, string transpiler = null ) { try {
+         return DoPatch( type.Method( method ), prefix, postfix, transpiler );
       } catch ( Exception ex ) {
          Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", type, method, prefix, postfix, transpiler, ex );
          return null;
       } }
-      protected ModPatch TryPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) { try {
-         return Patch( method, prefix, postfix, transpiler );
+      protected ModPatch Patch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) { try {
+         return DoPatch( method, prefix, postfix, transpiler );
       } catch ( Exception ex ) {
          Warn( "Could not patch {0} {1} | Pre: {2} | Post: {3} | Trans: {4}\n{5}", method?.DeclaringType, method?.Name, prefix, postfix, transpiler, ex );
          return null;

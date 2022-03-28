@@ -12,9 +12,9 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
    internal class PatcherMilestoneSim: ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( Simulation ), "GetNewMilestoneChallenge", prefix: nameof( CaptureCurrentReward ), postfix: nameof( ClearMilestoneChecks ) );
-         TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", prefix: nameof( FilterMilestoneChallenge ) );
-         TryPatch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );
+         Patch( typeof( Simulation ), "GetNewMilestoneChallenge", prefix: nameof( CaptureCurrentReward ), postfix: nameof( ClearMilestoneChecks ) );
+         Patch( typeof( Simulation ), "SetMilestoneChallengeReward", prefix: nameof( FilterMilestoneChallenge ) );
+         Patch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );
       }
 
       private static bool isNewChallenge = true;

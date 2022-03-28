@@ -10,17 +10,17 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
    internal class PatcherMissionSim: ModPatcher {
       internal void Apply () {
-         TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
-         TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateSpaceTouristMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
-         TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionType" ), prefix: nameof( SetMissionWeight ), postfix: nameof( LogMissionRemoval ) );
-         TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionContext" ), postfix: nameof( LogMissionRemoval ) );
+         Patch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
+         Patch( typeof( Simulation ).Method( "AgencyTryGenerateSpaceTouristMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
+         Patch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionType" ), prefix: nameof( SetMissionWeight ), postfix: nameof( LogMissionRemoval ) );
+         Patch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionContext" ), postfix: nameof( LogMissionRemoval ) );
          if ( config.joint_mission_chance >= 0 || config.diplomacy_office_bonus_chance >= 0 )
-            TryPatch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
+            Patch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
          if ( config.joint_trait_multiplier >= 0 )
-            TryPatch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
+            Patch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
          if ( config.standalone_mission_rng ) {
-            TryPatch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackPlayerNewMission ) );
-            TryPatch( typeof( LINQExtensions ).Method( "RandomElement" ).MakeGenericMethod( typeof( Data.RequestMissionData ) ), postfix: nameof( RollRandomMission ) );
+            Patch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackPlayerNewMission ) );
+            Patch( typeof( LINQExtensions ).Method( "RandomElement" ).MakeGenericMethod( typeof( Data.RequestMissionData ) ), postfix: nameof( RollRandomMission ) );
          }
       }
 

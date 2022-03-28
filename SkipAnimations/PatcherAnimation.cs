@@ -11,40 +11,40 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
    internal class PatcherAnimation : ModPatcher {
       internal void Apply () {
          if ( config.max_delay >= 0 ) {
-            TryPatch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
-            TryPatch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
+            Patch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
+            Patch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
             if ( config.max_delay <= 0.5f ) {
-               TryPatch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
-               TryPatch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
-               TryPatch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
+               Patch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
+               Patch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
+               Patch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
             }
          }
          if ( config.remove_delays ) {
-            TryPatch( typeof( ConstructionCompleteScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( LaunchDayScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
-            TryPatch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", prefix: nameof( RemoveWait_WaitForSecondsSkippable ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "AppendInterval", prefix: nameof( RemoveWait_Tween ) );
-            TryPatch( typeof( TweenSettingsExtensions ), "PrependInterval", prefix: nameof( RemoveWait_Tween ) );
+            Patch( typeof( ConstructionCompleteScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
+            Patch( typeof( LaunchDayScreen ), "Wait", prefix: nameof( RemoveWait_CompleteScreen ) );
+            Patch( typeof( MissionGameplayScreen ), "WaitForSecondsSkippable", prefix: nameof( RemoveWait_WaitForSecondsSkippable ) );
+            Patch( typeof( TweenSettingsExtensions ), "AppendInterval", prefix: nameof( RemoveWait_Tween ) );
+            Patch( typeof( TweenSettingsExtensions ), "PrependInterval", prefix: nameof( RemoveWait_Tween ) );
          }
          if ( config.max_screen_fade >= 0 )
             foreach ( var m in typeof( Blackout ).Methods().Where( e => e.Name == "Fade" || e.Name == "FadeInOut" ) )
-               TryPatch( m, prefix: nameof( RemoveWait_Blackout ) );
+               Patch( m, prefix: nameof( RemoveWait_Blackout ) );
          if ( config.fast_launch ) {
             foreach ( var m in new string[] { "AstroInitialise", "InSequence", "LaunchReportSequence", "PartLevellingSequence" } )
-               TryPatch( typeof( LaunchEventsScreen ), m, prefix: nameof( SpeedUpLaunch ) );
-            TryPatch( typeof( LaunchEventsScreen ), "SkipPressed", postfix: nameof( SkipLaunchAnimation ) );
+               Patch( typeof( LaunchEventsScreen ), m, prefix: nameof( SpeedUpLaunch ) );
+            Patch( typeof( LaunchEventsScreen ), "SkipPressed", postfix: nameof( SkipLaunchAnimation ) );
          }
          if ( config.skip_mission_intro )
-            TryPatch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", prefix: nameof( SkipPayloadDeploy ) );
+            Patch( typeof( MissionGameplayScreen ), "RunMissionIntroductions", prefix: nameof( SkipPayloadDeploy ) );
          if ( config.fast_mission )
-            TryPatch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", postfix: nameof( SkipReliabilityFill ) );
+            Patch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", postfix: nameof( SkipReliabilityFill ) );
          if ( config.swoosh_speed > 0 && config.swoosh_speed != 1 )
-            TryPatch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
+            Patch( typeof( MissionGameplayScene ), "AnimateSwooshEffects", prefix: nameof( SpeedUpMissionSwoosh ) );
          if ( config.fast_mission_result ) {
-            TryPatch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
-            TryPatch( typeof( MissionSummary ), "AnimatePhaseProgress", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
-            TryPatch( typeof( MissionSummary ), "AnimateRewards", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpRewards ) );
-            TryPatch( typeof( MissionSummaryPhaseProgress ), "Animate", transpiler: nameof( SpeedUpPhaseAnimation ) );
+            Patch( typeof( MissionSummary ), "SkipOnly", transpiler: nameof( SpeedUpMissionSkip ) );
+            Patch( typeof( MissionSummary ), "AnimatePhaseProgress", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpPhaseProgress ) );
+            Patch( typeof( MissionSummary ), "AnimateRewards", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpRewards ) );
+            Patch( typeof( MissionSummaryPhaseProgress ), "Animate", transpiler: nameof( SpeedUpPhaseAnimation ) );
          }
       }
 

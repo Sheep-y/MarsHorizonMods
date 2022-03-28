@@ -13,9 +13,9 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             //TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );
             SkipSplash();
          if ( config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
-            TryPatch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
+            Patch( typeof( CinematicSceneController ), "GetInputDownSkip", postfix: nameof( SkipCinmatic ) );
          if ( Environment.UserName == "Sheepy" )
-            TryPatch( typeof( CinematicSetupCreator ).Method( "TryGetValidSetup", typeof( CinematicSetup.ECategory ), typeof( CinematicData ), typeof( CinematicSetup ).MakeByRefType() ), postfix: nameof( LogCinematic ) );
+            Patch( typeof( CinematicSetupCreator ).Method( "TryGetValidSetup", typeof( CinematicSetup.ECategory ), typeof( CinematicData ), typeof( CinematicSetup ).MakeByRefType() ), postfix: nameof( LogCinematic ) );
       }
 
       private static void SkipSplash () {

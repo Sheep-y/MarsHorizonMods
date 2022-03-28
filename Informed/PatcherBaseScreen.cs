@@ -10,9 +10,9 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherBaseScreen : ModPatcher {
       internal void Apply () {
          if ( config.show_base_bonus ) {
-            TryPatch( typeof( AstroViewElement ), "Refresh", postfix: nameof( ClearBaseBonus ) );
-            TryPatch( typeof( BaseScreen ), "EnterPurchaseState", postfix: nameof( HideBaseBonus ) );
-            TryPatch( typeof( BaseScreen ), "OnCellHovered", postfix: nameof( ShowBaseBonus ) );
+            Patch( typeof( AstroViewElement ), "Refresh", postfix: nameof( ClearBaseBonus ) );
+            Patch( typeof( BaseScreen ), "EnterPurchaseState", postfix: nameof( HideBaseBonus ) );
+            Patch( typeof( BaseScreen ), "OnCellHovered", postfix: nameof( ShowBaseBonus ) );
          }
       }
 
@@ -52,7 +52,7 @@ namespace ZyMod.MarsHorizon.Informed {
          links = bonus.Where( e => e.Value != 0 ).Select( e => new Data.Effect{ type = e.Key, strength = e.Value } ).ToArray();
       } catch ( Exception x ) { Err( x ); } }
 
-      private static readonly MethodInfo Refresh = typeof( BaseHighlightToolTipElement ).Method( "RefreshModifierListElement" );
+      private static readonly MethodInfo Refresh = typeof( BaseHighlightToolTipElement ).Method( "RefreshModifierListElement", typeof( Data.Building.AdjacencyLink ), typeof( BuildingModifierElement ) );
       private static readonly FieldInfo ModList = typeof( BaseHighlightToolTipElement ).Field( "modifierList" );
       private static readonly FieldInfo Name = typeof( BaseHighlightToolTipElement ).Field( "objectName" );
       private static readonly FieldInfo Cost = typeof( BaseHighlightToolTipElement ).Field( "clearCost" );

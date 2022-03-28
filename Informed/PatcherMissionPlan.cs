@@ -11,14 +11,14 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherMissionPlan : ModPatcher {
       internal void Apply () {
          if ( config.show_planet_launch_window ) {
-            TryPatch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
-            TryPatch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
-            TryPatch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
-            TryPatch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
-            TryPatch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
+            Patch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
+            Patch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );
+            Patch( typeof( MissionSelectSidebarToggle ), "OnClick", prefix: nameof( ShowLaunchWindow ) );
+            Patch( typeof( MissionSelectSidebarToggle ), "OnPointerClick", prefix: nameof( BlockLaunchWindowDblClick ) );
+            Patch( typeof( CalendarScreen ), "IHeaderData.GetTitle", postfix: nameof( SetCalendarTitle ) );
          }
          if ( config.show_mission_expiry || config.show_mission_payload )
-            TryPatch( typeof( MissionSidebarResearchRequirements ), "SetMission", postfix: nameof( ShowMissionExpiry ) );
+            Patch( typeof( MissionSidebarResearchRequirements ), "SetMission", postfix: nameof( ShowMissionExpiry ) );
       }
 
       private const string LaunchWindowGuid = "e019269c-9b9b-4ee3-ac1c-ee5c35f0e4f6";

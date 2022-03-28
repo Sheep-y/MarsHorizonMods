@@ -11,15 +11,15 @@ namespace ZyMod.MarsHorizon.Informed {
    internal class PatcherMainHUD : ModPatcher {
       internal void Apply () {
          if ( config.hint_dynamic_colour )
-            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
+            Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
          if ( config.hint_available_mission )
-            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintAvailableMission ) );
+            Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintAvailableMission ) );
          if ( config.hint_new_candidates )
-            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintNewCandidates ) );
+            Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintNewCandidates ) );
          if ( config.hint_propose_join_mission )
-            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintJointMission ) );
+            Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintJointMission ) );
          if ( config.hint_spacepedia_hide )
-            TryPatch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HideSpacepediaHint ) );
+            Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HideSpacepediaHint ) );
       }
 
       private static Sprite icoInfo, icoWarn;
