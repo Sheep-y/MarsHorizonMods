@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherBypass : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.bypass_fullscreen_notices )
             Patch( typeof( ClientViewer ).Method( "ShowMissionNotifications", typeof( NotificationCache ), typeof( bool ) ), prefix: nameof( BypassFullScreenNotices ) );
          if ( config.bypass_popups_notices )

@@ -6,58 +6,29 @@ using System.Reflection;
 using System.Text;
 using UnityModManagerNet;
 using static ZyMod.ModHelpers;
-using static ZyMod.ModComponent;
 
 namespace ZyMod.MarsHorizon.Zhant {
-
    [ BepInPlugin( "Zy.MarsHorizon.Zhant", "Traditional Chinese", "0.0.2022.0326" ) ]
    public class Plugin : BaseUnityPlugin {
-      private void Awake() => Mod.Main();
-      public void OnDestroy() => Mod.Unload();
+      private void Awake() { new BepInUtil().Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => MarsHorizonMod.Unload();
    }
 
-   [EnableReloading]
-   public static class UMM_Mod {
-      public static void Load ( UnityModManager.ModEntry modEntry ) {
-         ModDir = modEntry.Path;
-         Mod.Main();
-         modEntry.OnToggle = OnOff;
-         modEntry.OnUnload = ( _ ) => Mod.Unload();
-      }
-
-      private static bool OnOff ( UnityModManager.ModEntry modEntry, bool active ) {
-         Info( "UMM - Switching {0}.", active ? "On" : "Off" );
-         if ( ! active ) Mod.patchers.Values.FirstOrDefault()?.UnpatchAll();
-         else Mod.Load();
-         return true;
-      }
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
    }
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Zhant";
       public static void Main () => new Mod().Initialize();
-      internal static readonly Dictionary< Type, ModPatcher > patchers = new Dictionary< Type, ModPatcher >();
-      protected override void OnGameAssemblyLoaded ( Assembly game ) => Load();
-      internal static void Load () {
-         ModPatcher.config.Load();
-         if ( ! patchers.ContainsKey( typeof( PatcherL10N ) ) )
-            patchers.Add( typeof( PatcherL10N ), new PatcherL10N() );
-         foreach ( var p in patchers.Values ) p.Apply();
+      protected override void OnGameAssemblyLoaded ( Assembly game ) {
+         if ( ! configLoaded ) ModPatcher.config.Load();
+         ActivatePatcher( typeof( PatcherL10N ) );
       }
-      internal static bool Unload () { try {
-         Info( "Unloading." );
-         patchers.Values.FirstOrDefault()?.UnpatchAll();
-         foreach ( var p in patchers.Values ) p.Unload();
-         Log.Flush();
-         Log.LogLevel = System.Diagnostics.TraceLevel.Off;
-         return true;
-      } catch ( Exception x ) { return Err( x, false ); } }
    }
 
-   internal abstract class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
-      internal abstract void Apply();
-      internal virtual void Unload() { }
    }
 
    internal class Config : IniConfig {

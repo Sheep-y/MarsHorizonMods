@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherCinematic : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.skip_intro )
             //TryPatch( typeof( SplashDelayScene ), "Start", prefix: nameof( SkipSplash ) );
             SkipSplash();
@@ -49,17 +49,13 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
          return false;
       }
 
-      private static readonly HashSet< string > NonSkippable = new HashSet< string >();
       private static readonly HashSet< string > TempSkip = new HashSet< string >();
 
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance, bool ___isSkippable ) { try {
          if ( __result ) return;
          var id = __instance.CurrentCinematicBindingType.ToString();
          if ( ! ___isSkippable ) {
-            if ( ! NonSkippable.Contains( id ) ) {
-               Fine( "Non-skippable cinematic: {0}", id );
-               NonSkippable.Add( id );
-            }
+            Fine( "Non-skippable cinematic: {0}", id );
             return;
          }
          __result = ShouldSkip( id );
@@ -76,5 +72,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
             , c.nextPlanetaryBody, c.payload?.id, c.phaseIndex, c.taskIndex, c.vehicle?.isShuttle, c.vehicle?.isReusable
             , c.mission.requestMissionContext?.localisationReference, c.mission?.template?.minCrew );
       } catch ( Exception x ) { Err( x ); } }
+
+      internal override void Unload () => TempSkip.Clear();
    }
 }

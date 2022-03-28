@@ -1,30 +1,41 @@
-﻿using System;
+﻿using BepInEx;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
+   [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0326" ) ]
+   public class Plugin : BaseUnityPlugin {
+      private void Awake() { new BepInUtil().Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => MarsHorizonMod.Unload();
+   }
+
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   }
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "SkipAnimations";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         config.Load();
+         if ( ! configLoaded ) config.Load();
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
-            new PatcherCinematic().Apply();
+            ActivatePatcher( typeof( PatcherCinematic ) );
          if ( config.max_delay >= 0 || config.remove_delays || config.max_screen_fade >= 0 || config.skip_mission_intro ||
                config.fast_launch || config.fast_mission || config.fast_mission_result )
-            new PatcherAnimation().Apply();
+            ActivatePatcher( typeof( PatcherAnimation ) );
          if ( config.bypass_fullscreen_notices || config.bypass_popups_notices || config.auto_pass_normal_action )
-            new PatcherBypass().Apply();
+            ActivatePatcher( typeof( PatcherBypass ) );
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
    }
 

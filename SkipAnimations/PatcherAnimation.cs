@@ -9,7 +9,7 @@ using UnityEngine;
 namespace ZyMod.MarsHorizon.SkipAnimations {
 
    internal class PatcherAnimation : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.max_delay >= 0 ) {
             Patch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
             Patch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );

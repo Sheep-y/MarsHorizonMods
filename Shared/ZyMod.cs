@@ -37,7 +37,7 @@ namespace ZyMod {
    }
 
    public abstract class RootMod : ModComponent {
-      private static RootMod instance;
+      protected static RootMod instance;
 
       protected virtual bool IgnoreAssembly ( Assembly asm ) => asm is AssemblyBuilder || asm.FullName.StartsWith( "DMDASM." ) || asm.FullName.StartsWith( "HarmonyDTFAssembly" );
       protected virtual bool IsTargetAssembly ( Assembly asm ) => asm.GetName().Name == "Assembly-CSharp"; // If overrode, OnGameAssemblyLoaded may be called mutliple times
@@ -453,7 +453,7 @@ namespace ZyMod {
          lock ( sync ) if ( harmony == null ) return;
          var m = typeof( Harmony ).Method( "UnpatchAll", typeof( string ) ) ?? typeof( Harmony ).Method( "UnpatchId", typeof( string ) );
          if ( m == null ) return;
-         Info( "Unpatching all" );
+         Info( "Unpatching all." );
          m.Run( harmony, harmony.Id );
       }
       internal MethodInfo UnpatchAll ( MethodInfo orig ) {
@@ -551,7 +551,10 @@ namespace ZyMod {
          if ( level == TraceLevel.Error || FlushInterval == 0 ) Flush();
       }
 
-      protected virtual string Format ( TraceLevel level, string timeFormat, object msg, object[] arg ) {
+      protected virtual string Format ( TraceLevel level, string timeFormat, object msg, object[] arg )
+         => DefaultFormatter( level, knownErrors, timeFormat, msg, arg );
+
+      public static string DefaultFormatter ( TraceLevel level, ICollection<string> knownErrors, string timeFormat, object msg, params object[] arg ) {
          string tag = "INFO ";
          switch ( level ) {
             case TraceLevel.Off : return null;
@@ -559,17 +562,25 @@ namespace ZyMod {
             case TraceLevel.Warning : tag = "WARN " ; break;
             case TraceLevel.Verbose : tag = "FINE " ; break;
          }
+         if ( ! string.IsNullOrEmpty( timeFormat ) ) tag = DateTime.Now.ToString( timeFormat ) + tag;
+         return tag + DefaultFormatter( knownErrors, msg, arg );
+      }
+
+      public static string DefaultFormatter ( ICollection<string> knownErrors, object msg, params object[] arg ) {
          if ( arg != null ) for ( var i = arg.Length - 1 ; i >= 0 ; i-- ) if ( arg[i] is Func<string> f ) arg[i] = f();
          if ( msg is string txt && txt.Contains( '{' ) && arg?.Length > 0 ) msg = string.Format( msg.ToString(), arg );
-         else if ( msg is Exception ) { var str = msg.ToString(); lock ( knownErrors ) { if ( knownErrors.Contains( str ) ) return null; knownErrors.Add( str ); } msg = str; }
+         else if ( msg is Exception ) {
+            var str = msg.ToString();
+            if ( knownErrors != null ) lock ( knownErrors ) { if ( knownErrors.Contains( str ) ) return null; knownErrors.Add( str ); }
+            msg = str;
+         }
          #if DotNet35
          else if ( arg?.Length > 0 ) msg = string.Join( ", ", new object[] { msg }.Union( arg ).Select( e => e?.ToString() ?? "null" ).ToArray() );
          #else
          else if ( arg?.Length > 0 ) msg = string.Join( ", ", new object[] { msg }.Union( arg ).Select( e => e?.ToString() ?? "null" ) );
          #endif
          else msg = msg?.ToString();
-         if ( ! string.IsNullOrEmpty( timeFormat ) ) tag = DateTime.Now.ToString( timeFormat ) + tag;
-         return tag + ( msg?.ToString() ?? "null" );
+         return msg?.ToString() ?? "null";
       }
    }
    #endif
