@@ -11,8 +11,8 @@ using UnityModManagerNet;
 namespace ZyMod.MarsHorizon.SkipAnimations {
    [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0326" ) ]
    public class Plugin : BaseUnityPlugin {
-      private void Awake() { new BepInUtil().Setup( this, ModPatcher.config ); Mod.Main(); }
-      private void OnDestroy() => MarsHorizonMod.Unload();
+      private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => BepInUtil.Unbind();
    }
 
    [ EnableReloading ] public static class UMM_Mod {

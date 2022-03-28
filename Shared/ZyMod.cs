@@ -24,7 +24,8 @@ namespace ZyMod {
    public class ModComponent {
       protected static readonly object sync = new object();
       public static string ModName, ModPath, ModDir, AppDataDir;
-      public static LogFunc Logger { get; set; }
+      public static LogFunc _Logger;
+      public static LogFunc Logger { get { lock ( sync ) return _Logger; } set { lock ( sync ) _Logger = value; } }
       public static void Err ( object msg ) => Error( msg );
       public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
       public static void Error ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Error, msg, arg );

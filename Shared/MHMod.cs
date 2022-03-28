@@ -8,9 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using UnityModManagerNet;
-using static ZyMod.ModComponent;
 
 // Common base mod for Mars Horizon.  Find and initialize the correct class, set log and config path and name.
 namespace ZyMod.MarsHorizon {
@@ -50,11 +48,12 @@ namespace ZyMod.MarsHorizon {
          Info( "Unloading." );
          foreach ( var p in patchers.Values ) p.Unload();
          patchers.Clear();
-         if ( Log != null ) lock ( sync ) {
+         lock ( sync ) if ( Log != null ) {
             Log.Flush();
             Log.LogLevel = TraceLevel.Off;
             Log = null;
          }
+         Logger = null;
          return true;
       } catch ( Exception x ) { return Err( x, false ); } }
 
@@ -75,16 +74,21 @@ namespace ZyMod.MarsHorizon {
       }
    }
 
-   internal class BepInUtil {
-      internal void Setup ( BaseUnityPlugin mod, BaseConfig config = null ) {
+   internal class BepInUtil : ModComponent {
+      internal static void Setup ( BaseUnityPlugin mod, BaseConfig config = null ) {
          SetLogger( typeof( BaseUnityPlugin ).Property( "Logger" ).GetValue( mod ) as ManualLogSource );
          BindConfig( mod.Config, config );
          if ( mod.Info.Location != null ) Info( mod.Info.Location );
       }
 
-      private Dictionary< string, object > configBindings;
+      internal static void Unbind () {
+         MarsHorizonMod.Unload();
+         configBindings.Clear();
+      }
 
-      internal void BindConfig ( ConfigFile Config, BaseConfig conf ) { try {
+      private static Dictionary< string, object > configBindings;
+
+      internal static void BindConfig ( ConfigFile Config, BaseConfig conf ) { try {
          if ( Config == null || conf == null ) return;
          var type = conf.GetType();
          var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( conf, conf ) as IEnumerable< FieldInfo >;
@@ -110,45 +114,40 @@ namespace ZyMod.MarsHorizon {
             if ( configBindings == null ) configBindings = new Dictionary< string, object >();
             configBindings.Add( f.Name, b );
          }
-         if ( configBindings != null && configBindings.Count > 0 )
+         if ( configBindings?.Count > 0 )
             Config.ConfigReloaded += GetOnReloadListener( conf );
          MarsHorizonMod.configLoaded = true;
       } catch ( Exception x ) { Err( x ); } }
 
-      private bool TryGetBoxedValue ( object binding, out object value ) {
+      private static bool TryGetBoxedValue ( object binding, out object value ) {
          var box = binding.GetType().Property( "BoxedValue" );
          if ( box == null ) { value = null; return false; }
          value = box.GetValue( binding );
          return true;
       }
 
-      internal EventHandler GetOnChangeListener ( FieldInfo field, BaseConfig conf ) {
-         return ( _, evt ) => {
-            var e = evt as SettingChangedEventArgs;
-            if ( e == null || e.ChangedSetting == null ) return;
-            var val = e.ChangedSetting.BoxedValue;
-            Info( "Config {0} changed to {1}.", field, val );
-            field.SetValue( conf, val );
-            MarsHorizonMod.ReApply();
-         };
-      }
+      internal static EventHandler GetOnChangeListener ( FieldInfo field, BaseConfig conf ) { return ( _, evt ) => {
+         if ( ! ( evt is SettingChangedEventArgs e ) || e.ChangedSetting == null ) return;
+         var val = e.ChangedSetting.BoxedValue;
+         Info( "Config {0} changed to {1}.", field, val );
+         field.SetValue( conf, val );
+         MarsHorizonMod.ReApply();
+      }; }
 
-      internal EventHandler GetOnReloadListener ( BaseConfig conf ) {
-         return ( _, evt ) => {
-            var type = conf.GetType();
-            Info( "Config reloaded." );
-            foreach ( var b in configBindings ) {
-               if ( ! TryGetBoxedValue( b, out var val ) ) continue;
-               Info( "  {0} = {1}", b.Key, val );
-               type.Field( b.Key ).SetValue( conf, val );
-            }
-            MarsHorizonMod.ReApply();
-         };
-      }
+      internal static EventHandler GetOnReloadListener ( BaseConfig conf ) { return ( _, evt ) => {
+         var type = conf.GetType();
+         Info( "Config reloaded." );
+         foreach ( var b in configBindings ) {
+            if ( ! TryGetBoxedValue( b, out var val ) ) continue;
+            Fine( "Config {0} = {1}", b.Key, val );
+            type.Field( b.Key ).SetValue( conf, val );
+         }
+         MarsHorizonMod.ReApply();
+      }; }
 
       internal static void SetLogger ( ManualLogSource logger ) {
-         if ( logger == null ) { ModComponent.Logger = null; return; }
-         ModComponent.Logger = ( TraceLevel lv, object msg, object[] arg ) => {
+         if ( logger == null ) return;
+         Logger = ( TraceLevel lv, object msg, object[] arg ) => {
             object obj = msg is Exception ? msg : ZyLogger.DefaultFormatter( null, msg, arg );
             switch ( lv ) {
                case TraceLevel.Verbose : logger.LogDebug( obj ); break;
@@ -160,9 +159,9 @@ namespace ZyMod.MarsHorizon {
       }
    }
 
-   internal static class UMMUtil {
+   internal class UMMUtil : ModComponent {
       internal static void Init ( UnityModManager.ModEntry modEntry, Type modType ) {
-         ModDir = modEntry.Path;
+         lock ( sync ) ModDir = modEntry.Path;
          modType.Method( "Main" ).RunStatic();
          modEntry.OnToggle = ( _, on ) => { if ( on ) MarsHorizonMod.Apply(); else MarsHorizonMod.Unapply(); return true; };
          modEntry.OnUnload = ( _ ) => MarsHorizonMod.Unload();
