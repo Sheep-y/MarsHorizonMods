@@ -12,10 +12,16 @@ New saves made with this mod will still work when mod is disabled.
 
 # Installation #
 
-1. Setup Mars Horizon Mod Loader.
-2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
-3. Extract (Drag and Drop) `MH_DeepSpaceSlots.dll` into the game's `Mods` folder.
-4. Launch the game and enjoy.
+A mod loader is required.
+Supports BepInEx v5, Simple Mars Horizon Mod Loader, Unity Mod Manager, and Unity Doorstop.
+
+* **BepInEx** : Extract package to `BepInEx\plugins` folder.
+* **Simple Mars Horizon Mod Loader** : Extract package to `Mods` folder.
+* **Unity Mod Manager** : Drag and drop package or use the Install button.
+* **Unity Doorstop** : Edit `doorstop_config.ini`, set `targetAssembly` to path of mod dll.
+
+Folder/File locations are relative to game root.
+To unintall this mod, simply delete the files.
 
 
 # Default Mechanic #
@@ -57,13 +63,12 @@ Each setting have a short description that explains its effects.
 
 The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
 but should be compatible with Steam and Epic on Windows/Wine/Proton.
-All game languages are supported.
+All game languages supported.
 
-This mod does not change save games or game files.
-If a save is made with mission(s) on the deep space slots, and is later loaded without the mod,
-all missions will still be up and running. But you won't be able to launch new mission until the number of missions drops back to vanilla level.
-The same also happens if the mod config is changed leading to less missions to be transferred.
-
+This mod does not change saves or game files.
+If a game is saved with mission(s) in deep space slot(s), and is later loaded without the mod,
+all missions will still be up and running, but you cannot launch new mission until the number
+of missions drops to vanilla level.  The same may also happen if mod config is changed mid-game.
 
 
 # Troubleshoot #
@@ -93,16 +98,6 @@ The mod is configurable.  If it is not configured right, such as typos, the mod 
 
 If you delete the config file `DeepSpaceSlots.ini` from `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`,
 the mod will recreate it with default values.
-
-
-# Uninstall #
-
-To remove the mod, rename or delete `MH_DeepSpaceSlots.dll` from the game's `Mods` folder.
-
-If you are not using other mods, you may also remove the mod loader.
-Please refer to the mod loader's instructions.
-
-The mod does not modify game files, so there is no need to Verify Files.
 
 
 # License #

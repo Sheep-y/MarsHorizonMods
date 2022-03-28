@@ -58,16 +58,6 @@ https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 如果真的有錯誤，那大概要編程處理。補丁是開源的。
 
 
-# 反安裝 #
-
-從遊戲的 `Mods` 目錄中刪除 `MH_Zhant.dll` 和所有字型檔案。
-
-如果你沒有使用其他外掛，也可以反安裝包括 Mod Loader 在內的所有東西。
-也就是刪除遊戲目錄下的 `doorstop_config.ini`, `version.dll`, 和 `Mods` 目錄。
-
-本補丁不修改遊戲檔案，無復驗證修復。
-
-
 # 授權 #
 
 GPL v3.  字型皆採用 SIL OFL v1.1 授權。

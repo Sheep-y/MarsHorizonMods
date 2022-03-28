@@ -14,10 +14,16 @@ The game may also crash during mini-game, but it's something that also happens o
 
 # Installation #
 
-1. Setup Mars Horizon Mod Loader.
-2. Download latest mod release from GitHub or NexusMods.  Open with 7-zip.
-3. Extract (Drag and Drop) `MH_SkipAnimations.dll` into the game's `Mods` folder.
-4. Launch the game and enjoy.
+A mod loader is required.
+Supports BepInEx v5, Simple Mars Horizon Mod Loader, Unity Mod Manager, or Unity Doorstop.
+
+* **BepInEx** : Extract package to `BepInEx\plugins` folder.
+* **Simple Mars Horizon Mod Loader** : Extract package to `Mods` folder.
+* **Unity Mod Manager** : Drag and drop package or use the Install button.
+* **Unity Doorstop** : Edit `doorstop_config.ini`, set `targetAssembly` to path of mod dll.
+
+Folder/File locations are relative to game root.
+To unintall this mod, simply delete the files.
 
 
 ## The Story ##
@@ -135,16 +141,6 @@ The mod is configurable.  If it is not configured right, such as typos, the mod 
 
 If you delete the config file `SkipAnimations.ini` from `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`,
 the mod will recreate it with default values.
-
-
-# Uninstall #
-
-To remove the mod, rename or delete `MH_SkipAnimations.dll` from the game's `Mods` folder.
-
-If you are not using other mods, you may also remove the mod loader.
-Please refer to the mod loader's instructions.
-
-The mod does not modify game files, so there is no need to Verify Files.
 
 
 # License #
