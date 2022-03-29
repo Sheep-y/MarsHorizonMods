@@ -8,7 +8,7 @@ using System.Reflection;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherBaseScreen : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.show_base_bonus ) {
             Patch( typeof( AstroViewElement ), "Refresh", postfix: nameof( ClearBaseBonus ) );
             Patch( typeof( BaseScreen ), "EnterPurchaseState", postfix: nameof( HideBaseBonus ) );

@@ -1,24 +1,35 @@
-﻿using System;
+﻿using BepInEx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.MissionControl {
+   [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "0.0.2022.0326" ) ]
+   public class BIE_Mod : BaseUnityPlugin {
+      private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => BepInUtil.Unbind();
+   }
+
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   }
 
    public class Mod : MarsHorizonMod {
       public static void Main () => new Mod().Initialize();
       protected override string GetModName () => "MissionControl";
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         config.Load();
-         new PatcherMissionSim().Apply();
+         if ( ! configLoaded ) config.Load();
+         ActivatePatcher( typeof( PatcherMissionSim ) );
          if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 || config.milestone_challenge_no_duplicate_reward )
-            new PatcherMilestoneSim().Apply();
+            ActivatePatcher( typeof( PatcherMilestoneSim ) );
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
    }
 

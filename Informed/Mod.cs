@@ -1,32 +1,43 @@
 ﻿using Astronautica.View;
+using BepInEx;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.Informed {
+   [ BepInPlugin( "Zy.MarsHorizon.Informed", "Informed", "0.0.2022.0326" ) ]
+   public class BIE_Mod : BaseUnityPlugin {
+      private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => BepInUtil.Unbind();
+   }
+
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   }
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "Informed";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         config.Load();
+         if ( ! configLoaded ) config.Load();
          if ( config.show_base_bonus )
-            new PatcherBaseScreen().Apply();
+            ActivatePatcher( typeof( PatcherBaseScreen ) );
          if ( config.show_planet_launch_window || config.show_mission_expiry || config.show_mission_payload )
-            new PatcherMissionPlan().Apply();
+            ActivatePatcher( typeof( PatcherMissionPlan ) );
          if ( config.show_supplement_in_booster_description )
-            new PatcherResearchScreen().Apply();
+            ActivatePatcher( typeof( PatcherResearchScreen ) );
          if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 || config.show_contractor_effects_on_button )
-            new PatcherVehicleDesigner().Apply();
+            ActivatePatcher( typeof( PatcherVehicleDesigner ) );
          if ( config.hint_available_mission || config.hint_new_candidates || config.hint_propose_join_mission || config.hint_spacepedia_hide )
-            new PatcherMainHUD().Apply();
+            ActivatePatcher( typeof( PatcherMainHUD ) );
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
       internal static string Localise ( string tag, params string[] vars ) => MarsHorizonMod.Localise( tag, vars );
       internal static Client activeClient => Controller.Instance?.activeClient;

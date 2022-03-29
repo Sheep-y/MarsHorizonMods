@@ -11,7 +11,7 @@ using static Astronautica.Model.PayloadVariation.PayloadVariant.Type;
 namespace ZyMod.MarsHorizon.PayloadQA {
 
    internal class PatcherAutoResolve: ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.standalone_resolve_rng )
             Patch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
          Patch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )

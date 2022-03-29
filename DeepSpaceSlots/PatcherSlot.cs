@@ -9,7 +9,7 @@ using UnityEngine;
 namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
    internal class PatcherSlot : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          Patch( typeof( MissionSidebarScreen ), "SetState", prefix: nameof( RecalcMissionSlots ) );
          Patch( typeof( PlannedMissionsScreen ), "Setup", prefix: nameof( RecalcMissionSlots ) );
          Patch( typeof( MissionSummary ), "Setup", postfix: nameof( RecalcAfterPhase ) ); // Refresh after mission phase change

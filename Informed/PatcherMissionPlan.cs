@@ -9,7 +9,7 @@ using static Astronautica.Data;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMissionPlan : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.show_planet_launch_window ) {
             Patch( typeof( MissionSelectSidebarScreen ), "SetState", postfix: nameof( AddLaunchWindowButton ) );
             Patch( typeof( MissionSelectSidebarToggle ), "SetMission", prefix: nameof( SetLaunchWindowButton ) );

@@ -9,7 +9,7 @@ using System.Diagnostics;
 namespace ZyMod.MarsHorizon.MissionControl {
 
    internal class PatcherMissionSim: ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateSpaceTouristMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionType" ), prefix: nameof( SetMissionWeight ), postfix: nameof( LogMissionRemoval ) );

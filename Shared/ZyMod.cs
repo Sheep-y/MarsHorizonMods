@@ -77,10 +77,16 @@ namespace ZyMod {
 #endif
          OnGameAssemblyLoaded( asm );
          #if ! NoPatch
-         var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
-         Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+         CountPatches();
          #endif
       } catch ( Exception ex ) { Error( ex ); } }
+
+      #if ! NoPatch
+      protected virtual void CountPatches () {
+         var patches = new Harmony( ModName ).GetPatchedMethods().Select( e => Harmony.GetPatchInfo( e ) );
+         Info( "Bootstrap complete.  Patched {0} methods with {1} patches.", patches.Count(), patches.Sum( e => e.Prefixes.Count + e.Postfixes.Count + e.Transpilers.Count ) );
+      }
+      #endif
 
       protected virtual void SetModIO () { lock ( sync ) {
          if ( ModName == null ) ModName = GetModName() ?? "ZyMod";
@@ -302,7 +308,7 @@ namespace ZyMod {
    #if ! NoConfig
    public abstract class BaseConfig  : ModComponent { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
       protected virtual string GetFileExtension () => ".conf";
-      public virtual string GetDefaultPath () => Path.Combine( AppDataDir, ModName + GetFileExtension() );
+      public virtual string GetDefaultPath () { lock( sync ) return Path.Combine( AppDataDir, ModName + GetFileExtension() ); }
 
       public void Load () => Load( this );
       public void Load ( string path ) => Load( this, path );

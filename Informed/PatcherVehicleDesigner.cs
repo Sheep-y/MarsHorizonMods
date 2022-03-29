@@ -15,7 +15,7 @@ using static ZyMod.ModHelpers;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherVehicleDesigner : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.show_contractor_effects_on_button && eVal != null ) {
             Patch( typeof( VehicleDesignerContractorUpgradeInfo ), "Initialise", postfix: nameof( TrackContractorUpgradeInfo ) );
             Patch( typeof( ContractorUpgradeListItem<Data.Contractor> ), "Setup", prefix: nameof( TrackDesignerState ) );

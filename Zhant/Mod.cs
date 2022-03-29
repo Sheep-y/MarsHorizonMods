@@ -9,7 +9,7 @@ using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.Zhant {
    [ BepInPlugin( "Zy.MarsHorizon.Zhant", "Traditional Chinese", "0.0.2022.0326" ) ]
-   public class Plugin : BaseUnityPlugin {
+   public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
    }

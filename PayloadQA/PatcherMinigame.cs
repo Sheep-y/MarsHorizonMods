@@ -7,7 +7,7 @@ using System.Reflection;
 namespace ZyMod.MarsHorizon.PayloadQA {
 
    internal class PatcherMinigame: ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 ) {
             Patch( typeof( MissionGameplayModuleElement ), "SetReliabilityBar", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
             Patch( typeof( MissionGameplaySimulation ), "GetPayloadActionChances", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );

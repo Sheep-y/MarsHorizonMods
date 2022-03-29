@@ -1,20 +1,31 @@
 ﻿using Astronautica.View;
+using BepInEx;
 using System;
 using System.Reflection;
+using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.DeepSpaceSlots {
+   [ BepInPlugin( "Zy.MarsHorizon.DeepSpaceSlots", "Deep Space Slots", "0.0.2022.0326" ) ]
+   public class BIE_Mod : BaseUnityPlugin {
+      private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => BepInUtil.Unbind();
+   }
+
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   }
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "DeepSpaceSlots";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         config.Load();
-         new PatcherSlot().Apply();
+         if ( ! configLoaded ) config.Load();
+         ActivatePatcher( typeof( PatcherSlot ) );
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
       internal static Simulation simulation => Controller.Instance?.activeClient.simulation;
    }

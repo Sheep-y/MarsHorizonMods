@@ -9,7 +9,7 @@ using static Astronautica.Data;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherResearchScreen : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.show_supplement_in_booster_description ) {
             Patch( typeof( TutorialTooltipStats ), "SetupResearchBooster", prefix: nameof( SetSupplementList ), postfix: nameof( ClearSupplementList ) );
             Patch( typeof( TutorialTooltipStatItem ), "Set", postfix: nameof( AppendSupplementStats ) );

@@ -13,13 +13,13 @@ namespace ZyMod.MarsHorizon.PayloadQA {
          var config = ModPatcher.config;
          config.Load();
          if ( config.special_payload_ar_bonus > 0 || config.extra_crew_ar_bonus > 0 || config.power_payload_ar_crit > 0 || config.standalone_resolve_rng )
-            new PatcherAutoResolve().Apply();
+            ActivatePatcher( typeof( PatcherAutoResolve ) );
          if ( config.minigame_base_crit >= 0 || config.minigame_porportion_crit > 0 )
-            new PatcherMinigame().Apply();
+            ActivatePatcher( typeof( PatcherMinigame ) );
       }
    }
 
-   internal class ModPatcher : Patcher {
+   internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
    }
 

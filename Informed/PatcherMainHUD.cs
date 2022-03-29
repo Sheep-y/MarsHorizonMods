@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMainHUD : ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          if ( config.hint_dynamic_colour )
             Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
          if ( config.hint_available_mission )

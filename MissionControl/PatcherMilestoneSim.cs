@@ -11,7 +11,7 @@ using static Astronautica.Model.MilestoneChallenge.MilestoneChallenge;
 namespace ZyMod.MarsHorizon.MissionControl {
 
    internal class PatcherMilestoneSim: ModPatcher {
-      internal void Apply () {
+      internal override void Apply () {
          Patch( typeof( Simulation ), "GetNewMilestoneChallenge", prefix: nameof( CaptureCurrentReward ), postfix: nameof( ClearMilestoneChecks ) );
          Patch( typeof( Simulation ), "SetMilestoneChallengeReward", prefix: nameof( FilterMilestoneChallenge ) );
          Patch( typeof( Simulation ), "SetMilestoneChallengeReward", postfix: nameof( AdjustMilestoneChallengeFund ) );

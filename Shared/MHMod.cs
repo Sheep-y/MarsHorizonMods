@@ -21,7 +21,7 @@ namespace ZyMod.MarsHorizon {
 
    public abstract class MarsHorizonMod : RootMod {
 
-      internal static bool configLoaded = true;
+      internal static bool configLoaded;
 
       internal static readonly Dictionary< Type, MarsHorizonPatcher > patchers = new Dictionary< Type, MarsHorizonPatcher >();
 
@@ -33,7 +33,11 @@ namespace ZyMod.MarsHorizon {
          patcher.Apply();
       }
 
-      internal static void Apply () => ( instance as MarsHorizonMod )?.OnGameAssemblyLoaded( null );
+      internal static void Apply () { try {
+         var mod = instance as MarsHorizonMod;
+         mod?.OnGameAssemblyLoaded( null );
+         mod?.CountPatches();
+      } catch ( Exception x ) { Err( x ); } }
 
       internal static bool Unapply () { try {
          patchers.Values.FirstOrDefault( e => e.harmony != null )?.UnpatchAll();
@@ -76,9 +80,9 @@ namespace ZyMod.MarsHorizon {
 
    internal class BepInUtil : ModComponent {
       internal static void Setup ( BaseUnityPlugin mod, BaseConfig config = null ) {
+         lock( sync ) ModPath = mod.Info.Location;
          SetLogger( typeof( BaseUnityPlugin ).Property( "Logger" ).GetValue( mod ) as ManualLogSource );
          BindConfig( mod.Config, config );
-         if ( mod.Info.Location != null ) Info( mod.Info.Location );
       }
 
       internal static void Unbind () {
@@ -96,7 +100,7 @@ namespace ZyMod.MarsHorizon {
             e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
          var section = "";
          configBindings?.Clear();
-         Info( "Creating BepInEx config bindings." );
+         Info( "Loading config from BepInEx." );
          foreach ( var f in fields ) {
             if ( f.Name == "config_version" ) continue;
             var tags = f.GetCustomAttributes( true ).OfType<ConfigAttribute>();
@@ -104,7 +108,7 @@ namespace ZyMod.MarsHorizon {
             if ( sec?.Comment.Contains( '[' ) == true ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
             var defVal = f.GetValue( conf );
 
-            var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment );
+            var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" );
             if ( TryGetBoxedValue( b, out var val ) ) {
                if ( ! Equals( val, defVal ) ) f.SetValue( conf, val );
                Fine( "Config {0} = {1}", f.Name, val );
@@ -129,7 +133,7 @@ namespace ZyMod.MarsHorizon {
       internal static EventHandler GetOnChangeListener ( FieldInfo field, BaseConfig conf ) { return ( _, evt ) => {
          if ( ! ( evt is SettingChangedEventArgs e ) || e.ChangedSetting == null ) return;
          var val = e.ChangedSetting.BoxedValue;
-         Info( "Config {0} changed to {1}.", field, val );
+         Info( "Config {0} changed to {1}.", field.Name, val );
          field.SetValue( conf, val );
          MarsHorizonMod.ReApply();
       }; }
