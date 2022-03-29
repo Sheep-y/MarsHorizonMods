@@ -31,6 +31,8 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       }
 
+      internal override void Unapply () { cachedPre = cachedPost = null; }
+
       #region Contractor
       private static VehicleDesignerContractorUpgradeInfo upgradeInfo;
       private static VehicleDesignerState designerState;
