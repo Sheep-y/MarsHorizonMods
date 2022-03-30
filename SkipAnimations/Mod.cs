@@ -24,7 +24,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         if ( ! configLoaded ) config.Load();
+         config.Load();
          if ( config.skip_intro || config.skip_all_cinematic || config.skip_seen_cinematic || config.skip_seen_cinematic_until_exit || config.SkipCinematics.Count > 0 )
             ActivatePatcher( typeof( PatcherCinematic ) );
          if ( config.max_delay >= 0 || config.remove_delays || config.max_screen_fade >= 0 || config.skip_mission_intro ||

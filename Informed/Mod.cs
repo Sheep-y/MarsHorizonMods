@@ -24,7 +24,7 @@ namespace ZyMod.MarsHorizon.Informed {
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         if ( ! configLoaded ) config.Load();
+         config.Load();
          if ( config.show_base_bonus )
             ActivatePatcher( typeof( PatcherBaseScreen ) );
          if ( config.show_planet_launch_window || config.show_mission_expiry || config.show_mission_payload )

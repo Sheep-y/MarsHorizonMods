@@ -22,7 +22,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       protected override string GetModName () => "MissionControl";
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;
-         if ( ! configLoaded ) config.Load();
+         config.Load();
          ActivatePatcher( typeof( PatcherMissionSim ) );
          if ( config.milestone_challenge_fund_multiplier != 1 || config.milestone_challenge_research_highpass >= 0 || config.milestone_challenge_no_duplicate_reward )
             ActivatePatcher( typeof( PatcherMilestoneSim ) );

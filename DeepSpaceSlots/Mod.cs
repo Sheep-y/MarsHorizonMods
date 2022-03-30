@@ -19,8 +19,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       protected override string GetModName () => "DeepSpaceSlots";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
-         var config = ModPatcher.config;
-         if ( ! configLoaded ) config.Load();
+         ModPatcher.config.Load();
          ActivatePatcher( typeof( PatcherSlot ) );
       }
    }

@@ -24,8 +24,6 @@ namespace ZyMod.MarsHorizon {
 
    public abstract class MarsHorizonMod : RootMod {
 
-      internal static bool configLoaded;
-
       internal static readonly Dictionary< Type, MarsHorizonPatcher > patchers = new Dictionary< Type, MarsHorizonPatcher >();
 
       internal static void ActivatePatcher ( Type type ) {
@@ -81,11 +79,31 @@ namespace ZyMod.MarsHorizon {
       }
    }
 
-   internal class BepInUtil : ModComponent {
+   internal class BepInUtil : Patcher {
       internal static void Setup ( BaseUnityPlugin mod, BaseConfig config = null ) {
          lock( sync ) { BepInUtil.mod = mod; ModPath = mod.Info.Location; } // ModPath is null when loaded by ScriptEngine
          SetLogger( typeof( BaseUnityPlugin ).Property( "Logger" ).GetValue( mod ) as ManualLogSource );
-         BindConfig( mod.Config, config );
+         if ( config != null ) new BepInUtil().PatchConfig( config );
+      }
+
+      internal static void SetLogger ( ManualLogSource logger ) {
+         if ( logger == null ) return;
+         Logger = ( TraceLevel lv, object msg, object[] arg ) => {
+            object obj = msg is Exception ? msg : ZyLogger.DefaultFormatter( null, msg, arg );
+            switch ( lv ) {
+               case TraceLevel.Verbose : logger.LogDebug( obj ); break;
+               case TraceLevel.Info : logger.LogInfo( obj ); break;
+               case TraceLevel.Warning : logger.LogWarning( obj ); break;
+               case TraceLevel.Error : logger.LogError( obj ); break;
+            }
+         };
+      }
+
+      private void PatchConfig ( BaseConfig conf ) {
+         modConfig = conf;
+         Type bcType = typeof( BaseConfig ), strType = typeof( string );
+         Patch( bcType.Method( "OnLoading", strType ), prefix: nameof( LoadFromBep ) );
+         Patch( bcType.Method( "OnSaving", strType ), prefix: nameof( SaveToBep ) );
       }
 
       internal static void Unbind () {
@@ -98,23 +116,22 @@ namespace ZyMod.MarsHorizon {
       private static BaseConfig modConfig;
       private static Dictionary< FieldInfo, object > bindings;
 
-      internal static void BindConfig ( ConfigFile Config, BaseConfig conf ) { lock ( sync ) try {
-         if ( Config == null || conf == null ) return;
-         modConfig = conf;
-         Type type = conf.GetType(), strT = typeof( string );
-         var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( conf, conf ) as IEnumerable< FieldInfo >;
-         var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
-            e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
-         var section = "";
-         bindings?.Clear();
-         Info( "Loading config through BepInEx from {0}.", Config.ConfigFilePath );
-         foreach ( var f in fields ) BindConfigField( Config, f, bind, ref section );
-         new Harmony( ModName + ".Bep" ).Patch( type.Method( "OnSaving", strT ) ?? typeof( BaseConfig ).Method( "OnSaving", strT ),
-            prefix: new HarmonyMethod( typeof( BepInUtil ).Method( nameof( SaveToBep ) ) ) );
+      internal static bool LoadFromBep () { try {
+         lock ( sync ) if ( bindings == null ) {
+            var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
+               e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
+            var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( modConfig, modConfig ) as IEnumerable< FieldInfo >;
+            var section = "";
+            var Config = mod.Config;
+            Info( "Creating BepInEx config bindings." );
+            foreach ( var f in fields ) BindConfigField( Config, f, bind, ref section );
+            if ( bindings == null ) return false;
+            Config.ConfigReloaded += ReloadConfig;
+         }
+         LoadConfig( false );
          ValidateConfig();
-         if ( bindings?.Count > 0 ) Config.ConfigReloaded += GetOnReloadListener();
-         MarsHorizonMod.configLoaded = true;
-      } catch ( Exception x ) { Err( x ); } }
+         return false;
+      } catch ( Exception x ) { return Err( x, false ); } }
 
       private static void BindConfigField ( ConfigFile Config, FieldInfo f, MethodInfo bind, ref string section ) {
          if ( f.Name == "config_version" ) return;
@@ -122,13 +139,9 @@ namespace ZyMod.MarsHorizon {
          ConfigAttribute sec = tags.FirstOrDefault( e => e.Comment?.EndsWith( "]" ) == true ), desc = tags.LastOrDefault();
          if ( sec?.Comment.Contains( '[' ) == true ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
          var defVal = f.GetValue( modConfig );
-
          var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" );
-         if ( ! TryGetValues( null, b, out var val, out _ ) ) return;
-         if ( ! Equals( val, defVal ) ) f.SetValue( modConfig, val );
-         Fine( "Config {0} = {1}", f.Name, val );
-
-         b.GetType().GetEvent( "SettingChanged" )?.AddEventHandler( b, GetOnChangeListener( f ) );
+         if ( b == null ) return;
+         b.GetType().GetEvent( "SettingChanged" )?.AddEventHandler( b, (EventHandler) ReloadConfigField );
          if ( bindings == null ) bindings = new Dictionary< FieldInfo, object >();
          bindings.Add( f, b );
       }
@@ -141,26 +154,29 @@ namespace ZyMod.MarsHorizon {
          return true;
       }
 
-      internal static EventHandler GetOnChangeListener ( FieldInfo field ) { return ( _, evt ) => {
+      internal static void ReloadConfigField ( object _, object evt ) {
          if ( ! ( evt is SettingChangedEventArgs e ) || e.ChangedSetting == null ) return;
+         var b = e.ChangedSetting;
          lock ( sync ) {
-            object bVal = e.ChangedSetting.BoxedValue, myVal = field.GetValue( modConfig );
-            if ( Equals( bVal, myVal ) ) return;
+            var field = bindings.Keys.FirstOrDefault( f => f.Name == b.Definition.Key );
+            object bVal = b.BoxedValue, myVal = field?.GetValue( modConfig );
+            if ( field == null || Equals( bVal, myVal ) ) return;
             Info( "Config {0} changed to {1} by BepInEx.", field.Name, bVal );
             field.SetValue( modConfig, bVal );
          }
          ScheduleReapply();
-      }; }
+      }
 
-      internal static EventHandler GetOnReloadListener () { return ( _, evt ) => {
-         Info( "Config reloaded by BepInEx." );
+      internal static void ReloadConfig ( object _, object evt ) => LoadConfig( true );
+      internal static void LoadConfig ( bool reapply ) {
+         Info( "Syncing config from BepInEx from {0}.", mod.Config.ConfigFilePath );
          lock ( sync ) foreach ( var b in bindings ) {
             if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) || Equals( bVal, myVal ) ) continue;
             Fine( "Config {0} = {1}", b.Key.Name, bVal );
             b.Key.SetValue( modConfig, bVal );
          }
-         ScheduleReapply();
-      }; }
+         if ( reapply ) ScheduleReapply();
+      }
 
       private static Task ReapplyMod;
 
@@ -185,7 +201,7 @@ namespace ZyMod.MarsHorizon {
       }
 
       private static void SyncToBep () {
-         foreach ( var b in bindings ) {
+         lock ( sync ) foreach ( var b in bindings ) {
             if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) || Equals( bVal, myVal ) ) continue;
             Fine( "Sync Config {0} ({1}) to BepInEx ({2}).", b.Key.Name, myVal, bVal );
             b.Value.GetType().Property( "BoxedValue" ).SetValue( b.Value, myVal );
@@ -194,22 +210,9 @@ namespace ZyMod.MarsHorizon {
  
       private static bool SaveToBep ( ref bool __result ) { try {
          __result = false;
-         lock ( sync ) SyncToBep();
+         SyncToBep();
          return false;
       } catch ( Exception x ) { return Err( x, false ); } }
-
-      internal static void SetLogger ( ManualLogSource logger ) {
-         if ( logger == null ) return;
-         Logger = ( TraceLevel lv, object msg, object[] arg ) => {
-            object obj = msg is Exception ? msg : ZyLogger.DefaultFormatter( null, msg, arg );
-            switch ( lv ) {
-               case TraceLevel.Verbose : logger.LogDebug( obj ); break;
-               case TraceLevel.Info : logger.LogInfo( obj ); break;
-               case TraceLevel.Warning : logger.LogWarning( obj ); break;
-               case TraceLevel.Error : logger.LogError( obj ); break;
-            }
-         };
-      }
    }
 
    internal class UMMUtil : ModComponent {

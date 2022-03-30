@@ -445,8 +445,10 @@ namespace ZyMod {
          } }
       };
 
+      protected virtual string GetHarmonyId () => ModName ?? Assembly.GetExecutingAssembly().CodeBase;
+
       private ModPatch DoPatch ( MethodBase method, string prefix = null, string postfix = null, string transpiler = null ) {
-         lock ( sync ) if ( harmony == null ) harmony = new Harmony( ModName );
+         lock ( sync ) if ( harmony == null ) harmony = new Harmony( GetHarmonyId() );
          Fine( "Patching {0} {1} | Pre: {2} | Post: {3} | Trans: {4}", method.DeclaringType, method, prefix, postfix, transpiler );
          var patch = new ModPatch( harmony, method ) { prefix = ToHarmony( prefix ), postfix = ToHarmony( postfix ), transpiler = ToHarmony( transpiler ) };
          harmony.Patch( method, patch.prefix, patch.postfix, patch.transpiler );
