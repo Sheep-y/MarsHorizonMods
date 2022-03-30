@@ -171,8 +171,10 @@ namespace ZyMod.MarsHorizon {
       internal static void LoadConfig ( bool reapply ) {
          Info( "Syncing config from BepInEx from {0}.", mod.Config.ConfigFilePath );
          lock ( sync ) foreach ( var b in bindings ) {
-            if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) || Equals( bVal, myVal ) ) continue;
-            Fine( "Config {0} = {1}", b.Key.Name, bVal );
+            if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) ) continue;
+            var same = Equals( bVal, myVal );
+            if ( ! same || ! reapply ) Fine( "Config {0} = {1}", b.Key.Name, bVal );
+            if ( same ) continue;
             b.Key.SetValue( modConfig, bVal );
          }
          if ( reapply ) ScheduleReapply();
