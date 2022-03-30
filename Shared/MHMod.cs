@@ -114,20 +114,19 @@ namespace ZyMod.MarsHorizon {
 
       private static BaseUnityPlugin mod;
       private static BaseConfig modConfig;
-      private static Dictionary< FieldInfo, object > bindings;
+      private static Dictionary< FieldInfo, ConfigEntryBase > bindings;
 
-      internal static bool LoadFromBep ( ref bool __result ) { try {
+      internal static bool LoadFromBep ( ref bool __result ) { try { // Replaces BaseConfig.OnLoading
          __result = false;
          lock ( sync ) if ( bindings == null ) {
             var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
                e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
             var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( modConfig, modConfig ) as IEnumerable< FieldInfo >;
             var section = "";
-            var Config = mod.Config;
             Info( "Creating BepInEx config bindings." );
-            foreach ( var f in fields ) BindConfigField( Config, f, bind, ref section );
+            foreach ( var f in fields ) BindConfigField( mod.Config, f, bind, ref section );
             if ( bindings == null ) return false;
-            Config.ConfigReloaded += ReloadConfig;
+            mod.Config.ConfigReloaded += ReloadConfig;
          }
          LoadConfig( false );
          ValidateConfig();
@@ -135,27 +134,18 @@ namespace ZyMod.MarsHorizon {
       } catch ( Exception x ) { return Err( x, false ); } }
 
       private static void BindConfigField ( ConfigFile Config, FieldInfo f, MethodInfo bind, ref string section ) {
-         if ( f.Name == "config_version" ) return;
          var tags = f.GetCustomAttributes( true ).OfType<ConfigAttribute>();
-         ConfigAttribute sec = tags.FirstOrDefault( e => e.Comment?.EndsWith( "]" ) == true ), desc = tags.LastOrDefault();
-         if ( sec?.Comment.Contains( '[' ) == true ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
+         ConfigAttribute sec = tags.FirstOrDefault( e => e.Comment?.Contains( "[" ) == true ), desc = tags.LastOrDefault();
+         if ( sec != null ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
          var defVal = f.GetValue( modConfig );
-         var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" );
+         var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" ) as ConfigEntryBase;
          if ( b == null ) return;
          b.GetType().GetEvent( "SettingChanged" )?.AddEventHandler( b, (EventHandler) ReloadConfigField );
-         if ( bindings == null ) bindings = new Dictionary< FieldInfo, object >();
+         if ( bindings == null ) bindings = new Dictionary< FieldInfo, ConfigEntryBase >();
          bindings.Add( f, b );
       }
 
-      private static bool TryGetValues ( FieldInfo confField, object binding, out object bVal, out object myVal ) {
-         var box = binding.GetType().Property( "BoxedValue" );
-         if ( box == null ) { Warn( "Cannot get BoxedValue from {0}.", binding ); bVal = myVal = null; return false; }
-         bVal = box.GetValue( binding );
-         myVal = confField?.GetValue( modConfig );
-         return true;
-      }
-
-      internal static void ReloadConfigField ( object _, object evt ) {
+      internal static void ReloadConfigField ( object _, object evt ) { // Listen to ConfigEntry.SettingChanged
          if ( ! ( evt is SettingChangedEventArgs e ) || e.ChangedSetting == null ) return;
          var b = e.ChangedSetting;
          lock ( sync ) {
@@ -168,11 +158,11 @@ namespace ZyMod.MarsHorizon {
          ScheduleReapply();
       }
 
-      internal static void ReloadConfig ( object _, object evt ) => LoadConfig( true );
+      internal static void ReloadConfig ( object _, object evt ) => LoadConfig( true ); // Listen to Config.ConfigReloaded
       internal static void LoadConfig ( bool reapply ) {
          Info( "Syncing config from BepInEx from {0}.", mod.Config.ConfigFilePath );
          lock ( sync ) foreach ( var b in bindings ) {
-            if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) ) continue;
+            object bVal = b.Value.BoxedValue, myVal = b.Key.GetValue( modConfig );
             var same = Equals( bVal, myVal );
             if ( ! same || ! reapply ) Fine( "Config {0} = {1}", b.Key.Name, bVal );
             if ( same ) continue;
@@ -183,7 +173,7 @@ namespace ZyMod.MarsHorizon {
 
       private static Task ReapplyMod;
 
-      private static void ScheduleReapply () { lock ( sync ) {
+      private static void ScheduleReapply () { lock ( sync ) { // Called after config is changed or reloaded.
          if ( ReapplyMod != null || mod == null ) return;
          ReapplyMod = Task.Run( async () => {
             await Task.Delay( 50 );
@@ -199,19 +189,20 @@ namespace ZyMod.MarsHorizon {
       }
 
       private static void ValidateConfig () {
-         modConfig.GetType().Method( "OnLoad", typeof( string ) )?.Run( modConfig, mod?.Config.ConfigFilePath );
+         typeof( BaseConfig ).Method( "OnLoad", typeof( string ) )?.Run( modConfig, mod?.Config.ConfigFilePath );
          SyncToBep();
       }
 
-      private static void SyncToBep () {
+      private static void SyncToBep () { // Called after OnLoad fixed things, or on BaseConfig.Save
          lock ( sync ) foreach ( var b in bindings ) {
-            if ( ! TryGetValues( b.Key, b.Value, out var bVal, out var myVal ) || Equals( bVal, myVal ) ) continue;
+            object bVal = b.Value.BoxedValue, myVal = b.Key.GetValue( modConfig );
+            if ( Equals( bVal, myVal ) ) continue;
             Fine( "Sync Config {0} ({1}) to BepInEx ({2}).", b.Key.Name, myVal, bVal );
-            b.Value.GetType().Property( "BoxedValue" ).SetValue( b.Value, myVal );
+            b.Value.BoxedValue = myVal;
          }
       }
  
-      private static bool SaveToBep ( ref bool __result ) { try {
+      private static bool SaveToBep ( ref bool __result ) { try { // Replaces BaseConfig.OnSaving
          __result = false;
          SyncToBep();
          return false;
