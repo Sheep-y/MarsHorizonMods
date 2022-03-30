@@ -108,17 +108,15 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20200304;
 
-      public override void Load ( object subject, string path ) {
-         base.Load( subject, path );
-         if ( ! ( subject is Config conf ) ) return;
-         if ( conf.challenging_weight_multiplier < 0 ) conf.challenging_weight_multiplier = 1;
-         if ( conf.experimental_weight_multiplier < 0 ) conf.experimental_weight_multiplier = 1;
-         if ( conf.lucrative_weight_multiplier < 0 ) conf.lucrative_weight_multiplier = 1;
-         if ( conf.lucrative_weight_multiplier_opening < 0 ) conf.lucrative_weight_multiplier_opening = 1;
-         if ( conf.lucrative_weight_multiplier_full_tech < 0 ) conf.lucrative_weight_multiplier_full_tech = 1;
-         if ( conf.publicised_weight_multiplier < 0 ) conf.publicised_weight_multiplier = 1;
-         if ( conf.test_weight_multiplier < 0 ) conf.test_weight_multiplier = 1;
-         if ( conf.variation_weight_divider < 0 ) conf.variation_weight_divider = 1;
+      protected override void OnLoad ( string _ ) {
+         if ( challenging_weight_multiplier < 0 ) challenging_weight_multiplier = 1;
+         if ( experimental_weight_multiplier < 0 ) experimental_weight_multiplier = 1;
+         if ( lucrative_weight_multiplier < 0 ) lucrative_weight_multiplier = 1;
+         if ( lucrative_weight_multiplier_opening < 0 ) lucrative_weight_multiplier_opening = 1;
+         if ( lucrative_weight_multiplier_full_tech < 0 ) lucrative_weight_multiplier_full_tech = 1;
+         if ( publicised_weight_multiplier < 0 ) publicised_weight_multiplier = 1;
+         if ( test_weight_multiplier < 0 ) test_weight_multiplier = 1;
+         if ( variation_weight_divider < 0 ) variation_weight_divider = 1;
       }
    }
 }

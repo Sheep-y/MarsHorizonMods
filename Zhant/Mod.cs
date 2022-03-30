@@ -51,15 +51,13 @@ namespace ZyMod.MarsHorizon.Zhant {
       [ Config( "本設定檔的版本號。敬請勿動。" ) ]
       public int config_version = 20200322;
 
-      public override void Load ( object subject, string path ) {
-         base.Load( subject, path );
-         if ( ! ( subject is Config conf ) ) return;
-         conf.atlas_height = Math.Min( Math.Max( 512, conf.atlas_height ), 16384 );
-         conf.atlas_width = Math.Min( Math.Max( 512, conf.atlas_width ), 16384 );
-         conf.sample_size_other = Math.Max( 8, conf.sample_size_other );
-         conf.sample_size_normal = Math.Max( 8, conf.sample_size_normal );
-         if ( ! Rational( conf.padding_ratio ) || conf.padding_ratio < 0 )
-            conf.padding_ratio = 0.1f;
+      protected override void OnLoad ( string _ ) {
+         atlas_height = Math.Min( Math.Max( 512, atlas_height ), 16384 );
+         atlas_width = Math.Min( Math.Max( 512, atlas_width ), 16384 );
+         sample_size_other = Math.Max( 8, sample_size_other );
+         sample_size_normal = Math.Max( 8, sample_size_normal );
+         if ( ! Rational( padding_ratio ) || padding_ratio < 0 )
+            padding_ratio = 0.1f;
       }
    }
 

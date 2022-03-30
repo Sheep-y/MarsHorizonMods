@@ -309,6 +309,10 @@ namespace ZyMod {
    public abstract class BaseConfig  : ModComponent { // Abstract code to load and save simple config object to text-based file.  By default only process public instant fields, may be filtered by attributes.
       protected virtual string GetFileExtension () => ".conf";
       public virtual string GetDefaultPath () { lock( sync ) return Path.Combine( AppDataDir, ModName + GetFileExtension() ); }
+      protected virtual bool OnLoading ( string from ) => true;
+      protected virtual void OnLoad ( string from ) { }
+      protected virtual bool OnSaving ( string to ) => true;
+      protected virtual void OnSave ( string to ) { }
 
       public void Load () => Load( this );
       public void Load ( string path ) => Load( this, path );
@@ -316,12 +320,15 @@ namespace ZyMod {
       public void Load < T > ( out T subject ) where T : new() => Load( subject = new T() );
       public void Load < T > ( out T subject, string path ) where T : new() => Load( subject = new T(), path );
       public virtual void Load ( object subject, string path ) { try {
+         var conf = subject as BaseConfig;
+         if ( conf?.OnLoading( path ) == false ) return;
          if ( ! File.Exists( path ) ) {
             Save( subject, path );
          } else {
             Info( "Loading {0} into {1}", path, subject.GetType().FullName );
             _ReadFile( subject, path );
          }
+         conf?.OnLoad( path );
          foreach ( var prop in GetType().GetFields() ) Info( "Config {0} = {1}", prop.Name, prop.GetValue( this ) );
       } catch ( Exception ex ) { Warn( ex ); } }
 
@@ -340,6 +347,8 @@ namespace ZyMod {
       public void Save ( object subject ) => Save( subject, GetDefaultPath() );
       public virtual void Save ( object subject, string path ) { try {
          if ( subject == null ) { File.Delete( path ); return; }
+         var conf = subject as BaseConfig;
+         if ( conf?.OnSaving( path ) == false ) return;
          var type = subject.GetType();
          Info( "Writing {0} from {1}", path, type.FullName );
          using ( TextWriter tw = File.CreateText( path ) ) {
@@ -349,6 +358,7 @@ namespace ZyMod {
             _WriteData( tw, subject, type, subject, null );
          }
          Fine( "{0} bytes written", (Func<string>) ( () => new FileInfo( path ).Length.ToString() ) );
+         conf?.OnSave( path );
       } catch ( Exception ex ) { Warn( "Cannot create config file" ); Warn( ex ); } }
 
       protected virtual IEnumerable< string > _GetComments ( MemberInfo mem )

@@ -88,8 +88,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
 
       internal readonly HashSet< string > SkipCinematics = new HashSet< string >();
 
-      public override void Load ( object subject, string path ) { try {
-         base.Load( subject, path );
+      protected override void OnLoad ( string _ ) { try {
          if ( string.Equals( skip_cinematics, "default", StringComparison.InvariantCultureIgnoreCase ) ) {
             skip_cinematics = new Config().skip_cinematics;
             Task.Run( Save );
