@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.Informed {
@@ -32,7 +33,7 @@ namespace ZyMod.MarsHorizon.Informed {
             ActivatePatcher( typeof( PatcherResearchScreen ) );
          if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 || config.show_contractor_effects_on_button )
             ActivatePatcher( typeof( PatcherVehicleDesigner ) );
-         if ( config.hint_available_mission || config.hint_new_candidates || config.hint_propose_join_mission || config.hint_spacepedia_hide )
+         if ( config.hint_available_mission || config.hint_new_candidates || config.hint_propose_join_mission || config.hint_spacepedia_hide || config.show_final_funding_tier )
             ActivatePatcher( typeof( PatcherMainHUD ) );
       }
    }
@@ -46,11 +47,6 @@ namespace ZyMod.MarsHorizon.Informed {
    }
 
    internal class Config : IniConfig {
-      [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default True." ) ]
-      public bool show_base_bonus = true;
-      [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
-      public bool show_supplement_in_booster_description = true;
-
       [ Config( "\r\n[Vehicle Designer]" ) ]
       [ Config( "On vehicle designer screen, show launch window up to this many months before vehicle is ready.  Default 2.  0 to not show.  Max 6." ) ]
       public byte launch_window_hint_before_ready = 2;
@@ -67,13 +63,15 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Show contractor effects on contractor buttons.  Default True." ) ]
       public bool show_contractor_effects_on_button = true;
 
-      [ Config( "\r\n[Solar System]" ) ]
+      [ Config( "\r\n[Planet Mission Screen]" ) ]
       [ Config( "Add a Launch Window button on planetery body mission list.  Default True." ) ]
       public bool show_planet_launch_window = true;
       [ Config( "Show expiry countdown for request and joint missions.  Default True." ) ]
       public bool show_mission_expiry = true;
       [ Config( "Show payload(s) time and weight of researched but unplanned mission.  Default True." ) ]
       public bool show_mission_payload = true;
+
+      [ Config( "\r\n[Solar System]" ) ]
       [ Config( "Show an icon next to mission button when a slot is available.  Default True." ) ]
       public bool hint_available_mission = true;
       [ Config( "Show an icon next to crew button when new candidates are available.  Default True." ) ]
@@ -85,15 +83,25 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Toggle highlight colour and icon to distinguish vanilla notices (warnings) and mod notice (info).  Default True." ) ]
       public bool hint_dynamic_colour = true;
 
+      [ Config( "\r\n[Misc]" ) ]
+      [ Config( "Show base bonus on base screen, when not in build/edit/clear mode.  Default True." ) ]
+      public bool show_base_bonus = true;
+      [ Config( "Show which supplements can be installed on booster on research screen.  Default True." ) ]
+      public bool show_supplement_in_booster_description = true;
+      [ Config( "Show the final tier on next funding, instead of current tier + 1.  Default True." ) ]
+      public bool show_final_funding_tier = true;
+
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200226;
+      public int config_version = 20220330;
 
-      public override void Load ( object subject, string path ) {
-         base.Load( subject, path );
-         if ( ! ( subject is Config conf ) ) return;
-         conf.launch_window_hint_before_ready = Math.Min( conf.launch_window_hint_before_ready, (byte) 6 );
-         conf.launch_window_hint_after_ready  = Math.Min( conf.launch_window_hint_after_ready, (byte) 24 );
+      protected override void OnLoad ( string _ ) {
+         launch_window_hint_before_ready = Math.Min( launch_window_hint_before_ready, (byte) 6 );
+         launch_window_hint_after_ready  = Math.Min( launch_window_hint_after_ready, (byte) 24 );
+         if ( config_version < 20220330 ) { // Added: show_final_funding_tier
+            config_version = 20220330;
+            Task.Run( Save );
+         }
       }
    }
 

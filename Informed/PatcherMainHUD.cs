@@ -10,6 +10,10 @@ namespace ZyMod.MarsHorizon.Informed {
 
    internal class PatcherMainHUD : ModPatcher {
       internal override void Apply () {
+         if ( config.show_final_funding_tier ) {
+            Patch( typeof( ResourcesScreenFunding ), "Show", prefix: nameof( CheckFunding ), postfix: nameof( ClearFunding ) );
+            Patch( typeof( Simulation ).Method( "GetAgencyFundingTier", typeof( Agency ), typeof( int ) ), prefix: nameof( GetFinalFundingTier ) );
+         }
          if ( config.hint_dynamic_colour )
             Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( GetInfoIcon ) );
          if ( config.hint_available_mission )
@@ -20,6 +24,27 @@ namespace ZyMod.MarsHorizon.Informed {
             Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HintJointMission ) );
          if ( config.hint_spacepedia_hide )
             Patch( typeof( HUDScreenSelect ), "_Refresh", postfix: nameof( HideSpacepediaHint ) );
+      }
+
+      private static int currTier = -1;
+
+      private static void CheckFunding () => currTier = 0;
+      private static void ClearFunding () => currTier = -1;
+
+      private static void GetFinalFundingTier ( Simulation __instance, Agency agency, ref int tier ) {
+         if ( currTier < 0 ) return;
+         Info( "Curr {0}, In = {1}, support = {2}", currTier, tier, agency.support );
+         if ( currTier == 0 ) { currTier = tier; return; }
+         if ( tier <= currTier ) return;
+         try {
+            var curr = tier;
+            var tiers = __instance.universe.scenario.agencies[ agency.type - Agency.Type.USA ].fundingTiers;
+            var final = tiers.Find( e => e.requiredSupport >= agency.support );
+            if ( final != null && final.tier > tier ) {
+               Info( "Upgrading Next Tier from {0} to {1} ({2}/{3}).", tier, final.tier, agency.support, final.requiredSupport );
+               tier = final.tier;
+            }
+         } catch ( Exception x ) { Err( x ); }
       }
 
       private static Sprite icoInfo, icoWarn;
