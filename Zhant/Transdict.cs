@@ -67,14 +67,9 @@ namespace ZyMod.MarsHorizon.Zhant {
             "簡體中文",  "中文",
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
             "{Name_{buildingId}}待完成",  "{Name_{buildingId}}完成",
-            "{agency}已完成{{mission}}的{phase}階段",  "{agency}已完成{{mission}}的階段{phase}",
-            "新的聯合任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}聯合任務",
-            "新的請求任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}請求任務",
-            "{agency}下個月將會推出{{mission}}！",  "{agency}將於下個月發射{{mission}}！",
-            "{{mission}}預備下一階段！",  "{{mission}}的下一階段已就緒！",
             "{Name_{buildingId}}已完成",  "{Name_{buildingId}}建造完畢",
-            "{payload}已完成",  "{payload}建造完畢",
-            "{vehicle}已完成",  "{vehicle}建造完畢",
+            "{limit} 的 {current}", "最大 {limit}，現有 {current}",
+            "{total} 的 {current}", "{current}/{total}",
             "上下文", "過去、現在、未來",
             "雙薪", "眼疾手快",
             "已公開", "公眾關注",
@@ -118,6 +113,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             "所有與科學相關的毗鄰建築獎金增加一倍", "與科學相關的建築物毗鄰效應全部翻倍",
 
             // Payload / Vehicle / Installation
+            "{payload}已完成",  "{payload}建造完畢",
+            "{vehicle}已完成",  "{vehicle}建造完畢",
             "運載火箭檢查", "載具檢查",
             "由於發射條件不利，發射可靠性懲罰減半", "將發射條件不利導致的發射可靠性減半",
             "宇航員時段 +{strength}", "宇航員數量 +{strength}",
@@ -126,6 +123,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "{Name_{building}}安裝已過期", "{Name_{building}}完成使命",
             "發射所需的{Building_Effect_{launchpad}}！", "需要{Building_Effect_{launchpad}}才能發射！",
             "起動電源", "初始電力",
+            "{duration} 建造時間", "建做需時 {duration}",
  
             // Training
             "基地科學獎勵", "基本科學回報",
@@ -137,9 +135,15 @@ namespace ZyMod.MarsHorizon.Zhant {
             "你尚未選擇訓練簡介。此任務並無發放任何訓練獎金。", "尚未選擇任務訓練，本任務未能受益。",
 
             // Mission
+            "{{mission}}預備下一階段！",  "{{mission}}的下一階段已就緒！",
+            "{agency}已完成{{mission}}的{phase}階段",  "{agency}已完成{{mission}}的階段{phase}",
+            "新的聯合任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}聯合任務",
+            "新的請求任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}請求任務",
+            "{agency}下個月將會推出{{mission}}！",  "{agency}將於下個月發射{{mission}}！",
+            "{agency}已完成{{mission}}（{rank}）", "{agency}已達成{{mission}}（{rank}）",
+            "超過 {turns} 個月獲得 {value}", "{value}，用 {turn} 個月攤分",
             "完成獎金將在下項工作開始時發放", "完成後的額外回報會累加到下項工作",
             "在本回合中重置", "重置本回合的",
-            "{agency}已完成{{mission}}（{rank}）", "{agency}已達成{{mission}}（{rank}）",
 
             // Other
             "備用電源發電機", "備用發電機",
@@ -179,6 +183,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
             "没有任何有效任務", "没有任何進行中的任務",
             "有效任務", "任務列表",
+            "沒有任何任務列表。要尋找可用任務，", "沒有任務。要尋找可以規劃的任務",
             "表面棲息地", "地面居所",
             "變軌彈道", "轉移航道",
             "準備狀態", "技術指標",
@@ -196,6 +201,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "電源", "電力",
             "總是供應不足！", "總是不夠用！",
             "預備發射！", "發射就緒！",
+            "{total} 中的 {value}", "{value}/{total} ",
 
             "剩余", "剩餘",
             "明了", "明瞭",
@@ -225,9 +231,9 @@ namespace ZyMod.MarsHorizon.Zhant {
             for ( var i = 0 ; i < content.Length ; i += 2 )
                w.WriteCsvLine( content[ i ], content[ i + 1 ] );
          }
-      } catch ( Exception x ) {
+      } catch ( SystemException x ) {
          Error( x );
-         try { File.Delete( file ); } catch ( Exception ) { }
+         try { File.Delete( file ); } catch ( SystemException ) { }
       } }
    }
 }
