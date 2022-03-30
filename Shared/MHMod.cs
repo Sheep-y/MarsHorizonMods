@@ -116,7 +116,8 @@ namespace ZyMod.MarsHorizon {
       private static BaseConfig modConfig;
       private static Dictionary< FieldInfo, object > bindings;
 
-      internal static bool LoadFromBep () { try {
+      internal static bool LoadFromBep ( ref bool __result ) { try {
+         __result = false;
          lock ( sync ) if ( bindings == null ) {
             var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
                e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
