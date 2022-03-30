@@ -54,8 +54,10 @@ namespace ZyMod.MarsHorizon.Zhant {
       } catch ( Exception x ) { Err( x ); } } }
 
       private static void ApplyZhPatches () {
-         if ( patchZh == null )
+         if ( patchZh == null ) {
             patchZh = me.Patch( typeof( Localisation ).Method( "Interpolate", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( ToZht ) );
+            me.Patch( typeof( Localisation ).Method( "Localise", typeof( string ), typeof( Dictionary<string, string> ) ), prefix: nameof( LogTag ) );
+         }
          if ( patchFont == null )
             patchFont = me.Patch( typeof( UIStateController ), "SetViewState", postfix: nameof( SetZhtFont ) );
          Transdict.LoadDicts();
@@ -107,6 +109,9 @@ namespace ZyMod.MarsHorizon.Zhant {
          Info( "Inserting {0} at end of {1}.", font.name, fname );
          fb.Add( font );
       }
+
+      internal static string l10nTag;
+      private static void LogTag ( string tag ) => l10nTag = tag;
 
       private static readonly Dictionary< string, string > zhs2zht = new Dictionary< string, string >();
       private static readonly Dictionary< string, TMP_FontAsset > zhtTMPFs = new Dictionary< string, TMP_FontAsset >();
@@ -171,6 +176,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       };
 
       private static string ZhtTweaks ( ref string txt ) {
+         if ( l10nTag == "Month_Singular" || l10nTag == "Month_Plural" ) return "個月";
          var buf = new StringBuilder( txt );
          for ( var i = 0 ; i < charMap.Length ; i += 2 )
             buf.Replace( charMap[ i ], charMap[ i + 1 ] );

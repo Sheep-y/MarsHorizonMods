@@ -68,7 +68,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
             "{Name_{buildingId}}待完成",  "{Name_{buildingId}}完成",
             "{Name_{buildingId}}已完成",  "{Name_{buildingId}}建造完畢",
-            "{limit} 的 {current}", "最大 {limit}，現有 {current}",
+            "{limit} 的 {current}", "已建 {current}，上限 {limit}",
             "{total} 的 {current}", "{current}/{total}",
             "上下文", "過去、現在、未來",
             "雙薪", "眼疾手快",
@@ -124,8 +124,12 @@ namespace ZyMod.MarsHorizon.Zhant {
             "發射所需的{Building_Effect_{launchpad}}！", "需要{Building_Effect_{launchpad}}才能發射！",
             "起動電源", "初始電力",
             "{duration} 建造時間", "建做需時 {duration}",
+            "在發射日期", "發射當日",
  
             // Training
+            "出生日期", "出生",
+            "消防宇航員", "解聘宇航員",
+            "不適用：任務的訓練", "不可用：任務訓練中",
             "基地科學獎勵", "基本科學回報",
             "基地資金獎勵", "基本資金回報",
             "基地支持獎勵", "基本支持回報",
@@ -141,9 +145,12 @@ namespace ZyMod.MarsHorizon.Zhant {
             "新的請求任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}請求任務",
             "{agency}下個月將會推出{{mission}}！",  "{agency}將於下個月發射{{mission}}！",
             "{agency}已完成{{mission}}（{rank}）", "{agency}已達成{{mission}}（{rank}）",
-            "超過 {turns} 個月獲得 {value}", "{value}，用 {turn} 個月攤分",
+            "超過 {turns} 個月獲得 {value}", "{value}，用 {turns} 個月攤分",
             "完成獎金將在下項工作開始時發放", "完成後的額外回報會累加到下項工作",
+            "為 <size=28>{targetCount}", "/ <size=28>{targetCount}",
+            "{duration} 直至發射", "{duration} 後發射",
             "在本回合中重置", "重置本回合的",
+            "宇航員恢復試驗", "宇航員回收試驗",
 
             // Other
             "備用電源發電機", "備用發電機",
@@ -201,7 +208,9 @@ namespace ZyMod.MarsHorizon.Zhant {
             "電源", "電力",
             "總是供應不足！", "總是不夠用！",
             "預備發射！", "發射就緒！",
+            "按時間發放", "緩緩獲得",
             "{total} 中的 {value}", "{value}/{total} ",
+            "成本</b>用於{duration}", "需求<b>，尚餘{duration}",
 
             "剩余", "剩餘",
             "明了", "明瞭",
@@ -213,6 +222,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "游戲", "遊戲",
             "游客", "遊客",
             "占用", "佔用",
+            "盡管", "儘管",
 
             "禁用", "停用",
             "丟失", "失去",
