@@ -90,10 +90,12 @@ namespace ZyMod.MarsHorizon {
          configBindings.Clear();
       }
 
+      private static BaseConfig modConfig;
       private static Dictionary< string, object > configBindings;
 
       internal static void BindConfig ( ConfigFile Config, BaseConfig conf ) { try {
          if ( Config == null || conf == null ) return;
+         modConfig = conf;
          var type = conf.GetType();
          var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( conf, conf ) as IEnumerable< FieldInfo >;
          var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
@@ -103,25 +105,30 @@ namespace ZyMod.MarsHorizon {
          Info( "Loading config from BepInEx." );
          foreach ( var f in fields ) {
             if ( f.Name == "config_version" ) continue;
-            var tags = f.GetCustomAttributes( true ).OfType<ConfigAttribute>();
-            ConfigAttribute sec = tags.FirstOrDefault( e => e.Comment?.EndsWith( "]" ) == true ), desc = tags.LastOrDefault();
-            if ( sec?.Comment.Contains( '[' ) == true ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
-            var defVal = f.GetValue( conf );
-
-            var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" );
-            if ( TryGetBoxedValue( b, out var val ) ) {
-               if ( ! Equals( val, defVal ) ) f.SetValue( conf, val );
-               Fine( "Config {0} = {1}", f.Name, val );
-            } else Warn( "Cannot read {0}", f.Name );
-
-            b.GetType().GetEvent( "SettingChanged" )?.AddEventHandler( b, GetOnChangeListener( f, conf ) );
-            if ( configBindings == null ) configBindings = new Dictionary< string, object >();
-            configBindings.Add( f.Name, b );
+            BindConfigField( Config, f, bind, ref section );
          }
          if ( configBindings?.Count > 0 )
-            Config.ConfigReloaded += GetOnReloadListener( conf );
+            Config.ConfigReloaded += GetOnReloadListener();
          MarsHorizonMod.configLoaded = true;
       } catch ( Exception x ) { Err( x ); } }
+
+      private static string BindConfigField ( ConfigFile Config, FieldInfo f, MethodInfo bind, ref string section ) {
+         var tags = f.GetCustomAttributes( true ).OfType<ConfigAttribute>();
+         ConfigAttribute sec = tags.FirstOrDefault( e => e.Comment?.EndsWith( "]" ) == true ), desc = tags.LastOrDefault();
+         if ( sec?.Comment.Contains( '[' ) == true ) section = sec.Comment.Split( '[' )[ 1 ].Trim( ']' );
+         var defVal = f.GetValue( modConfig );
+
+         var b = bind.MakeGenericMethod( f.FieldType ).Run( Config, section, f.Name, defVal, desc?.Comment ?? "" );
+         if ( TryGetBoxedValue( b, out var val ) ) {
+            if ( !Equals( val, defVal ) ) f.SetValue( modConfig, val );
+            Fine( "Config {0} = {1}", f.Name, val );
+         } else Warn( "Cannot read {0}", f.Name );
+
+         b.GetType().GetEvent( "SettingChanged" )?.AddEventHandler( b, GetOnChangeListener( f ) );
+         if ( configBindings == null ) configBindings = new Dictionary<string, object>();
+         configBindings.Add( f.Name, b );
+         return section;
+      }
 
       private static bool TryGetBoxedValue ( object binding, out object value ) {
          var box = binding.GetType().Property( "BoxedValue" );
@@ -130,21 +137,21 @@ namespace ZyMod.MarsHorizon {
          return true;
       }
 
-      internal static EventHandler GetOnChangeListener ( FieldInfo field, BaseConfig conf ) { return ( _, evt ) => {
+      internal static EventHandler GetOnChangeListener ( FieldInfo field ) { return ( _, evt ) => {
          if ( ! ( evt is SettingChangedEventArgs e ) || e.ChangedSetting == null ) return;
          var val = e.ChangedSetting.BoxedValue;
          Info( "Config {0} changed to {1}.", field.Name, val );
-         field.SetValue( conf, val );
+         field.SetValue( modConfig, val );
          MarsHorizonMod.ReApply();
       }; }
 
-      internal static EventHandler GetOnReloadListener ( BaseConfig conf ) { return ( _, evt ) => {
-         var type = conf.GetType();
+      internal static EventHandler GetOnReloadListener () { return ( _, evt ) => {
+         var type = modConfig.GetType();
          Info( "Config reloaded." );
          foreach ( var b in configBindings ) {
             if ( ! TryGetBoxedValue( b, out var val ) ) continue;
             Fine( "Config {0} = {1}", b.Key, val );
-            type.Field( b.Key ).SetValue( conf, val );
+            type.Field( b.Key ).SetValue( modConfig, val );
          }
          MarsHorizonMod.ReApply();
       }; }
