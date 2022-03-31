@@ -13,7 +13,7 @@ Please refer to `Alternatives.md` for instructions.
 3. Goto `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`, check that `ModLoader.log` has a last modified time that is the same as when you launched the game.
 
 The last step is used to check whether the mod loader is actually installed correctly.
-Since the mod loader does not actually modify the game, the log is a relatively reliable way to check that.
+Since the mod loader does not modify the game, the log is the sure way to check that.
 
 
 # Behaviour #
@@ -23,13 +23,12 @@ This mod loader has three parts.
 ## Unity Doorstop ##
 
 This loader comes with `doorstop_config.ini` and `winhttp.dll`.
-The later is a bootstraper called Unity Doorstop, which reads the former
-to find the payload to run.  It is pre-configured to run `Mods\MH_ModLoader.dll`.
+They are Unity Doorstop, and are pre-configured to run `Mods\MH_ModLoader.dll`.
 
 ## Mod Loader ##
 
 `MH_ModLoader.dll` is the mod loader.
-It will find all other `MH_*.dll` under the same folder, up to a depth of 3 subfolders.
+It will find all other `MH_*.dll` in same folder, up to a depth of 3 subfolders.
 Each will be loaded into memory, and call the first `public static Main()` on a top-level public class.
 
 This mod loader does not detect or avoid mods that are already loaded,
@@ -38,7 +37,7 @@ since only the mod itself can tell whether it has been initiated.
 ## Harmony ##
 
 The mod loader comes with Harmony 2.
-It is used by mods to temporary change the game on the fly, without changing game files.
+It is used by mods to temporary change the game, without changing game files.
 The mod loader itself does not use it, but all my mods require it.
 
 HarmonyX 2 can also be dropped in as a replacement.
@@ -58,7 +57,6 @@ Since it does not depends on game code, it is expected to be compatible with fut
 If the mod loader doesn't work, or if none of the mod works, there are a few things you can try.
 
 Before you try it, though, make sure Window Explorer is showing file extensions.
-Ask Google if you are not sure.  Same for any steps you are unsure of.
 
 ## Check Mod Loader Is Loaded
 

@@ -1,5 +1,4 @@
 # Informed #
-## A mod of Mars Horizon ##
 
 *Your personal Mars Horizon assistant.*
 
@@ -13,13 +12,13 @@ such as payload options, launch windows, or total building synergies.
 A mod loader is required.
 Supports BepInEx v5, Simple Mars Horizon Mod Loader, Unity Mod Manager, and Unity Doorstop.
 
-* **BepInEx** : Extract package to `BepInEx\plugins` folder.
-* **Simple Mars Horizon Mod Loader** : Extract package to `Mods` folder.
+* **BepInEx** : Extract package content into `BepInEx\plugins` folder.
+* **Simple Mars Horizon Mod Loader** : Extract package into `Mods` folder.
 * **Unity Mod Manager** : Drag and drop package or use the Install button.
 * **Unity Doorstop** : Edit `doorstop_config.ini`, set `targetAssembly` to path of mod dll.
 
 Folder/File locations are relative to game root.
-To unintall this mod, simply delete the files.
+To unintall this mod, delete the extracted files.
 
 
 # Default Behaviour #
@@ -33,7 +32,7 @@ This mod provides the following features by default:
 * Show info icon next to Diplomacy when a joint mission can be proposed.
 * Spacepedia will now never show an icon.
 
-Hiding spacepedia notice is _way_ simpler, and _way_ more reliable, than trying to fix the mark all button in-game.
+Hiding spacepedia notice is _way_ simpler, and _way_ more reliable, than trying to fix the mark all button.
 If you insist, a simple google should show you a simple json fix.
 
 ## Planet Screen ##
@@ -53,13 +52,9 @@ The payload build time already factors in all applicable bonus.
 I couldn't find a way to show launch window without mouse movement, sorry about that.
 Contractor bonus already factor in applicable multipliers.
 
-The number of months and their colours can be changed in mod config.
-
 ## Research Screen ##
 
 * Booster research node will now show all possible supplements and the combined capacity of each.
-
-If the supplement has not been researched, a warning icon will be added.
 
 ## Base Screen ##
 
@@ -67,14 +62,20 @@ If the supplement has not been researched, a warning icon will be added.
 
 Only synergies count.  Building effects are not included on the list.
 
+## Funding Screen ##
+
+Next Tier now accurately shows the tier you will be at, instead of current tier + 1.
+
 
 # Configuration #
 
-On first launch, the mod will create `Informed.ini` and `Informed.log` in the game's user data folder,
-i.e. %AppData%\..\LocalLow\Auroch Digital\Mars Horizon
+The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.DeepSpaceSlots.cfg`.
+On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\DeepSpaceSlots.ini`.
 
-You can edit the ini file to disable or adjust various features.
-Each setting have a short description that explains its effects.
+You can edit the config file to disable or adjust some features.
+
+BepInEx also has a configuration manager plugin which can modify the parameters on the fly.
+For some screens you may need to close and reopen it to get it up to date.
 
 
 # Compatibility #
@@ -96,12 +97,13 @@ If the mod doesn't work, there are a few things you can try:
 
 ## Check Mod Is Loaded
 
-Find `MissionControl.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+If using BepInEx, read its log to be sure that mod is loaded.
+Otherwise, find `DeepSpaceSlots.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 
 If the log exists, delete it and re-launch the game.
 
-If the log does not exists, or is not recreated after relaunch, the mod is not loaded.
-Please follow mod loader's troubleshoot section.
+If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,
+you need to fix that first.  Please follow the mod loader's troubleshoot instructions.
 
 ## Check Mod Errors
 
@@ -113,10 +115,9 @@ Resetting the config may help, though.  Which brings us to...
 
 ## Check Mod Config
 
-The mod is configurable.  If it is not configured right, such as typos, the mod may not work as expected.
+The mod is configurable.  If it is not configured right, the mod may not work as expected.
 
-If you delete the config file `MissionControl.ini` from `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`,
-the mod will recreate it with default values.
+If you delete the config file, the mod will recreate it with default values.
 
 
 # License #

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Mars Horizon Mod Loader" )]
+[assembly: AssemblyTitle( "Simple Mars Horizon Mod Loader" )]
 [assembly: AssemblyDescription( "Basic Mod Loader for Mars Horizon.  Find MH_*.dll and call Main()." )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany( "Sheepy" )]
