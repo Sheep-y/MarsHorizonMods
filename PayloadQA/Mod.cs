@@ -1,10 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using BepInEx;
 using System.Reflection;
-using System.Text;
+using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.PayloadQA {
+
+   [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0331" ) ]
+   public class BIE_Mod : BaseUnityPlugin {
+      private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
+      private void OnDestroy() => BepInUtil.Unbind();
+   }
+
+   [ EnableReloading ] public static class UMM_Mod {
+      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   }
 
    public class Mod : MarsHorizonMod {
       protected override string GetModName () => "PayloadQA";

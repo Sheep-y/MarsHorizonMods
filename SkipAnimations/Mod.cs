@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.SkipAnimations {
-   [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0326" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0331" ) ]
    public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();

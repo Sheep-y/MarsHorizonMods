@@ -1,13 +1,9 @@
 ﻿using BepInEx;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.MissionControl {
-   [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "0.0.2022.0326" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "0.0.2022.0331" ) ]
    public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
