@@ -122,7 +122,7 @@ namespace ZyMod.MarsHorizon {
             var bind = typeof( ConfigFile ).Methods( "Bind" ).First( e =>
                e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
             var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( modConfig, modConfig ) as IEnumerable< FieldInfo >;
-            var section = "";
+            var section = "General";
             Info( "Creating BepInEx config bindings." );
             foreach ( var f in fields ) BindConfigField( mod.Config, f, bind, ref section );
             if ( bindings == null ) return false;
