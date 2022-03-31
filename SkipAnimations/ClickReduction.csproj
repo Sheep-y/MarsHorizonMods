@@ -7,8 +7,8 @@
     <ProjectGuid>{991C96F1-6E08-41F4-970C-5BC85A31E180}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZyMod.MarsHorizon.SkipAnimations</RootNamespace>
-    <AssemblyName>MH_SkipAnimations</AssemblyName>
+    <RootNamespace>ZyMod.MarsHorizon.ClickReduction</RootNamespace>
+    <AssemblyName>MH_ClickReduction</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

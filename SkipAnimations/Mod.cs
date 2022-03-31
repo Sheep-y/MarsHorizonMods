@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityModManagerNet;
 
-namespace ZyMod.MarsHorizon.SkipAnimations {
-   [ BepInPlugin( "Zy.MarsHorizon.SkipAnimations", "Skip Animations", "0.0.2022.0331" ) ]
+namespace ZyMod.MarsHorizon.ClickReduction {
+   [ BepInPlugin( "Zy.MarsHorizon.ClickReduction", "Click Reduction", "1.0" ) ]
    public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
@@ -20,7 +20,7 @@ namespace ZyMod.MarsHorizon.SkipAnimations {
    }
 
    public class Mod : MarsHorizonMod {
-      protected override string GetModName () => "SkipAnimations";
+      protected override string GetModName () => "ClickReduction";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine.Rendering;
 
-namespace ZyMod.MarsHorizon.SkipAnimations {
+namespace ZyMod.MarsHorizon.ClickReduction {
 
    internal class PatcherCinematic : ModPatcher {
       internal override void Apply () {

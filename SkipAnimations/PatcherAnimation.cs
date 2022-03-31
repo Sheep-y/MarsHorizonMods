@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ZyMod.MarsHorizon.SkipAnimations {
+namespace ZyMod.MarsHorizon.ClickReduction {
 
    internal class PatcherAnimation : ModPatcher {
       internal override void Apply () {

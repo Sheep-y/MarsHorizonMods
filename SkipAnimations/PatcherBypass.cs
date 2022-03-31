@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace ZyMod.MarsHorizon.SkipAnimations {
+namespace ZyMod.MarsHorizon.ClickReduction {
 
    internal class PatcherBypass : ModPatcher {
       internal override void Apply () {
