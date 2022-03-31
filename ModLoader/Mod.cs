@@ -49,7 +49,7 @@ namespace ZyMod.MarsHorizon.ModLoader {
 
       private static void LoadMarsHorizonMod ( Assembly asm ) {
          foreach ( var t in GetTypes( asm ) ) {
-            if ( t.IsNotPublic ) continue;
+            if ( t?.IsNotPublic != false ) continue;
             var main = t.Methods().FirstOrDefault( e => e.Name == "Main" && e.IsStatic && e.IsPublic && e.GetParameters().Length == 0 && ! e.IsGenericMethod );
             if ( main == null ) continue;
             Fine( "Calling {0} of {1}", main, main.DeclaringType.FullName );
