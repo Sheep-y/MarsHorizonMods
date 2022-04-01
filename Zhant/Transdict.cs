@@ -66,9 +66,6 @@ namespace ZyMod.MarsHorizon.Zhant {
             "正在登錄中...", "載入中……",
             "簡體中文",  "中文",
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
-            "{Name_{buildingId}}待完成",  "{Name_{buildingId}}完成",
-            "{Name_{buildingId}}已完成",  "{Name_{buildingId}}建造完畢",
-            "{limit} 的 {current}", "已建 {current}，上限 {limit}",
             "{total} 的 {current}", "{current}/{total}",
             "上下文", "過去、現在、未來",
             "雙薪", "眼疾手快",
@@ -112,6 +109,13 @@ namespace ZyMod.MarsHorizon.Zhant {
             "獲得里程碑排名前三位發放 <sprite name=\"Science\"> 科學獎金高達 25%", "打入里程碑前三名時獲得額外 25% <sprite name=\"Science\"> 科學回報",
             "所有與科學相關的毗鄰建築獎金增加一倍", "與科學相關的建築物毗鄰效應全部翻倍",
 
+            // Buildings
+            "{Name_{buildingId}}待完成",  "{Name_{buildingId}}完成",
+            "{Name_{buildingId}}已完成",  "{Name_{buildingId}}建造完畢",
+            "{limit} 的 {current}", "已建 {current}，上限 {limit}",
+            "Err:509", "向勇敢的冒險家們致上敬意的好地方，也是用宇航局成就去激勵國民的最佳地方。",
+            "備用電源發電機", "備用發電機",
+
             // Payload / Vehicle / Installation
             "{payload}已完成",  "{payload}建造完畢",
             "{vehicle}已完成",  "{vehicle}建造完畢",
@@ -151,9 +155,12 @@ namespace ZyMod.MarsHorizon.Zhant {
             "{duration} 直至發射", "{duration} 後發射",
             "在本回合中重置", "重置本回合的",
             "宇航員恢復試驗", "宇航員回收試驗",
-
-            // Other
-            "備用電源發電機", "備用發電機",
+            "脈沖位置", "發送定位信號",
+            "軌道重新校正", "軌道校正",
+            "可視數據採集", "可見光譜採樣",
+            "紅外光譜", "紅外光譜分析",
+            "電源充電", "充電",
+            "{duration} 直至下一階段", "距下一階段還有 {duration}",
          };
          for ( var i = 0 ; i < list.Length ; i += 2 )
             whole.Add( list[ i ], list[ i + 1 ] );
@@ -170,6 +177,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "獎金", "額外",
             "任務懲罰", "失敗懲罰",
             "懲罰", "削減",
+            "受到以下削減", "受到以下懲罰",
             "適用獎勵", "獎勵",
             "適用期限已至", "期限已至",
             "所有適用的研究", "的所有研究",
@@ -209,9 +217,11 @@ namespace ZyMod.MarsHorizon.Zhant {
             "總是供應不足！", "總是不夠用！",
             "預備發射！", "發射就緒！",
             "按時間發放", "緩緩獲得",
+            "啟動每項工作", "開始每項工作",
             "{total} 中的 {value}", "{value}/{total} ",
             "成本</b>用於{duration}", "需求<b>，尚餘{duration}",
-
+            "{Agency_Default_Name_ {", "{Agency_Default_Name_{",
+ 
             "剩余", "剩餘",
             "明了", "明瞭",
             "采集", "採集",
