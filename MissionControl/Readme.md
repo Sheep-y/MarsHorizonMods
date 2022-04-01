@@ -77,7 +77,7 @@ On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\De
 
 You can edit the config file to disable some features or adjust the numbers.
 
-BepInEx also has a configuration manager plugin which can modify the parameters on the fly.
+BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
 
 
 # Compatibility #

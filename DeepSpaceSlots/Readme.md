@@ -56,7 +56,7 @@ On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\De
 You can edit the file to adjust the number of slots and requirement of missions.
 You can also key slots to other buildings, missions, and/or researches, if you know their in-game id.
 
-BepInEx also has a configuration manager plugin which can modify the parameters on the fly.
+BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
 Then close and reopen mission list to get it up to date.
 
 

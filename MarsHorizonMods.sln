@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickReduction", "SkipAnimations\ClickReduction.csproj", "{991C96F1-6E08-41F4-970C-5BC85A31E180}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickReduction", "ClickReduction\ClickReduction.csproj", "{991C96F1-6E08-41F4-970C-5BC85A31E180}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{CC3F2D84-7515-4FE6-85B2-72713933DD4D}"
 EndProject

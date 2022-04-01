@@ -1,14 +1,16 @@
-# Skip Animations #
+# Click Reduction #
 
 *Mars Horizon on Adrenaline.*
 
 This is an unofficial mod of Mars Horizon (2020 game).
-It reduces or eliminates many delays and screen fades, auto-skip normal launch and normal minigame actions, bypass seen cutscenes (reset on launch), and skips a few common cutscenes by default.
+It removes most unnecessary clicks and greatly speed up gameplay.
 
-**If the game UI became misaligned during mini-game, immediately save, quit, and relaunch.**
-If you try to finish the mini-game, the corruption will spread to other screens including save screen.
+Given the increased pace, the game *will* break and crash sooner than normal.
+**If the game UI became misaligned, please immediately save, quit, and relaunch.**
+The corruption may spread to other screens if you keep playing.
 
-The game may also crash during mini-game, but it's something that also happens on vanilla.  So I guess that's not me.
+The mod skip construction reports by default.
+Please pay attention to event countdowns and the mission list alert icon.
 
 
 # Installation #
@@ -28,18 +30,16 @@ To unintall this mod, delete the extracted files.
 ## The Story ##
 
 This is my first Mars Horizon mod.
-The animations appeal to my 5yo son, but he is not a seasoned gamer and he has time to waste,
-esp. when we are still doing covid lockdown here in Hong Kong on 2022.
+The animations appeal to my 5yo son, who I purchased the game for, but he has time to waste,
+esp. when we are still doing covid lockdowns in 2022 in Hong Kong.
 
-He also didn't pay for the new multi-button trackball after the old one dies from excessive clicks within the first few hours of this game,
-which by the way is a lot more expensive than this game.
+He also didn't pay for the new multi-button trackball after the old one died from excessive clicks within the first few hours of this game,
+which by the way cost a lot more than this game.
 
-I sincerely hope this mod can save your pointer device in time.
+Hope this mod can save your pointer device in time.
 
-He hates the mod, though.  Rocket rocket rocket rocket go launch! (cue Storybots.)
-Did I mention I buy this game for him?  Thanks James Webb Space Telescope.
-
-Yes.  We'd like to see James Webb added to the game.  With full unfold animation please. :D
+He hates the mod, though.  That and the missing of James Webb Space Telescope.
+So, yes, we'd like to see it added to the game.  With full unfold animation please. :D
 
 
 # Default Behaviour #
@@ -58,23 +58,21 @@ You can set the mod to permantely skip seen cinematics, which will add their ids
 but I tried it and don't recommend it.  Occasional cinematics are cool.
 
 Crew return, shuttle return, and rocket reuse cinematics are not skipped by default because they are major milestones.
-Skip them once per session seems to be acceptable tradeoff.
+Allow them to play once per session seems to be a good balance.
 
 ## General Animation Skip ##
 
-* Blanket removal of screen fades.
+* Blanket reduction of screen fades.
 * Blanket reduction of assorted delays.
 * Reduction of selected screen delays.
-* Removal of selected screen waits.
+* Reduction of selected screen waits.
 
 Because there are too many delays in this game,
 this mod use a carpet bombing approach to remove fades and delays.
 
 Unfortunately, a short delay leads to a high chance of mini-game UI corruption,
 while a non-trivial delay will be felt across the game.
-
-So, this mod let you control the delay.
-Don't worry; it will only shorten delays, not increase them.
+The default value is relatively safe while still offering noted improvement.
 
 ## Specific Animation Speedup ##
 
@@ -85,10 +83,10 @@ Don't worry; it will only shorten delays, not increase them.
 ## Auto Bypass ##
 
 * Auto-skip launch countdown.
-* Auto-skip uneventful launch and max vehicle level up.
+* Auto-skip uneventful launch and max vehicle level.
 * Auto-skip mini-game intro and briefing.
 * Auto-skip uneventful mini-game actions.
-* Auto-skip construction reports and research report.
+* Auto-skip construction reports and research reports.
 
 
 # Configuration #
@@ -98,7 +96,7 @@ On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\De
 
 You can edit the ini file to disable or adjust various features and timings.
 
-BepInEx also has a configuration manager plugin which can modify the parameters on the fly.
+BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
 
 
 # Compatibility #
@@ -110,7 +108,7 @@ All game languages are supported.
 This mod does not change save games or game files.
 
 Due to the number of screen it mods and the number of information it pulls,
-each non-minor game updates have a good chance of breaking something.
+each non-minor game update have a good chance of breaking something.
 Good luck!
 
 
