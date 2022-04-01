@@ -73,7 +73,7 @@ namespace ZyMod {
       private void GameLoaded ( Assembly asm ) { try {
          Info( "Target assembly loaded." );
 #else
-         var asm = AppDomain.CurrentDomain.GetAssemblies().First( e => ! IgnoreAssembly( e ) && IsTargetAssembly( e ) );
+         var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault( e => ! IgnoreAssembly( e ) && IsTargetAssembly( e ) );
 #endif
          OnGameAssemblyLoaded( asm );
          #if ! NoPatch

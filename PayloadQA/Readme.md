@@ -10,12 +10,11 @@ and manual action crit rate by payload reliability.
 # Installation #
 
 A mod loader is required.
-Supports BepInEx v5, Simple Mars Horizon Mod Loader, Unity Mod Manager, and Unity Doorstop.
+Supports BepInEx v5, Simple Mars Horizon Mod Loader, and Unity Mod Manager.
 
 * **BepInEx** : Extract package content into `BepInEx\plugins` folder.
 * **Simple Mars Horizon Mod Loader** : Extract package into `Mods` folder.
 * **Unity Mod Manager** : Drag and drop package or use the Install button.
-* **Unity Doorstop** : Edit `doorstop_config.ini`, set `targetAssembly` to path of mod dll.
 
 Folder/File locations are relative to game root.
 To unintall this mod, delete the extracted files.
