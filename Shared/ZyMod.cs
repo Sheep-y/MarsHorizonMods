@@ -121,10 +121,11 @@ namespace ZyMod {
       public static bool Non0 ( float val ) => val != 0 && Rational( val );
       public static bool Rational ( float val ) => ! float.IsNaN( val ) && ! float.IsInfinity( val );
 
-      public static IEnumerable< MethodInfo > Methods ( this Type type ) => type.GetMethods( Public | NonPublic | Instance | Static | DeclaredOnly ).Where( e => ! e.IsAbstract );
-      public static IEnumerable< MethodInfo > Methods ( this Type type, string name ) => type.Methods().Where( e => e.Name == name );
+      public static IEnumerable< MethodInfo > Methods ( this Type type ) => type?.GetMethods( Public | NonPublic | Instance | Static | DeclaredOnly ).Where( e => ! e.IsAbstract );
+      public static IEnumerable< MethodInfo > Methods ( this Type type, string name ) => type?.Methods().Where( e => e.Name == name );
 
       public static MethodInfo Method ( this Type type, string name ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly );
+      public static MethodInfo Method ( this Type type, string name, int param_count ) => Methods( type, name ).FirstOrDefault( e => e.GetParameters().Length == param_count );
       public static MethodInfo Method ( this Type type, string name, params Type[] types ) => type?.GetMethod( name, Public | NonPublic | Instance | Static | DeclaredOnly, null, types ?? Type.EmptyTypes, null );
       public static MethodInfo TryMethod ( this Type type, string name ) { try { return Method( type, name ); } catch ( Exception ) { return null; } }
       public static object Run ( this MethodInfo func, object self, params object[] args ) => func.Invoke( self, args );
@@ -133,7 +134,6 @@ namespace ZyMod {
       public static object TryRunStatic ( this MethodInfo func, params object[] args ) { try { return RunStatic( func, args ); } catch ( Exception x ) { return x; } }
       public static FieldInfo  Field ( this Type type, string name ) => type?.GetField( name, Public | NonPublic | Instance | Static | DeclaredOnly );
       public static PropertyInfo Property ( this Type type, string name ) => type?.GetProperty( name, Public | NonPublic | Instance | Static | DeclaredOnly );
-      public static Type[] ArrayTypeEmpty = new Type[0];
 
       #if CIL
       private static MethodInfo GetILs, EnumMoveNext;
@@ -144,7 +144,7 @@ namespace ZyMod {
          var list = GetILs?.TryRunStatic( null, subject ) as IList;
          var args = list?.GetType().GenericTypeArguments;
          if ( list == null || list.Count == 0 || args.Length == 0 ) return null;
-         var code = args[ 0 ].Method( "GetCodeInstruction", ArrayTypeEmpty );
+         var code = args[ 0 ].Method( "GetCodeInstruction", 0 );
          return list.Cast<object>().Select( e => code?.Run( e ) as CodeInstruction );
       }
       // Find the MoveNext method of an iterator method.
@@ -156,7 +156,7 @@ namespace ZyMod {
             if ( EnumMoveNext != null ) return MoveNext( subject );
          }
          var op = subject.GetCodes()?.FirstOrDefault( e => e?.opcode.Name == "newobj" );
-         return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", ArrayTypeEmpty );
+         return ( op.operand as ConstructorInfo )?.DeclaringType.Method( "MoveNext", 0 );
       }
       #endif
 

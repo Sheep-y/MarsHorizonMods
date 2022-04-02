@@ -17,7 +17,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          Patch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
          if ( Patch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
             Patch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
-         Patch( typeof( Simulation ).Methods( "CanAgencyDestroyBuilding" ).FirstOrDefault( e => e.GetParameters().Length >= 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
+         Patch( typeof( Simulation ).Method( "CanAgencyDestroyBuilding", 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
       }
 
       internal override void Unapply () => deepSpaceMissions.Clear();
