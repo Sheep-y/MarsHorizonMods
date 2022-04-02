@@ -82,9 +82,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
       } catch ( Exception x ) { Err( x ); } }
 
       private static bool ShouldBlock ( int completed, Dictionary< TechTree.Type, int > total, TechTree.Type type ) {
-         var result = completed + config.milestone_challenge_research_highpass>= total[ type ];
-         RootMod.Log.Write( result ? TraceLevel.Info : TraceLevel.Verbose,
-            "{0} {1} type milestone rewards: {2}/{3}", result ? "Blocking" : "Allowing", type, completed, total[ type ] );
+         if ( ! total.TryGetValue( type, out var count ) ) return false;
+         var result = completed + config.milestone_challenge_research_highpass >= count;
+         Log( result ? TraceLevel.Info : TraceLevel.Verbose,
+            "{0} {1} type milestone rewards: {2}/{3}", result ? "Blocking" : "Allowing", type, completed, count );
          return result;
       }
 

@@ -28,12 +28,13 @@ namespace ZyMod {
       public static LogFunc Logger { get { lock ( sync ) return _Logger; } set { lock ( sync ) _Logger = value; } }
       public static void Err ( object msg ) => Error( msg );
       public static T Err < T > ( object msg, T val ) { Error( msg ); return val; }
-      public static void Error ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Error, msg, arg );
-      public static void Warn  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Warning, msg, arg );
-      public static void Info  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Info, msg, arg );
-      public static void Fine  ( object msg, params object[] arg ) => Logger?.Invoke( TraceLevel.Verbose, msg, arg );
+      public static void Error ( object msg, params object[] arg ) => Log( TraceLevel.Error, msg, arg );
+      public static void Warn  ( object msg, params object[] arg ) => Log( TraceLevel.Warning, msg, arg );
+      public static void Info  ( object msg, params object[] arg ) => Log( TraceLevel.Info, msg, arg );
+      public static void Fine  ( object msg, params object[] arg ) => Log( TraceLevel.Verbose, msg, arg );
+      public static void Log   ( TraceLevel lv, object msg, params object[] arg ) => Logger?.Invoke( lv, msg, arg );
       #if ! NoLog
-      public static ZyLogger Log;
+      public static ZyLogger ZyLog;
       #endif
    }
 
@@ -105,8 +106,8 @@ namespace ZyMod {
          }
          #if ! NoLog
          if ( Logger == null ) {
-            if ( Log == null ) Log = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
-            Logger = Log.Write;
+            if ( ZyLog == null ) ZyLog = new ZyLogger( Path.Combine( AppDataDir, ModName + ".log" ) );
+            Logger = ZyLog.Write;
          }
          #endif
       } }

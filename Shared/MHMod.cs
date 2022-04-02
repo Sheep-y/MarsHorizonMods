@@ -52,10 +52,10 @@ namespace ZyMod.MarsHorizon {
          Info( "Unloading." );
          foreach ( var p in patchers.Values ) p.Unload();
          patchers.Clear();
-         lock ( sync ) if ( Log != null ) {
-            Log.Flush();
-            Log.LogLevel = TraceLevel.Off;
-            Log = null;
+         lock ( sync ) if ( ZyLog != null ) {
+            ZyLog.Flush();
+            ZyLog.LogLevel = TraceLevel.Off;
+            ZyLog = null;
          }
          Logger = null;
          return true;
