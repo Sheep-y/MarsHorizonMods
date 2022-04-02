@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace ZyMod.MarsHorizon.Informed {
 
-   internal class PatcherMainHUD : ModPatcher {
+   internal class PatcherSolarSystem : ModPatcher {
       internal override void Apply () {
          if ( config.show_final_funding_tier ) {
             Patch( typeof( ResourcesScreenFunding ), "Show", prefix: nameof( CheckFunding ), postfix: nameof( ClearFunding ) );

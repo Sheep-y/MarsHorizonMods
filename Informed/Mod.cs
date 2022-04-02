@@ -31,7 +31,7 @@ namespace ZyMod.MarsHorizon.Informed {
          if ( config.launch_window_hint_before_ready > 0 || config.launch_window_hint_after_ready > 0 || config.show_contractor_effects_on_button )
             ActivatePatcher( typeof( PatcherVehicleDesigner ) );
          if ( config.hint_available_mission || config.hint_new_candidates || config.hint_propose_join_mission || config.hint_spacepedia_hide || config.show_final_funding_tier )
-            ActivatePatcher( typeof( PatcherMainHUD ) );
+            ActivatePatcher( typeof( PatcherSolarSystem ) );
       }
    }
 
