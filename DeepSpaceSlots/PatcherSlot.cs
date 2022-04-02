@@ -15,8 +15,10 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          Patch( typeof( MissionSummary ), "Setup", postfix: nameof( RecalcAfterPhase ) ); // Refresh after mission phase change
          Patch( typeof( ClientViewer ), "SetAgency", postfix: nameof( RecalcAgencySlots ) ); // Refresh after load game
          Patch( typeof( Simulation ).Method( "GetAgencyMaxMissionSlots", typeof( Agency ) ), postfix: nameof( AddMaxMissionSlots ) );
-         if ( Patch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null )
+         if ( Patch( typeof( PlannedMissionsScreen ), "GetMissions", postfix: nameof( RemoveMissions ) ) != null ) {
             Patch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( ReAddMissions ) );
+            Patch( typeof( PlannedMissionsScreen ), "Setup", postfix: nameof( SelectDeepSpaceMission ) );
+         }
          Patch( typeof( Simulation ).Method( "CanAgencyDestroyBuilding", 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
       }
 
@@ -149,6 +151,12 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
             ___installations.Get().SetMission( __instance, mission, MissionPlanScreen.EState.Overview );
          ___installationsParent?.gameObject?.SetActive( true );
          Info( "Migrated {0} deep space missions.", deepSpaceMissions.Count );
+      } catch ( Exception x ) { Err( x ); } }
+
+      private static void SelectDeepSpaceMission ( PlannedMissionsScreen __instance, Mission mission, SimplePooler<PlannedMissionsScreenToggle> ___installations ) { try {
+         if ( mission == null ) return;
+         var toggle = ___installations.Find( e => e.Mission.guid == mission.guid );
+         if ( toggle != null ) __instance.Delay( 1, toggle.Select );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void PreventDeepSpaceBuildingDestruction ( Agency agency, Data.Blueprint blueprint, ref string invalidTag, ref bool __result ) { try {
