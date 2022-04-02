@@ -40,6 +40,7 @@ namespace ZyMod.MarsHorizon {
 
       internal static bool Unapply () { try {
          patchers.Values.FirstOrDefault( e => e.harmony != null )?.UnpatchAll();
+         Fine( "Unapplying individual patches." );
          foreach ( var p in patchers.Values ) p.Unapply();
          return true;
       } catch ( Exception x ) { return Err( x, false ); } }
