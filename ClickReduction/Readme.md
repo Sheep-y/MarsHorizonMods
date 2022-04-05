@@ -5,8 +5,8 @@
 This is an unofficial mod of Mars Horizon (2020 game).
 It removes most unnecessary clicks and greatly speed up gameplay.
 
-Given the increased pace, the game *will* break and crash sooner than normal.
-**If the game UI became misaligned, please immediately save, quit, and relaunch.**
+Given the increased pace, the game *will* break sooner than normal.
+**If the game UI looks or acts wrong, please immediately save, exit, and re-run the game.**
 The corruption may spread to other screens if you keep playing.
 
 The mod skip construction reports by default.

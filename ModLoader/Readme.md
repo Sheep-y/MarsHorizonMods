@@ -2,11 +2,15 @@
 
 This is an unofficial mod loader of the Mars Horizon (2020 game).
 
-Alternatively, all my mods support BepInEx (v5), Unity Mod Loader, and Unity Doorstop (direct load) as alternatives.
+Alternatively, all my mods support BepInEx (v5) and Unity Mod Loader too.
+BepInEx is recommended because of easy setup and optional in-game mod config UI.
 Please refer to `Alternatives.md` for instructions.
 
 
 # Installation #
+
+Repeat, these steps are only for Simple Mars Horizon Mod Loader,
+not for BepInEx or Unity Mod Manager.  Please use only one mod loader.
 
 1. Extract (Drag and Drop) `doorstop_config.ini`, `version.dll`, and the `Mods` folder into the game's root folder.
 2. Launch the game, then quit the game.  You may Alt+F4 as soon as you see the logos.
@@ -51,6 +55,14 @@ but should be compatible with Steam and Epic on Windows/Wine/Proton.
 This mod loader does not change save games or game files.
 Since it does not depends on game code, it is expected to be compatible with future game versions.
 
+## Mod Loader Bridging ##
+
+This mod loader is *also* a BepInEx plugin and a UMM plugin,
+meaning it can be used to load vanilla mods in those loaders.
+
+Use only the mod loader dll and maybe Info.json.  Do *not* replace winhttp and doorstop config.
+Place this loader and those incompatible mods in a subfolder, away from other mods.
+
 
 # Troubleshoot #
 
@@ -86,10 +98,10 @@ But just in case, Mac and Game Pass are generally non-moddable, while Linux are 
 ## Check Mods Location
 
 Mods must be dlls starting with `MH_` and must be placed in the same folder as this mod loader,
-by default the Mods folder under game root.  `MH` must be uppercase.
+by default the Mods folder under game root.  `MH_` must be uppercase.
 
-For example, the Skip Animations mod comes in form of `MH_SkipAnimations.dll`,
-which should be placed in Mods as `Mods\MH_SkipAnimations.dll`.
+For example, my Click Reduction mod comes in form of `MH_ClickReduction.dll`,
+which should be placed in Mods as `Mods\MH_ClickReduction.dll`.
 
 Some mods may require additional resources, please refer to each mod's instructions.
 
@@ -103,13 +115,6 @@ If a mod is not detected, please make sure it is in the right name and place.
 Initilisation errors, if any, can only be fixed by that mod.
 
 
-## Alternative Mod Loader ##
-
-This mod loader is dead simple.
-Unless/Until Unity Mod Manager supports this game,
-or unless Mars Horizon adds official mod support, all alternatives are more complicated.
-
-
 # Uninstall #
 
 Removing this mod loader will inactivate all mods, if there are no other mod loaders.
@@ -119,6 +124,28 @@ Delete `doorstop_config.ini`, `version.dll`, and `Mods\MH_ModLoader.dll` from ga
 If you are not using other mods, you may also remove the mod loader.
 
 The mod loader does not modify game files, so there is no need to Verify Files.
+
+
+# To Mod Authors #
+
+Historical reason aside, there are two main reasons for this mod loader to exists.
+
+First is I need a place on NexusMods to explain how to setup different mod loaders anyway.
+
+Second is to provide an option for mod authors who don't want to tie their mods to
+a specific loader, and the third is to provide an option for users who want or need to
+use these mods in BepInEx/UMM.
+
+See, if the game does gain official mod support in the future, there is a high chance
+it won't integrate BepInEx or UMM.  If a mod depends on them, it will fail.
+
+It is possible to make a mod supports multiple loaders, but it takes efforts and skills.
+My mod do that, but the code is not easy to understand.  You can copy them,
+but not all modders will be comfortable with them.
+
+Note that you can use `Harmony.PatchAll` instead of my manual patching style.
+Make sure to make *yourself* confortable with *your* code.  That's what I do.
+(Well, I do space out my code at work, but that's another topic.)
 
 
 # License #
