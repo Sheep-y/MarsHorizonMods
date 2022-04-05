@@ -46,6 +46,7 @@ namespace ZyMod.MarsHorizon.ClickReduction {
             Patch( typeof( MissionSummary ), "AnimateRewards", postfix: nameof( SpeedUpMissionSummary ), transpiler: nameof( SpeedUpRewards ) );
             Patch( typeof( MissionSummaryPhaseProgress ), "Animate", transpiler: nameof( SpeedUpPhaseAnimation ) );
          }
+         Patch( typeof( SolarSystemMissionPath ).Method( "GetPath", 3 ), transpiler: nameof( FineMissionPath ) );
       }
 
       #region Remove delays
@@ -105,6 +106,9 @@ namespace ZyMod.MarsHorizon.ClickReduction {
          => ReplaceFloat( ReplaceFloat( ReplaceFloat( codes, 0.5f, 0.2f, 3 ), 1f, 0.2f, 3 ), 1.5f, 0.2f, 1 );
       private static void SpeedUpMissionSummary ( Tween __result ) => __result.timeScale = 100f;
       #endregion
+
+      private static IEnumerable< CodeInstruction > FineMissionPath ( IEnumerable< CodeInstruction > codes )
+         => ReplaceFloat( codes, 0.5f, 0.1f, 2 );
 
       #region OpCode Replacement
       private static IEnumerable< CodeInstruction > ReplaceFloat ( IEnumerable< CodeInstruction > codes, float from, float to, int expected_count )
