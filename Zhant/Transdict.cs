@@ -155,6 +155,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "完成獎金將在下項工作開始時發放", "完成後的額外回報會累加到下項工作",
             "為 <size=28>{targetCount}", "/ <size=28>{targetCount}",
             "{duration} 直至發射", "{duration} 後發射",
+            "修改器：臨時", "環境變化：歸位",
             "在本回合中重置", "重置本回合的",
             "宇航員恢復試驗", "宇航員回收試驗",
             "脈沖位置", "發送定位信號",

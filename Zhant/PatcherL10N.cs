@@ -172,7 +172,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          => name.StartsWith( "NotoSansCJKtc-" ) || name.StartsWith( "NotoSansCJKhk-" ) || name.StartsWith( "NotoSansTC-" ) || name.StartsWith( "NotoSansHK-" );
 
       private static readonly char[] charMap = new char[] {
-         '后','後',  '并','並',  '进','進',  '于','於',  '愿','願',  '筑','築',  '范','範',  '涂','塗',  '余','餘',
+         '后','後',  '并','並',  '进','進',  '于','於',  '愿','願',  '筑','築',  '范','範',  '涂','塗',  '余','餘',  '么','麼',
       };
 
       private static string ZhtTweaks ( ref string txt ) {
