@@ -1,9 +1,8 @@
-# Mars Horizon Mod Loaders #
+# Mod Loader Alternatives #
 
-This document lists the step to install BepInEx and Unity Mod Manager.
+This document lists the step to install BepInEx and Unity Mod Manager for Mars Horizon.
 
-You *must* install only **one** mod loader.
-They generally conflicts with each other.
+Please install only **one** mod loader.  They generally conflict with each other.
 
 Other mod loaders that support generic Unity games can also be used on Mars Horizon,
 but you need to figure out how to get it to work.
@@ -29,8 +28,7 @@ https://github.com/BepInEx/BepInEx.ConfigurationManager
 
 7. Mod developers may also install UnityExplorer which provides a scene inspector and REPL console on F7:
 https://github.com/sinai-dev/UnityExplorer
-, while ScriptEngine enables hot-reload on F6:
-https://github.com/BepInEx/BepInEx.Debug
+, while ScriptEngine enables hot-reload on F6: https://github.com/BepInEx/BepInEx.Debug
 
 
 ## Unity Mod Manager ##
@@ -64,3 +62,12 @@ This guide is tested on Unity Mod Manager v0.24.
 6. A `Mods` folder is created under game root.  Mods are to be placed here in their own subfolders.
 For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
 
+
+## Other Mod Loaders ##
+
+If a mod loader that does not require a mod to be linked to it, such as Unity Mod Manager,
+you usully only need to write a config file for it to load my mods, such as `Info.json`.
+
+Loaders that require hard dependencies, such as Melon Loader,
+will be more difficult.  The simplest is to write a bridge for this mod loader,
+or modify this loader to be compatible, which can then load the other mods.
