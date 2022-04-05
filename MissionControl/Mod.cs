@@ -1,6 +1,8 @@
 ﻿using BepInEx;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityModManagerNet;
+using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.MissionControl {
    [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "0.0.2022.0331" ) ]
@@ -66,16 +68,16 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public float experimental_weight_multiplier = 1;
       [ Config( "Multiply lucartive variation chances (baseline).  Default 1.8.  Set to 1 to not change." ) ]
       public float lucrative_weight_multiplier = 1.8f;
-      [ Config( "Multiply lucartive variation chances when none exists (multiplied).  Default 2.  Set to 1 to not change." ) ]
-      public float lucrative_weight_multiplier_opening = 2;
-      [ Config( "Multiply lucartive variation chances when all researches are done (multiplied).  Default 5.  Set to 1 to not change." ) ]
-      public float lucrative_weight_multiplier_full_tech = 5;
+      [ Config( "Multiply lucartive variation chances when none exists (multiplied).  Default 1.6667.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_opening = 1.6667f;
+      [ Config( "Multiply lucartive variation chances when all researches are done (multiplied).  Default 1.3333.  Set to 1 to not change." ) ]
+      public float lucrative_weight_multiplier_full_tech = 1.3333f;
       [ Config( "Multiply publicised variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float publicised_weight_multiplier = 1;
       [ Config( "Multiply test variation chances.  Default 1.  Set to 1 to not change." ) ]
       public float test_weight_multiplier = 1;
       [ Config( "Try divide all variation weight by this amount to save cpu.  Affects multiplier accuracy; set log level to fine to see exact weights.  Default 10.  Set to 1 to not change." ) ]
-      public int variation_weight_divider = 10;
+      public ushort variation_weight_divider = 10;
 
       [ Config( "\r\n[Earth and Moon]" ) ]
       [ Config( "Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
@@ -102,17 +104,25 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200304;
+      public int config_version = 20220405;
 
       protected override void OnLoad ( string _ ) {
-         if ( challenging_weight_multiplier < 0 ) challenging_weight_multiplier = 1;
-         if ( experimental_weight_multiplier < 0 ) experimental_weight_multiplier = 1;
-         if ( lucrative_weight_multiplier < 0 ) lucrative_weight_multiplier = 1;
-         if ( lucrative_weight_multiplier_opening < 0 ) lucrative_weight_multiplier_opening = 1;
-         if ( lucrative_weight_multiplier_full_tech < 0 ) lucrative_weight_multiplier_full_tech = 1;
-         if ( publicised_weight_multiplier < 0 ) publicised_weight_multiplier = 1;
-         if ( test_weight_multiplier < 0 ) test_weight_multiplier = 1;
-         if ( variation_weight_divider < 0 ) variation_weight_divider = 1;
+         if ( ! Positive( challenging_weight_multiplier ) ) challenging_weight_multiplier = 1;
+         if ( ! Positive( experimental_weight_multiplier ) ) experimental_weight_multiplier = 1;
+         if ( ! Positive( lucrative_weight_multiplier ) ) lucrative_weight_multiplier = 1;
+         if ( ! Positive( lucrative_weight_multiplier_opening ) ) lucrative_weight_multiplier_opening = 1;
+         if ( ! Positive( lucrative_weight_multiplier_full_tech ) ) lucrative_weight_multiplier_full_tech = 1;
+         if ( ! Positive( publicised_weight_multiplier ) ) publicised_weight_multiplier = 1;
+         if ( ! Positive( test_weight_multiplier ) ) test_weight_multiplier = 1;
+         if ( ! Positive( variation_weight_divider ) ) variation_weight_divider = 1;
+         if ( config_version < 20220405 ) {
+            var def = new Config();
+            if ( lucrative_weight_multiplier_opening == 2 ) lucrative_weight_multiplier_opening = def.lucrative_weight_multiplier_opening;
+            if ( lucrative_weight_multiplier_full_tech == 5 ) lucrative_weight_multiplier_full_tech = def.lucrative_weight_multiplier_full_tech;
+            Task.Run( Save );
+         }
       }
+
+      private bool Positive ( float val ) => Rational( val ) && val >= 0;
    }
 }

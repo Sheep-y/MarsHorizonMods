@@ -95,7 +95,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          var m = lastMission = missionTemplate;
          allowed = true;
          var weight = GetMissionWeight( m );
-         if ( weight < 0 ) weight = m.requestWeighting;
+         if ( ! ModHelpers.Rational( weight ) || weight < 0 ) weight = m.requestWeighting;
          Fine( "Mission {0}, weight {1}{2}.", m.primaryMilestone, m.requestWeighting, weight == m.requestWeighting ? "" : $" => {weight}" );
          if ( weight != m.requestWeighting ) {
             origWeightM[ m ] = m.requestWeighting;
@@ -125,12 +125,12 @@ namespace ZyMod.MarsHorizon.MissionControl {
 
       private static void SetVariationWeights ( Data.MissionTemplate m ) {
          if ( m.requestWeighting == 0 ) return;
-         var divider = config.variation_weight_divider;
-         if ( divider != 1 ) divider = m.requestMissionTypes.All( e => e.weighting % divider == 0 ) ? divider : 1;
+         var divider = (int) config.variation_weight_divider;
+         divider = divider != 1 && m.requestMissionTypes.All( e => e.weighting % divider == 0 ) ? divider : 1;
          foreach ( var t in m.requestMissionTypes ) {
             var tWeight = t.weighting;
             var multiplier = GetVariationWeight( t );
-            if ( multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
+            if ( ModHelpers.Rational( multiplier ) && multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
             if ( divider != 1 ) tWeight /= divider;
             Fine( "   > Variation {0}, weight {1}{2}", t.type, t.weighting, t.weighting == tWeight ? "" : $" => {tWeight}" );
             if ( t.weighting != tWeight ) {
