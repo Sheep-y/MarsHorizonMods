@@ -15,11 +15,6 @@ namespace ZyMod.MarsHorizon.Zhant {
       internal static string PartCsv  => Path.Combine( RootMod.AppDataDir, "Zhant-Dict-Terms.csv" );
 
       internal static void LoadDicts () {
-         if ( Environment.UserName == "Sheepy" ) {
-            LoadWholeDefaults();
-            LoadPartDefaults();
-         }
-
          whole.Clear();
          if ( ! ReadCsv( WholeCsv, ReadWhole ) )
             LoadWholeDefaults();
@@ -68,7 +63,9 @@ namespace ZyMod.MarsHorizon.Zhant {
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
             "{total} 的 {current}", "{current}/{total}",
             "上下文", "過去、現在、未來",
+            "保障", "把關者",
             "雙薪", "眼疾手快",
+            "跨國公司", "多重國藉",
             "已公開", "公眾關注",
             "點擊跳過", "任意鍵跳過",
             "點擊忽略", "任意鍵關閉",
@@ -120,15 +117,17 @@ namespace ZyMod.MarsHorizon.Zhant {
             "{payload}已完成",  "{payload}建造完畢",
             "{vehicle}已完成",  "{vehicle}建造完畢",
             "運載火箭檢查", "載具檢查",
-            "由於發射條件不利，發射可靠性懲罰減半", "將發射條件不利導致的發射可靠性減半",
-            "宇航員時段 +{strength}", "宇航員數量 +{strength}",
             "安裝", "設施",
+            "起動電源", "初始電力",
+            "在發射日期", "發射當日",
+            "{duration} 建造時間", "建做需時 {duration}",
+            "宇航員時段 +{strength}", "宇航員數量 +{strength}",
             "完成此安裝以獲得以下獎勵", "完成此設施可得獲以下回報",
             "{Name_{building}}安裝已過期", "{Name_{building}}完成使命",
+            "由於發射條件不利，發射可靠性懲罰減半", "將發射條件不利導致的發射可靠性減半",
             "發射所需的{Building_Effect_{launchpad}}！", "需要{Building_Effect_{launchpad}}才能發射！",
-            "起動電源", "初始電力",
-            "{duration} 建造時間", "建做需時 {duration}",
-            "在發射日期", "發射當日",
+            "在 <sprite name=Agency{agencyIcon}>{Agency_Default_Name_{agency}} 中 +{value} 聲望", "成功時跟 <sprite name=Agency{agencyIcon}>{Agency_Default_Name_{agency}} +{value} 聲望",
+            "載具上面級發射後獲得了 {value} 個經驗等級", "上面級在發射後將獲得 {value} 個經驗等級",
  
             // Training
             "出生日期", "出生",
@@ -143,6 +142,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             "你尚未選擇訓練簡介。此任務並無發放任何訓練獎金。", "尚未選擇任務訓練，本任務未能受益。",
 
             // Mission
+            "積極", "正面",
+            "消極", "負面",
             "{{mission}}預備下一階段！",  "{{mission}}的下一階段已就緒！",
             "{agency}已完成{{mission}}的{phase}階段",  "{agency}已完成{{mission}}的階段{phase}",
             "新的聯合任務適用於{Name_Body_{body}} ！",  "有新的{Name_Body_{body}}聯合任務",
@@ -150,6 +151,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "{agency}下個月將會推出{{mission}}！",  "{agency}將於下個月發射{{mission}}！",
             "{agency}已完成{{mission}}（{rank}）", "{agency}已達成{{mission}}（{rank}）",
             "超過 {turns} 個月獲得 {value}", "{value}，用 {turns} 個月攤分",
+            "在 {duration} 內的獎勵總共為 {value}", "分 {duration} 獲得總共 {value}",
             "完成獎金將在下項工作開始時發放", "完成後的額外回報會累加到下項工作",
             "為 <size=28>{targetCount}", "/ <size=28>{targetCount}",
             "{duration} 直至發射", "{duration} 後發射",
@@ -160,6 +162,10 @@ namespace ZyMod.MarsHorizon.Zhant {
             "可視數據採集", "可見光譜採樣",
             "紅外光譜", "紅外光譜分析",
             "電源充電", "充電",
+            "弱 Ping", "微弱信號",
+            "位置外推", "航程預測",
+            "低空飛行路線調整", "掠空軌道調整",
+            "星鎖丟失", "丟失星光鎖定",
             "{duration} 直至下一階段", "距下一階段還有 {duration}",
          };
          for ( var i = 0 ; i < list.Length ; i += 2 )
@@ -203,6 +209,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "變軌彈道", "轉移航道",
             "準備狀態", "技術指標",
             "中途操控", "中途軌道調整",
+            ">總結<", ">概覽<",
             ">上下文<", ">過去、現在、未來<",
             "試驗飛行員", "試飛員",
             "航天地面指揮中心", "任務控制中心",
@@ -218,6 +225,11 @@ namespace ZyMod.MarsHorizon.Zhant {
             "預備發射！", "發射就緒！",
             "按時間發放", "緩緩獲得",
             "啟動每項工作", "開始每項工作",
+            "指令艙", "指揮艙",
+            "星的星鎖已丟失", "系統無法鎖定星光",
+            "修改器：", "環境變化：",
+            "此部分已解鎖，", "此組件未解鎖，",
+            "當前工作中持續存在。", "當前工作中起效，不影響後續工作。",
             "{total} 中的 {value}", "{value}/{total} ",
             "成本</b>用於{duration}", "需求<b>，尚餘{duration}",
             "{Agency_Default_Name_ {", "{Agency_Default_Name_{",
@@ -233,6 +245,8 @@ namespace ZyMod.MarsHorizon.Zhant {
             "游客", "遊客",
             "占用", "佔用",
             "盡管", "儘管",
+            "跟蹤", "追蹤",
+            "細致", "細緻",
 
             "禁用", "停用",
             "丟失", "失去",
