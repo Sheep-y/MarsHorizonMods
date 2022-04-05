@@ -24,7 +24,13 @@ This guide is tested on BepInEx v5.4.19.
 5. Place your mods in their own subfolders in the plugins folder.
 For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
 
-6. Optionally, install mod config manager to manage configs in-game by pressing F5: https://github.com/BepInEx/BepInEx.ConfigurationManager
+6. Optionally, install mod config manager to manage configs in-game by pressing F1:
+https://github.com/BepInEx/BepInEx.ConfigurationManager
+
+7. Mod developers may also install UnityExplorer which provides a scene inspector and REPL console on F7:
+https://github.com/sinai-dev/UnityExplorer
+, while ScriptEngine enables hot-reload on F6:
+https://github.com/BepInEx/BepInEx.Debug
 
 
 ## Unity Mod Manager ##

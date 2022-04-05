@@ -175,7 +175,7 @@ namespace ZyMod.MarsHorizon {
       private static void ScheduleReapply () { lock ( sync ) { // Called after config is changed or reloaded.
          if ( ReapplyMod != null || mod == null ) return;
          ReapplyMod = Task.Run( async () => {
-            await Task.Delay( 50 );
+            await Task.Delay( 2000 ); // BepInEx.ConfigurationManager will refresh config in realtime.
             mod.StartCoroutine( ReapplyConfig() );
          } );
       } }
