@@ -2,9 +2,9 @@
 using System.Reflection;
 using UnityModManagerNet;
 
-namespace ZyMod.MarsHorizon.PayloadQA {
+namespace ZyMod.MarsHorizon.PayloadCheckup {
 
-   [ BepInPlugin( "Zy.MarsHorizon.PayloadQA", "Payload QA", "1.0" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.PayloadCheckup", "Payload Checkup", "1.0" ) ]
    public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();

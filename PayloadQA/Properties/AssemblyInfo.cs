@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Mod: Payload QA" )]
+[assembly: AssemblyTitle( "Mod: Payload Checkup" )]
 [assembly: AssemblyDescription( "A Mars Horizon mod to make payload type and reliability more relevant." )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany( "Sheepy" )]

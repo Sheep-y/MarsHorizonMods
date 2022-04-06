@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using static Astronautica.Model.PayloadVariation.PayloadVariant.Type;
 
-namespace ZyMod.MarsHorizon.PayloadQA {
+namespace ZyMod.MarsHorizon.PayloadCheckup {
 
    internal class PatcherAutoResolve: ModPatcher {
       internal override void Apply () {

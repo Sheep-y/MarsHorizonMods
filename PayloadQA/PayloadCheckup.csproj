@@ -7,8 +7,8 @@
     <ProjectGuid>{68B09C92-C9FC-44AB-832C-504594A5376F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZyMod.MarsHorizon.PayloadQA</RootNamespace>
-    <AssemblyName>MH_PayloadQA</AssemblyName>
+    <RootNamespace>ZyMod.MarsHorizon.PayloadCheckup</RootNamespace>
+    <AssemblyName>MH_PayloadCheckup</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

@@ -1,4 +1,4 @@
-# Payload QA #
+# Payload Checkup #
 
 *Payload variation that matters.*
 
@@ -38,12 +38,11 @@ This mod provides the following features by default:
 
 # Configuration #
 
-The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.DeepSpaceSlots.cfg`.
-On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\DeepSpaceSlots.ini`.
+The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.PayloadCheckup.cfg`.
+On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\PayloadCheckup.ini`.
 
 You can edit the config file to disable or adjust some features.
-
-BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
+Except when using BepInEx's configuration manager, the changes will take effect on game's next launch.
 
 
 # Compatibility #
@@ -62,7 +61,7 @@ If the mod doesn't work, there are a few things you can try:
 ## Check Mod Is Loaded
 
 If using BepInEx, read its log to be sure that mod is loaded.
-Otherwise, find `DeepSpaceSlots.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+Otherwise, find `PayloadCheckup.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 
 If the log exists, delete it and re-launch the game.
 

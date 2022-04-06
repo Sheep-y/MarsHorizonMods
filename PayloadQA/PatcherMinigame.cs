@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ZyMod.MarsHorizon.PayloadQA {
+namespace ZyMod.MarsHorizon.PayloadCheckup {
 
    internal class PatcherMinigame: ModPatcher {
       internal override void Apply () {
@@ -25,12 +25,13 @@ namespace ZyMod.MarsHorizon.PayloadQA {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetReliability ( float payloadReliability ) {
-         if ( float.IsNaN( OriginalPayloadCritChance ) ) OriginalPayloadCritChance = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
+         if ( float.IsNaN( OriginalPayloadCritChance ) ) 
+            OriginalPayloadCritChance = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
          var crit = LastCritChance;
          if ( LastReliability != payloadReliability ) {
             crit = config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability;
             if ( crit > payloadReliability ) crit = payloadReliability;
-            Fine( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
+            Info( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
             LastReliability = payloadReliability;
             LastCritChance = crit;
          }
