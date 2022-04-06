@@ -31,9 +31,6 @@ This mod provides the following features by default:
 * Show info icon next to Diplomacy when a joint mission can be proposed.
 * Spacepedia will now never show an icon.
 
-Hiding spacepedia notice is _way_ simpler, and _way_ more reliable, than trying to fix the mark all button.
-If you insist, a simple google should show you a simple json fix.
-
 ## Planet Screen ##
 
 * A "Launch Window" button is added to the bottom of milestone/request mission list.
@@ -48,9 +45,6 @@ The payload build time already factors in all applicable bonus.
 * After you hover out of any vehicle option on the left, the launch window around the point of vehicle completion will be listed.
 * The bonus and penalty of each contractor is displayed under their name for easy comparison.
 
-I couldn't find a way to show launch window without mouse movement, sorry about that.
-Contractor bonus already factor in applicable multipliers.
-
 ## Research Screen ##
 
 * Booster research node will now show all possible supplements and the combined capacity of each.
@@ -63,7 +57,7 @@ Only synergies count.  Building effects are not included on the list.
 
 ## Funding Screen ##
 
-Next Tier now accurately shows the tier you will be at, instead of current tier + 1.
+* *Next Tier now accurately shows the tier you will be at, instead of current tier + 1.
 
 
 # Configuration #

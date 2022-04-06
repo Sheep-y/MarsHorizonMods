@@ -2,16 +2,25 @@
 ## Mars Horizon 正體中文補丁 ##
 
 This is an unofficial translation of Mars Horizon (2020 game).
-It converts Simplified Chinese into Traditional Chinese.
+It converts Simplified Chinese into Traditional Chinese, and improves the translantions.
+
+Alternatively, set `dynamic_patch` to False to expand the character support in all languages.
+GNU Unifont is bundled to support most languages and symbols.
 
 
 # 安裝 #
 
-1. 安裝 Mars Horizon Mod Loader。將內容解壓到遊戲根目錄就可以。
-2. 從 GitHub 或 NexusMods 下載本補丁的最近版。用 7-zip 或類似軟件打開。
-3. 將 `MH_Zhant.dll`、三個 NotoSans 字型擋、及 unifont 字型檔 拖放到遊戲的 `Mods` 目錄。（共五個檔案）
-4. 啓動遊戲，將遊戲語言切換到中文即可。
+你需要先安裝一個外掛加載器（Mod Loader）。
+本補丁支援 BepInEx 5，Simple Mars Horizon Mod Loader，及 Unity Mod Loader。
 
+* **BepInEx** : 將內容解壓到 `BepInEx\plugins` 目錄。
+* **Simple Mars Horizon Mod Loader** : 將內容解壓到 `Mods` 目錄。
+* **Unity Mod Manager** : 將封包拖放進去，或使用 Install 按鍵。
+
+啓動遊戲後，到遊戲選項將遊戲語言切換到中文即可。
+
+Folder/File locations are relative to game root.
+To unintall this mod, delete the extracted files.
 
 # 相容性 #
 
