@@ -15,7 +15,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
    }
 
    public class Mod : MarsHorizonMod {
-      protected override string GetModName () => "PayloadQA";
+      protected override string GetModName () => "PayloadCheckup";
       public static void Main () => new Mod().Initialize();
       protected override void OnGameAssemblyLoaded ( Assembly game ) {
          var config = ModPatcher.config;

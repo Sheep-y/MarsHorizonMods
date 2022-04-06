@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissionControl", "MissionCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSpaceSlots", "DeepSpaceSlots\DeepSpaceSlots.csproj", "{9E5E3C36-9D28-40B7-83A1-8610F7F2E3EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayloadQA", "PayloadQA\PayloadQA.csproj", "{68B09C92-C9FC-44AB-832C-504594A5376F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayloadCheckup", "PayloadCheckup\PayloadCheckup.csproj", "{68B09C92-C9FC-44AB-832C-504594A5376F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhant", "Zhant\Zhant.csproj", "{2FD63D0B-772A-4FD6-A0ED-756A4B46ED15}"
 EndProject
