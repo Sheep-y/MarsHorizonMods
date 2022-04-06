@@ -1,0 +1,9 @@
+{
+  "Id": "ZyModLoader",
+  "DisplayName": "Mod Loader",
+  "Author": "Sheepy",
+  "Version": "1.0",
+  "ManagerVersion": "0.24",
+  "AssemblyName": "MH_ModLoader.dll",
+  "EntryMethod": "ZyMod.MarsHorizon.ModLoader.MarsHorizonModLoader.Main"
+}

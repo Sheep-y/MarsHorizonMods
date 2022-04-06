@@ -69,6 +69,25 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetPath)" "$(SolutionDir)release\"</PostBuildEvent>
+    <PostBuildEvent>mkdir "$(SolutionDir)release"
+mkdir "$(ProjectDir)release"
+mkdir "$(ProjectDir)release\Mods"
+mkdir "$(ProjectDir)release\src"
+
+copy /y "$(ProjectDir)*.md" "$(ProjectDir)release\"
+copy /y "$(ProjectDir)res\doorstop_config.ini" "$(ProjectDir)release\"
+copy /y "$(ProjectDir)res\unity_doorstop.dll" "$(ProjectDir)release\winhttp.dll"
+
+copy /y "$(TargetPath)" "$(ProjectDir)release\Mods\"
+copy /y "$(ProjectDir)res\Info.json" "$(ProjectDir)release\Mods\"
+copy /y "$(SolutionDir)packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll" "$(ProjectDir)release\Mods\"
+
+copy /y "$(ProjectDir)*.cs" "$(ProjectDir)release\src\"
+copy /y "$(ProjectDir)*.csproj" "$(ProjectDir)release\src\"
+copy /y "$(ProjectDir)packages.config" "$(ProjectDir)release\src\"
+copy /y "$(ProjectDir)res\LICENSE.*" "$(ProjectDir)release\src\"
+
+cd "$(ProjectDir)release"
+tar -a -cf "$(SolutionDir)release\MH_ModLoader.zip" *.*</PostBuildEvent>
   </PropertyGroup>
 </Project>
