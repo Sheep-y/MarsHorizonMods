@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle( "Mod: Informed" )]
-[assembly: AssemblyDescription( "A Mars Horizon mod to present more information" )]
+[assembly: AssemblyDescription( "A Mars Horizon mod to show launch window and other information." )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany( "Sheepy" )]
 [assembly: AssemblyProduct( "" )]
-[assembly: AssemblyCopyright( "" )]
+[assembly: AssemblyCopyright( "GPL v3 @ 2022" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "0.0.2022.0331" )]
-[assembly: AssemblyFileVersion( "0.0.2022.0331" )]
+[assembly: AssemblyVersion( "1.0.0.0" )]
+[assembly: AssemblyFileVersion( "1.0.0.0" )]

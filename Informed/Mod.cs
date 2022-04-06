@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.Informed {
-   [ BepInPlugin( "Zy.MarsHorizon.Informed", "Informed", "0.0.2022.0331" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.Informed", "Informed", "1.0" ) ]
    public class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();

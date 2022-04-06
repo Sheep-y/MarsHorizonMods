@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine;
 
 namespace ZyMod.MarsHorizon.ModLoader {
-   [ BepInPlugin( "Zy.MarsHorizon.SimpleModLoader", "Simple Mars Horizon Mod Loader", "1.0.0.0" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.SimpleModLoader", "Simple Mars Horizon Mod Loader", "1.0" ) ]
    public class BIE_Mod {
       private void Awake() => MarsHorizonModLoader.Main();
    }

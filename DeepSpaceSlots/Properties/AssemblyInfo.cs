@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DeepSpaceSlots")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle( "Mod: Deep Space Slots" )]
+[assembly: AssemblyDescription( "A Mars Horizon mod to add extra slots for deep space missions." )]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DeepSpaceSlots")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCompany( "Sheepy" )]
+[assembly: AssemblyProduct( "" )]
+[assembly: AssemblyCopyright( "GPL v3 @ 2022" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "0.0.2022.0331" )]
-[assembly: AssemblyFileVersion( "0.0.2022.0331" )]
+[assembly: AssemblyVersion( "1.0.0.0" )]
+[assembly: AssemblyFileVersion( "1.0.0.0" )]

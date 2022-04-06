@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Click Reduction" )]
-[assembly: AssemblyDescription( "A Mars Horizon mod to reduce clicks and speed up animations" )]
+[assembly: AssemblyTitle( "Mod: Click Reduction" )]
+[assembly: AssemblyDescription( "A Mars Horizon mod to reduce clicks and speed up animations." )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany( "Sheepy" )]
 [assembly: AssemblyProduct( "" )]
-[assembly: AssemblyCopyright( "" )]
+[assembly: AssemblyCopyright( "GPL v3 @ 2022" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
