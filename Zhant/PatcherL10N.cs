@@ -39,7 +39,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static ModPatch patchZh, patchFont;
       private const string SC_prefix = "NotoSansCJKsc-";
-      private static readonly string[] fallback_fonts = new string[]{ "TW-Sung.ttf", "HanaMinA.ttf", "HanaMinB.ttf", "CODE2000.TTF", "unifont.ttf" };
+      private static readonly string[] fallback_fonts = new string[]{ "TW-Sung.ttf", "HanaMinA.ttf", "HanaMinB.ttf", "CODE2000.TTF", "unifont.ttf", "unifont_upper.ttf" };
       private static readonly string[] variations = new string[] { "Thin", "Light", "Regular", "Medium", "Bold", "Black" };
 
       private static void DynamicPatch ( UserSettings.Language language ) { lock ( me ) { try {
