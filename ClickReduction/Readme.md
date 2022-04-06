@@ -1,7 +1,5 @@
 # Click Reduction #
 
-*Mars Horizon on Adrenaline.*
-
 This is an unofficial mod of Mars Horizon (2020 game).
 It removes most unnecessary clicks and greatly speed up gameplay.
 
@@ -18,12 +16,11 @@ Please pay attention to event countdowns and the mission list alert icon.
 A mod loader is required.
 Supports BepInEx v5, Simple Mars Horizon Mod Loader, and Unity Mod Manager.
 
-* **BepInEx** : Extract package content into `BepInEx\plugins` folder.
-* **Simple Mars Horizon Mod Loader** : Extract package into `Mods` folder.
-* **Unity Mod Manager** : Drag and drop package or use the Install button.
+* **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
+* **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
+* **Unity Mod Manager** : Drag and drop package into UMM or use the Install button.
 
-Folder/File locations are relative to game root.
-To unintall this mod, delete the extracted files.
+To uninstall this mod, delete the extracted files.
 
 
 ## The Story ##
@@ -90,8 +87,8 @@ The default value is relatively safe while still offering noted improvement.
 
 # Configuration #
 
-The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.DeepSpaceSlots.cfg`.
-On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\DeepSpaceSlots.ini`.
+The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.ClickReduction.cfg`.
+On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\ClickReduction.ini`.
 
 You can edit the ini file to disable or adjust various features and timings.
 
@@ -118,12 +115,12 @@ If the mod doesn't work, there are a few things you can try:
 ## Check Mod Is Loaded
 
 If using BepInEx, read its log to be sure that mod is loaded.
-Otherwise, find `DeepSpaceSlots.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+Otherwise, find `ClickReduction.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 
 If the log exists, delete it and re-launch the game.
 
 If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,
-you need to fix that first.  Please follow the mod loader's troubleshoot instructions.
+you need to fix that first.  Please make sure mod is placed in the correct folder.
 
 ## Check Mod Errors
 
@@ -142,4 +139,6 @@ If you delete the config file, the mod will recreate it with default values.
 
 # License #
 
-GPL v3.  The src folder contains complete source code and license.
+GPL v3.  The src folder contains source code and license.
+
+https://github.com/Sheep-y/MarsHorizonMods/

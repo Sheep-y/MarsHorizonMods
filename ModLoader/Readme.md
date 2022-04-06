@@ -152,4 +152,6 @@ Make sure to make *yourself* confortable with *your* code.  That's what I do.
 
 GPL v3.  Bundled libraries are either MIT or public domain.
 
-The src folder contains complete source code and license.
+The src folder contains source code and license.
+
+https://github.com/Sheep-y/MarsHorizonMods/

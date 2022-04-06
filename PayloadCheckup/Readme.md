@@ -1,7 +1,5 @@
 # Payload Checkup #
 
-*Payload variation that matters.*
-
 This is an unofficial mod of Mars Horizon (2020 game).
 It adjusts auto-resolve success/crit rate by payload variation,
 and manual action crit rate by payload reliability.
@@ -12,12 +10,11 @@ and manual action crit rate by payload reliability.
 A mod loader is required.
 Supports BepInEx v5, Simple Mars Horizon Mod Loader, and Unity Mod Manager.
 
-* **BepInEx** : Extract package content into `BepInEx\plugins` folder.
-* **Simple Mars Horizon Mod Loader** : Extract package into `Mods` folder.
-* **Unity Mod Manager** : Drag and drop package or use the Install button.
+* **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
+* **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
+* **Unity Mod Manager** : Drag and drop package into UMM or use the Install button.
 
-Folder/File locations are relative to game root.
-To unintall this mod, delete the extracted files.
+To uninstall this mod, delete the extracted files.
 
 
 # Default Behaviour #
@@ -85,4 +82,6 @@ If you delete the config file, the mod will recreate it with default values.
 
 # License #
 
-GPL v3.  The src folder contains complete source code and license.
+GPL v3.  The src folder contains source code and license.
+
+https://github.com/Sheep-y/MarsHorizonMods/

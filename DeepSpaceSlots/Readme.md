@@ -1,7 +1,5 @@
 # ﻿Deep Space Slots #
 
-*Secondary mission teams when you need them.*
-
 This is an unofficial mod of Mars Horizon (2020 game).
 It unlocks additional deep space slots for long duration missions, freeing up slots for more missions to help maintain game pace.
 
@@ -14,12 +12,11 @@ New saves made with this mod will still work when mod is disabled.
 A mod loader is required.
 Supports BepInEx v5, Simple Mars Horizon Mod Loader, and Unity Mod Manager.
 
-* **BepInEx** : Extract package content into `BepInEx\plugins` folder.
-* **Simple Mars Horizon Mod Loader** : Extract package into `Mods` folder.
-* **Unity Mod Manager** : Drag and drop package or use the Install button.
+* **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
+* **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
+* **Unity Mod Manager** : Drag and drop package into UMM or use the Install button.
 
-Folder/File locations are relative to game root.
-To unintall this mod, delete the extracted files.
+To uninstall this mod, delete the extracted files.
 
 
 # Default Mechanic #
@@ -83,7 +80,7 @@ Otherwise, find `DeepSpaceSlots.log` in `%AppData%\..\LocalLow\Auroch Digital\Ma
 If the log exists, delete it and re-launch the game.
 
 If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,
-you need to fix that first.  Please follow the mod loader's troubleshoot instructions.
+you need to fix that first.  Please make sure mod is placed in the correct folder.
 
 ## Check Mod Errors
 
@@ -103,3 +100,5 @@ If you delete the config file, the mod will recreate it with default values.
 # License #
 
 GPL v3.  The src folder contains source code and license.
+
+https://github.com/Sheep-y/MarsHorizonMods/
