@@ -15,6 +15,8 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          }
       }
 
+      internal override void Unapply () => RevertReliability();
+
       private static float OriginalPayloadCritChance = float.NaN;
       private static float LastReliability = float.NaN, LastCritChance;
 
@@ -34,13 +36,15 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
             Info( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
             LastReliability = payloadReliability;
             LastCritChance = crit;
-         }
+         } else
+            Fine( "Set crit chance to {0}", crit );
          Data.instance.rules.missionGameplayRules.positiveEventOccurrence = crit;
       }
 
       private static void RevertReliability () { try {
-         if ( ! float.IsNaN( OriginalPayloadCritChance ) )
-            Data.instance.rules.missionGameplayRules.positiveEventOccurrence = OriginalPayloadCritChance;
+         if ( float.IsNaN( OriginalPayloadCritChance ) ) return;
+         Fine( "Restore crit chance to {0}", OriginalPayloadCritChance );
+         Data.instance.rules.missionGameplayRules.positiveEventOccurrence = OriginalPayloadCritChance;
       } catch ( Exception x ) { Err( x ); } }
 
    }
