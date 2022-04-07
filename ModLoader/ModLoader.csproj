@@ -69,32 +69,34 @@
   <PropertyGroup>
     <PreBuildEvent>del "$(SolutionDir)release\$(TargetName).*"
 rmdir /s /q "$(ProjectDir)release"</PreBuildEvent>
-    <PostBuildEvent>mkdir "$(SolutionDir)release"
-mkdir "$(ProjectDir)release"
-mkdir "$(ProjectDir)release\Mods"
-mkdir "$(ProjectDir)release\src\Shared"
-mkdir "$(ProjectDir)release\src\$(ProjectName)"
-mkdir "$(ProjectDir)release\src\$(ProjectName)\Properties"
+    <PostBuildEvent>set sln_output=$(SolutionDir)release\
+set output=$(ProjectDir)release\
+set src=%25output%25src\
+set src_prj=%25src%25$(ProjectName)\
 
-copy /y "$(ProjectDir)*.md" "$(ProjectDir)release\"
-copy /y "$(ProjectDir)res\doorstop_config.ini" "$(ProjectDir)release\"
-copy /y "$(ProjectDir)res\unity_doorstop.dll" "$(ProjectDir)release\winhttp.dll"
+mkdir "%25sln_output%25"
+mkdir "%25output%25Mods"
+mkdir "%25src%25Shared"
+mkdir "%25src_prj%25Properties"
 
-copy /y "$(TargetPath)" "$(SolutionDir)release\"
-copy /y "$(TargetPath)" "$(ProjectDir)release\Mods\"
-copy /y "$(SolutionDir)packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll" "$(ProjectDir)release\Mods\"
+copy /y "$(ProjectDir)*.md" "%25output%25"
+copy /y "$(ProjectDir)res\doorstop_config.*" "%25output%25"
+copy /y "$(ProjectDir)res\unity_doorstop.*" "%25output%25winhttp.dll"
 
-copy /y "$(ProjectDir)*.cs" "$(ProjectDir)release\src\$(ProjectName)\"
-copy /y "$(ProjectDir)*.csproj" "$(ProjectDir)release\src\$(ProjectName)\"
-copy /y "$(ProjectDir)packages.config" "$(ProjectDir)release\src\$(ProjectName)\"
-copy /y "$(ProjectDir)Properties\*" "$(ProjectDir)release\src\$(ProjectName)\Properties\"
-copy /y "$(SolutionDir)Shared\ZyMod.cs" "$(ProjectDir)release\src\Shared\"
+copy /y "$(TargetPath)" "%25sln_output%25"
+copy /y "$(TargetPath)" "%25output%25Mods\"
+copy /y "$(SolutionDir)packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll" "%25output%25Mods\"
 
-copy /y "$(ProjectDir)res\Info.json" "$(ProjectDir)release\src\"
-copy /y "$(ProjectDir)res\LICENSE.*" "$(ProjectDir)release\src\"
-copy /y "$(SolutionDir)res\LICENSE.GPL*" "$(ProjectDir)release\src\"
+copy /y "$(ProjectDir)*.cs*" "%25src_prj%25"
+copy /y "$(ProjectDir)packages.*" "%25src_prj%25"
+copy /y "$(ProjectDir)Properties\*" "%25src_prj%25Properties\"
+copy /y "$(SolutionDir)Shared\ZyMod.cs" "%25src%25Shared\"
+
+copy /y "$(ProjectDir)res\Info.json" "%25src%25"
+copy /y "$(ProjectDir)res\LICENSE.*" "%25src%25"
+copy /y "$(SolutionDir)res\LICENSE.GPL*" "%25src%25"
 
 cd "$(ProjectDir)release"
-tar -a -cf "$(SolutionDir)release\$(TargetName).zip" *.*</PostBuildEvent>
+tar -a -cf "%25sln_output%25$(TargetName).zip" *.*</PostBuildEvent>
   </PropertyGroup>
 </Project>
