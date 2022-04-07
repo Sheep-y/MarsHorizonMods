@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <GamePath>C:\Program Files (x86)\GOG Galaxy\Games\Mars Horizon\</GamePath>
+    <GameManaged>$(GamePath)Mars Horizon_Data\Managed\</GameManaged>
+
+    <BepInExPath>C:\Users\Sheepy\Documents\My Games\BepInEx5\</BepInExPath>
+    <UMMPath>C:\Users\Sheepy\Documents\My Games\UnityModManager\</UMMPath>
+  </PropertyGroup>
+</Project>
