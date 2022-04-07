@@ -57,10 +57,11 @@ Since it does not depends on game code, it is expected to be compatible with fut
 
 ## Mod Loader Bridging ##
 
-This mod loader is *also* a BepInEx plugin and a UMM plugin,
+This mod loader is *also* a BepInEx plugin and can be loaded by UMM,
 meaning it can be used to load vanilla mods in those loaders.
 
-Use only the mod loader dll and maybe Info.json.  Do *not* replace winhttp and doorstop config.
+Use only the mod loader dll and Info.json, which can be found in `src`.
+Do *not* replace winhttp and doorstop config.  Do *not* include `0Harmony.dll`.
 Place this loader and those incompatible mods in a subfolder, away from other mods.
 
 

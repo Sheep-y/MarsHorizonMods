@@ -69,25 +69,33 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir "$(SolutionDir)release"
+    <PostBuildEvent>rmdir /s /q "$(ProjectDir)release"
+mkdir "$(SolutionDir)release"
 mkdir "$(ProjectDir)release"
 mkdir "$(ProjectDir)release\Mods"
-mkdir "$(ProjectDir)release\src"
+mkdir "$(ProjectDir)release\src\Shared"
+mkdir "$(ProjectDir)release\src\$(ProjectName)"
+mkdir "$(ProjectDir)release\src\$(ProjectName)\Properties"
 
 copy /y "$(ProjectDir)*.md" "$(ProjectDir)release\"
 copy /y "$(ProjectDir)res\doorstop_config.ini" "$(ProjectDir)release\"
 copy /y "$(ProjectDir)res\unity_doorstop.dll" "$(ProjectDir)release\winhttp.dll"
 
+copy /y "$(TargetPath)" "$(SolutionDir)release\"
 copy /y "$(TargetPath)" "$(ProjectDir)release\Mods\"
-copy /y "$(ProjectDir)res\Info.json" "$(ProjectDir)release\Mods\"
 copy /y "$(SolutionDir)packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll" "$(ProjectDir)release\Mods\"
 
-copy /y "$(ProjectDir)*.cs" "$(ProjectDir)release\src\"
-copy /y "$(ProjectDir)*.csproj" "$(ProjectDir)release\src\"
-copy /y "$(ProjectDir)packages.config" "$(ProjectDir)release\src\"
+copy /y "$(ProjectDir)*.cs" "$(ProjectDir)release\src\$(ProjectName)\"
+copy /y "$(ProjectDir)*.csproj" "$(ProjectDir)release\src\$(ProjectName)\"
+copy /y "$(ProjectDir)packages.config" "$(ProjectDir)release\src\$(ProjectName)\"
+copy /y "$(ProjectDir)Properties\*" "$(ProjectDir)release\src\$(ProjectName)\Properties\"
+copy /y "$(SolutionDir)Shared\ZyMod.cs" "$(ProjectDir)release\src\Shared\"
+
+copy /y "$(ProjectDir)res\Info.json" "$(ProjectDir)release\src\"
 copy /y "$(ProjectDir)res\LICENSE.*" "$(ProjectDir)release\src\"
+copy /y "$(SolutionDir)res\LICENSE.GPL*" "$(ProjectDir)release\src\"
 
 cd "$(ProjectDir)release"
-tar -a -cf "$(SolutionDir)release\MH_ModLoader.zip" *.*</PostBuildEvent>
+tar -a -cf "$(SolutionDir)release\$(TargetName).zip" *.*</PostBuildEvent>
   </PropertyGroup>
 </Project>
