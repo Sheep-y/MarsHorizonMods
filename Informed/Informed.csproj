@@ -88,6 +88,7 @@
     <Compile Include="Mod.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Info.json" />
     <None Include="packages.config" />
     <None Include="Readme.md" />
   </ItemGroup>

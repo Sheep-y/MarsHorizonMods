@@ -9,12 +9,11 @@ New saves made with this mod will still work when mod is disabled.
 
 # Installation #
 
-A mod loader is required.
-Supports BepInEx v5, Simple Mars Horizon Mod Loader, and Unity Mod Manager.
+A mod loader is required.  The following loaders have been tested:
 
 * **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
 * **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
-* **Unity Mod Manager** : Drag and drop package into UMM or use the Install button.
+* **Unity Mod Manager** : Extract package into a new subfolder under `Mods\Loader`.
 
 To uninstall this mod, delete the extracted files.
 

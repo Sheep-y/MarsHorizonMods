@@ -75,6 +75,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "保存游戲", "儲存遊戲",
             "加載游戲", "載入遊戲",
             "任務困難", "任務難度",
+            "資金活動 ({option1_int1})", "資助活動 ({option1_int1})",
 
             // Agency Traits
             "高效架構",  "高效建造",

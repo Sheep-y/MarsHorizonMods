@@ -65,3 +65,7 @@ e.g. `Mods\Loader\MH_ModLoader.dll` and `Mods\Loader\Info.json`.
 
 9. Place mods in their own subfolder under the loader subfolder.
 For example, the "Informed" mod may be placed as `Mods\Loader\Informed-1-0-123\MH_Informed.dll`.
+
+This mod loader is required as a bridge because Unity Mod Manager does not correctly handle
+`ReflectionTypeLoadException` as of version 0.24.2.  Until it fixes that, it cannot load
+BepInEx compatible mods, and they shall not be installed through the GUI.

@@ -1,0 +1,9 @@
+{
+  "Id": "ZyMissionControl",
+  "DisplayName": "Mission Control",
+  "Author": "Sheepy",
+  "Version": "1.0",
+  "ManagerVersion": "0.24",
+  "AssemblyName": "MH_MissionControl.dll",
+  "EntryMethod": "ZyMod.MarsHorizon.MissionControl.Mod.Main"
+}

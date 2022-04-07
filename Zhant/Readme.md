@@ -33,6 +33,45 @@ To unintall this mod, delete the extracted files.
 本補丁相容於我做的其他 Mars Horizon 外掛，它們會顯示正體中文。
 
 
+
+# Compatibility #
+
+The mod is developed and tested on Mars Horizon version 1.4.1, GOG.com,
+but should be compatible with Steam and Epic on Windows/Wine/Proton.
+All game languages are supported.
+
+This mod does not change save games or game files.
+
+
+# Troubleshoot #
+
+If the mod doesn't work, there are a few things you can try:
+
+## Check Mod Is Loaded
+
+If using BepInEx, read its log to be sure that mod is loaded.
+Otherwise, find `PayloadCheckup.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+
+If the log exists, delete it and re-launch the game.
+
+If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,
+you need to fix that first.  Please follow the mod loader's troubleshoot instructions.
+
+## Check Mod Errors
+
+If you get the log but mod is still not working, read the mod log and/or game log (`Player.log`).
+
+Errors normally have "Error" or "Exception" in the message.
+If you do find errors, you usually need a programmer.
+Resetting the config may help, though.  Which brings us to...
+
+## Check Mod Config
+
+The mod is configurable.  If it is not configured right, the mod may not work as expected.
+
+If you delete the config file, the mod will recreate it with default values.
+
+
 # 排錯 #
 
 如果有問題，可以試一下排錯：
@@ -69,5 +108,7 @@ https://fonts.google.com/noto/fonts?noto.script=Hant&noto.query=sans
 
 # 授權 #
 
-GPL v3.  字型皆採用 SIL OFL v1.1 授權。
+GPL v3。字型皆採用 SIL OFL v1.1 授權。
 src 目錄含有源碼和授權聲明。
+
+https://github.com/Sheep-y/MarsHorizonMods/

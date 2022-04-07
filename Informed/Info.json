@@ -1,0 +1,9 @@
+{
+  "Id": "ZyInformed",
+  "DisplayName": "Informed",
+  "Author": "Sheepy",
+  "Version": "1.0",
+  "ManagerVersion": "0.24",
+  "AssemblyName": "MH_Informed.dll",
+  "EntryMethod": "ZyMod.MarsHorizon.Informed.Mod.Main"
+}
