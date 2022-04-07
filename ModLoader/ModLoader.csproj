@@ -34,10 +34,6 @@
     <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>C:\Users\Sheepy\Documents\My Games\BepInEx5\BepInEx\core\BepInEx.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -66,11 +62,13 @@
     <None Include="packages.config" />
     <None Include="Alternatives.md" />
     <None Include="Readme.md" />
+    <None Include="res\Info.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rmdir /s /q "$(ProjectDir)release"
-mkdir "$(SolutionDir)release"
+    <PreBuildEvent>del "$(SolutionDir)release\$(TargetName).*"
+rmdir /s /q "$(ProjectDir)release"</PreBuildEvent>
+    <PostBuildEvent>mkdir "$(SolutionDir)release"
 mkdir "$(ProjectDir)release"
 mkdir "$(ProjectDir)release\Mods"
 mkdir "$(ProjectDir)release\src\Shared"

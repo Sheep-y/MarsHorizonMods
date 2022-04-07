@@ -55,15 +55,6 @@ but should be compatible with Steam and Epic on Windows/Wine/Proton.
 This mod loader does not change save games or game files.
 Since it does not depends on game code, it is expected to be compatible with future game versions.
 
-## Mod Loader Bridging ##
-
-This mod loader is *also* a BepInEx plugin and can be loaded by UMM,
-meaning it can be used to load vanilla mods in those loaders.
-
-Use only the mod loader dll and Info.json, which can be found in `src`.
-Do *not* replace winhttp and doorstop config.  Do *not* include `0Harmony.dll`.
-Place this loader and those incompatible mods in a subfolder, away from other mods.
-
 
 # Troubleshoot #
 

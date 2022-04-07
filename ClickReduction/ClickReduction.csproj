@@ -95,6 +95,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
+    <PreBuildEvent>del "$(SolutionDir)release\$(TargetName).*"
+rmdir /s /q "$(ProjectDir)release"</PreBuildEvent>
     <PostBuildEvent>rmdir /s /q "$(ProjectDir)release"
 mkdir "$(SolutionDir)release"
 mkdir "$(ProjectDir)release"

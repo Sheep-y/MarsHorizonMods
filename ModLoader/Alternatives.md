@@ -21,7 +21,7 @@ This guide is tested on BepInEx v5.4.19.
 4. Check that `BepInEx\config` and `BepInEx\plugins` folders have been created.
 
 5. Place your mods in their own subfolders in the plugins folder.
-For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
+For example, the "Informed" mod may be placed as `BepInEx\plugins\Informed-1-0-123\MH_Informed.dll`.
 
 6. Optionally, install mod config manager to manage configs in-game by pressing F1:
 https://github.com/BepInEx/BepInEx.ConfigurationManager
@@ -57,17 +57,28 @@ This guide is tested on Unity Mod Manager v0.24.
 
 4. Pick game folder if not auto-detected.  Double-check that the game is correct, not "A Dance of Fire and Ice" or other games.
 
-5. Click "Install".  Either method works.
+5. Click "Install".  Either method works.  A `Mods` folder is created under game root.
 
-6. A `Mods` folder is created under game root.  Mods are to be placed here in their own subfolders.
-For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
+6. Create a new subfolder under `Mods`, e.g. `Mods\Loader`.
+
+7. Find `Mods\MH_ModLoader.dll` and `src\Info.json` from this mod loader and put them in this subfolder.
+e.g. `Mods\Loader\MH_ModLoader.dll` and `Mods\Loader\Info.json`.
+
+8. Make sure `Mods` and the loader subfolder does *not* contain `0Harmony.dll`.
+
+9. Place mods in the loader subfolder, either together or in individual subfolders.
+For example, the "Informed" mod may be placed as `Mods\Loader\Informed-1-0-123\MH_Informed.dll`.
 
 
 ## Other Mod Loaders ##
 
-If a mod loader that does not require a mod to be linked to it, such as Unity Mod Manager,
-you usully only need to write a config file for it to load my mods, such as `Info.json`.
+Programming is complicated.  Honest.
 
-Loaders that require hard dependencies, such as Melon Loader,
-will be more difficult.  The simplest is to write a bridge for this mod loader,
-or modify this loader to be compatible, which can then load the other mods.
+For example, BepInEx requires hard reference to it, which causes the mods to fail to
+load in Unity Mod Manager because it does not properly handle ReflectionTypeLoadException,
+that is why we need this mod loader to serve as a bridge between UMM and my Mars Horizon mods.
+Which is possible because this mod loader does ignore unresolvable types and functions correctly
+regardless of when it is loaded.
+
+So, no, I can't feasibly support Melon Loader or Vortax or whatever new mod loader that is the
+latest hot topic.
