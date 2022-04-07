@@ -89,6 +89,7 @@
     <Compile Include="Mod.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Info.json" />
     <None Include="packages.config" />
     <None Include="Readme.md" />
   </ItemGroup>
@@ -105,11 +106,11 @@ mkdir "$(ProjectDir)release\src\$(ProjectName)\Properties"
 copy /y "$(TargetPath)" "$(SolutionDir)release\"
 copy /y "$(TargetPath)" "$(ProjectDir)release\"
 copy /y "$(ProjectDir)*.md" "$(ProjectDir)release\"
-copy /y "$(ProjectDir)Info.json" "$(ProjectDir)release\Mods\"
+copy /y "$(ProjectDir)Info.*" "$(ProjectDir)release\"
 
 copy /y "$(ProjectDir)*.cs" "$(ProjectDir)release\src\$(ProjectName)\"
 copy /y "$(ProjectDir)*.csproj" "$(ProjectDir)release\src\$(ProjectName)\"
-copy /y "$(ProjectDir)packages.config" "$(ProjectDir)release\src\$(ProjectName)\"
+copy /y "$(ProjectDir)packages.*" "$(ProjectDir)release\src\$(ProjectName)\"
 copy /y "$(ProjectDir)Properties\*" "$(ProjectDir)release\src\$(ProjectName)\Properties\"
 copy /y "$(SolutionDir)Shared\*.cs" "$(ProjectDir)release\src\Shared\"
 copy /y "$(SolutionDir)res\LICENSE.GPL*" "$(ProjectDir)release\src\"

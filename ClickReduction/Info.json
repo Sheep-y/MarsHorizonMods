@@ -1,0 +1,9 @@
+{
+  "Id": "Zy.MarsHorizon.ClickReduction",
+  "DisplayName": "Click Reduction",
+  "Author": "Sheepy",
+  "Version": "1.0",
+  "ManagerVersion": "0.24",
+  "AssemblyName": "MH_ClickReduction.dll",
+  "EntryMethod": "ZyMod.MarsHorizon.ClickReduction.Mod.Main"
+}
