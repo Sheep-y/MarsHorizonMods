@@ -25,15 +25,15 @@ To uninstall this mod, delete the extracted files.
 ## The Story ##
 
 This is my first Mars Horizon mod.
-The animations appeal to my 5yo son, who I purchased the game for, but he has time to waste,
+The animations appeal to my 5yo son, whom I purchased the game for, but he has time to waste,
 esp. when we are still doing covid lockdowns in 2022 in Hong Kong.
 
-He also didn't pay for the new multi-button trackball after the old one died from excessive clicks within the first few hours of this game,
-which by the way cost a lot more than this game.
+He also didn't pay for the new multi-button trackball after the old one coincidently died
+within the first few hours of this game, which by the way costs a lot more than the game.
 
 Hope this mod can save your pointer device in time.
 
-He hates the mod, though.  That and the missing of James Webb Space Telescope.
+He hates the mod, though.  That and the absent of James Webb Space Telescope.
 So, yes, we'd like to see it added to the game.  With full unfold animation please. :D
 
 
