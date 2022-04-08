@@ -134,22 +134,25 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       }
 
       private static void ReAddMissions ( PlannedMissionsScreen __instance, RectTransform ___installationsParent, SimplePooler<PlannedMissionsScreenToggle> ___installations ) { try {
-         var header = ___installationsParent.GetComponentInChildren< TMPro.TextMeshProUGUI >();
-         if ( header != null ) {
-            var txt = MarsHorizonMod.Localise( deepSpaceMissionSlot== 0 ? "Installations" : "MissionControl_Ongoing_Title" );
-            var inst = ___installations.Count;
-            if ( deepSpaceMissionSlot > 0 ) {
-               if ( deepSpaceMissionSlot == deepSpaceMissions.Count )
-                  txt += $" ({deepSpaceMissions.Count + inst })";
-               else
-                  txt += $" ({deepSpaceMissions.Count + inst }/{ deepSpaceMissionSlot + inst })";
+         __instance.Delay( 1, () => {
+            var header = ___installationsParent.GetComponentInChildren< TMPro.TextMeshProUGUI >();
+            if ( header != null ) {
+               if ( deepSpaceMissionSlot > 0 ) {
+                  var txt = MarsHorizonMod.Localise( "MissionControl_Ongoing_Title" );
+                  var inst = ___installations.Count - deepSpaceMissions.Count;
+                  if ( deepSpaceMissionSlot == deepSpaceMissions.Count )
+                     txt += $" ({deepSpaceMissions.Count + inst })";
+                  else
+                     txt += $" ({deepSpaceMissions.Count + inst }/{ deepSpaceMissionSlot + inst })";
+                  header.text = txt;
+               } else 
+                  header.tag = "Installations";
             }
-            header.text = txt;
-         }
+            if ( deepSpaceMissionSlot > 0 ) ___installationsParent?.gameObject?.SetActive( true );
+         } );
          if ( deepSpaceMissions.Count == 0 || ___installations == null ) return;
          foreach ( var mission in deepSpaceMissions )
             ___installations.Get().SetMission( __instance, mission, MissionPlanScreen.EState.Overview );
-         ___installationsParent?.gameObject?.SetActive( true );
          Info( "Migrated {0} deep space missions.", deepSpaceMissions.Count );
       } catch ( Exception x ) { Err( x ); } }
 
