@@ -43,8 +43,7 @@ since only the mod itself can tell whether it has been initiated.
 ## Harmony ##
 
 The mod loader comes with Harmony 2.
-It is used by mods to temporary change the game, without changing game files.
-The mod loader itself does not use it, but all my mods require it.
+It is used by the loader and most mods to temporary change the game, without changing game files.
 
 HarmonyX 2 can also be dropped in as a replacement.
 
@@ -54,9 +53,6 @@ HarmonyX 2 can also be dropped in as a replacement.
 The mod loader is developed and tested on Mars Horizon version 1.4.1, GOG.com,
 but should be compatible with Steam and Epic on Windows/Wine/Proton.
 
-This mod loader does not change the game at all.
-Since it does not depend on game code, it is expected to be compatible with future game versions.
-
 
 # Troubleshoot #
 
@@ -64,7 +60,7 @@ If the mod loader doesn't work, or if none of the mod works, there are a few thi
 
 Before you try it, though, make sure Window Explorer is showing file extensions.
 
-## Check Mod Loader Is Loaded
+## Check Mod Loader Is Loaded ##
 
 Find `ModLoader.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 
@@ -99,12 +95,18 @@ or in a subfolder up to 3 levels deep.  `MH_` must be uppercase.
 
 Some mods may require additional resources, please refer to each mod's instructions.
 
-## Check Mod Loader Log ##
+## Check Mod Logs ##
 
 Read the mod loader log (see above) to see what mods are detected, and whether they were
 loaded without error.  If a mod is not detected, make sure it is in the right name and place.
 
+Also check game log (Player.log) to see whether the game ran into any errors.
+
 Initilisation errors, if any, can only be fixed by that mod.
+
+## Restart PC ##
+
+A cold boot never hurts, as does Verify Files.
 
 
 # Uninstall #

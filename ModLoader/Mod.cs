@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,11 +47,14 @@ namespace ZyMod.MarsHorizon.ModLoader {
          return x.Types;
       } }
 
+      private static bool PatchedXNode;
+
       private static void LoadMarsHorizonMod ( Assembly asm ) {
          foreach ( var t in GetTypes( asm ) ) {
             if ( t?.IsNotPublic != false ) continue;
             var main = t.Methods().FirstOrDefault( e => e.Name == "Main" && e.IsStatic && e.IsPublic && e.GetParameters().Length == 0 && ! e.IsGenericMethod );
             if ( main == null ) continue;
+            if ( ! PatchedXNode ) PatchXNode();
             Fine( "Calling {0} of {1}", main, main.DeclaringType.FullName );
             main.RunStatic();
             return;
@@ -65,5 +69,10 @@ namespace ZyMod.MarsHorizon.ModLoader {
          if ( string.IsNullOrEmpty( path ) ) return null;
          return Path.Combine( Directory.GetParent( path ).FullName, "LocalLow", "Auroch Digital", "Mars Horizon" );
       }
+
+      private static void PatchXNode () { try {
+         PatchedXNode = true;
+         new PatcherGetTypes().PatchXNode();
+      } catch ( Exception x ) { Error( x ); } }
    }
 }

@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NoCsv, NoConfig, NoPatch</DefineConstants>
+    <DefineConstants>TRACE;NoCsv, NoConfig</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -51,12 +51,17 @@
       <HintPath>$(GameManaged)UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="XNode">
+      <HintPath>$(GameManaged)XNode.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Shared\ZyMod.cs">
       <Link>ZyMod.cs</Link>
     </Compile>
     <Compile Include="Mod.cs" />
+    <Compile Include="PatcherGetTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
