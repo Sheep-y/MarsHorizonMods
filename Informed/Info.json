@@ -5,5 +5,7 @@
   "Version": "1.0",
   "ManagerVersion": "0.24",
   "AssemblyName": "MH_Informed.dll",
-  "EntryMethod": "ZyMod.MarsHorizon.Informed.Mod.Main"
+  "EntryMethod": "ZyMod.MarsHorizon.Informed.Mod.Main",
+  "HomePage" : "https://github.com/Sheep-y/MarsHorizonMods",
+  "LoadAfter" : [ "ZyModLoader" ]
 }

@@ -5,5 +5,7 @@
   "Version": "1.0",
   "ManagerVersion": "0.24",
   "AssemblyName": "MH_Zhant.dll",
-  "EntryMethod": "ZyMod.MarsHorizon.Zhant.Mod.Main"
+  "EntryMethod": "ZyMod.MarsHorizon.Zhant.Mod.Main",
+  "HomePage" : "https://github.com/Sheep-y/MarsHorizonMods",
+  "LoadAfter" : [ "ZyModLoader" ]
 }

@@ -5,5 +5,7 @@
   "Version": "1.0",
   "ManagerVersion": "0.24",
   "AssemblyName": "MH_PayloadCheckup.dll",
-  "EntryMethod": "ZyMod.MarsHorizon.PayloadCheckup.Mod.Main"
+  "EntryMethod": "ZyMod.MarsHorizon.PayloadCheckup.Mod.Main",
+  "HomePage" : "https://github.com/Sheep-y/MarsHorizonMods",
+  "LoadAfter" : [ "ZyModLoader" ]
 }

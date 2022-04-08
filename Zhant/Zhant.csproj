@@ -113,7 +113,8 @@ mkdir "%25src_prj%25Properties"
 copy /y "$(TargetPath)" "%25sln_output%25"
 copy /y "$(TargetPath)" "%25output%25"
 copy /y "$(ProjectDir)*.md" "%25output%25"
-copy /y "$(ProjectDir)res\*.?tf" "%25output%25"
+copy /y "$(ProjectDir)res\*.otf" "%25output%25"
+copy /y "$(ProjectDir)Info.*" "%25output%25"
 
 copy /y "$(ProjectDir)*.cs*" "%25src_prj%25"
 copy /y "$(ProjectDir)packages.*" "%25src_prj%25"
@@ -127,7 +128,6 @@ rmdir /s /q "$(ProjectName)"
 rmdir /s /q Shared
 del *.xml
 
-copy /y "$(ProjectDir)Info.*" "%25src%25"
 copy /y "$(ProjectDir)res\LICENSE.*" "%25src%25"
 copy /y "$(SolutionDir)res\LICENSE.GPL*" "%25src%25"
 
