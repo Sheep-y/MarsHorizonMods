@@ -9,7 +9,6 @@ using XNode;
 namespace ZyMod.MarsHorizon.ModLoader {
    internal class PatcherGetTypes : Patcher {
       internal void PatchXNode () {
-         Info( "Patching XNode.NodeDataCache.BuildCache" );
          Patch( typeof( NodeDataCache ), "BuildCache", transpiler: nameof( ReplaceGetTypes ) );
       }
 
@@ -20,7 +19,6 @@ namespace ZyMod.MarsHorizon.ModLoader {
             //foreach ( var t in MarsHorizonModLoader.GetTypes( asm ) ) Fine( t );
             return;
          }
-         Info( "Patching Unity Mod Manager." );
          Patch( type, "Load", transpiler: nameof( ReplaceGetTypes ) );
          Patch( type, "Reload", transpiler: nameof( ReplaceGetTypes ) );
       }

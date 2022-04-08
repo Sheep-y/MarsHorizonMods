@@ -63,9 +63,10 @@ e.g. `Mods\Loader\MH_ModLoader.dll` and `Mods\Loader\Info.json`.
 
 8. Make sure `Mods` and the loader subfolder does *not* contain `0Harmony.dll`.
 
-9. Place mods in their own subfolder under the loader subfolder.
-For example, the "Informed" mod may be placed as `Mods\Loader\Informed-1-0-123\MH_Informed.dll`.
+9. Place mods in their own subfolders under the Mods folder, or use the GUI.
+For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
 
-This mod loader is required as a bridge because Unity Mod Manager does not correctly handle
-`ReflectionTypeLoadException` as of version 0.24.2.  Until it fixes that, it cannot load
-BepInEx compatible mods, and they shall not be installed through the GUI.
+This mod loader is required because Unity Mod Manager does not correctly handle
+`ReflectionTypeLoadException` as of version 0.24.2.
+The Mod Manager will mod UMM to fix the issue, since the XNode library used by the game
+has the same issue.
