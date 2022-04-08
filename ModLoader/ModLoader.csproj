@@ -82,7 +82,7 @@ mkdir "%25src_prj%25Properties"
 
 copy /y "$(ProjectDir)*.md" "%25output%25"
 copy /y "$(ProjectDir)res\doorstop_config.*" "%25output%25"
-copy /y "$(ProjectDir)res\unity_doorstop.*" "%25output%25winhttp.dll"
+copy /y "$(ProjectDir)res\unity_doorstop.dll" "%25output%25winhttp.dll"
 
 copy /y "$(TargetPath)" "%25sln_output%25"
 copy /y "$(TargetPath)" "%25output%25Mods\"
