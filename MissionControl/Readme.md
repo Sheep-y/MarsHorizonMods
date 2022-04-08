@@ -13,7 +13,7 @@ A mod loader is required.  The following loaders have been tested:
 
 * **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
 * **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
-* **Unity Mod Manager** : Extract package into a new subfolder under `Mods\Loader`.
+* **Unity Mod Manager** : Same, or install through the GUI.
 
 To uninstall this mod, delete the extracted files.
 

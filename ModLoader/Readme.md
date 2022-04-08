@@ -2,9 +2,9 @@
 
 This is an unofficial mod loader of the Mars Horizon (2020 game).
 
-Alternatively, you may also use BepInEx and Unity Mod Loader for my mods.
+Alternatively, you may use BepInEx or Unity Mod Loader to load my mods.
 BepInEx is recommended for its easy setup and optional in-game mod config UI.
-Please refer to `Alternatives.md` for instructions.
+Please refer to `Alternatives.md` for instructions of both.
 
 
 # Installation #
