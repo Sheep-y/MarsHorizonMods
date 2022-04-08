@@ -84,7 +84,7 @@ namespace ZyMod.MarsHorizon.ClickReduction {
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200223;
+      public int config_version = 20220223;
 
       internal readonly HashSet< string > SkipCinematics = new HashSet< string >();
 

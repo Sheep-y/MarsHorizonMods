@@ -86,6 +86,6 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       public byte custom_tech2_slot = 1;
 
       [ Config( "\r\n; Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200314;
+      public int config_version = 20220314;
    }
 }

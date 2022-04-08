@@ -50,6 +50,6 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
 
       [ Config( "\r\n" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20200320;
+      public int config_version = 20220320;
    }
 }
