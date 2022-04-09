@@ -52,7 +52,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
       private static int GetDeepSpaceMissionSlots ( Agency agency ) { try {
          int b = GetBuildingSlots( agency ), m = GetMissionSlots( agency ), t = GetTechSlots( agency );
-         Info( "Deep space mission slots: Building {0}, Mission {1}, Research {2}", b, m, t );
+         Fine( "Deep space mission slots: Building {0}, Mission {1}, Research {2}", b, m, t );
          return b + m + t;
       } catch ( Exception x ) { return Err( x, 0 ); } }
 

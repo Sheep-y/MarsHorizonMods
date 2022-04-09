@@ -6,6 +6,8 @@ Alternatively, you may use BepInEx or Unity Mod Loader to load my mods.
 BepInEx is recommended for its easy setup and optional in-game mod config UI.
 Please refer to `Alternatives.md` for instructions of both.
 
+Disclaimer: You mod the game at your own risk.
+
 
 # Installation #
 
@@ -26,24 +28,26 @@ Extract your mods into the `Mods` folder.
 
 This mod loader has three parts.
 
-## Unity Doorstop ##
+## Bootstrapper ##
 
 This loader comes with `doorstop_config.ini` and `winhttp.dll`.
-They are Unity Doorstop, and are pre-configured to run `Mods\MH_ModLoader.dll`.
+They are Unity Doorstop, responsible for loading `Mods\MH_ModLoader.dll` as the game runs.
 
 ## Mod Loader ##
 
 `MH_ModLoader.dll` is the mod loader.
 It will find all other `MH_*.dll` in same folder, up to a depth of 3 subfolders.
-Each will be loaded into memory, and call the first `public static Main()` on a top-level public class.
+Each will be loaded into memory, and have the first `public static Main()` on a top-level public class be invoked.
 
-This mod loader does not detect or avoid mods that are already loaded,
-since only the mod itself can tell whether it has been initiated.
+This mod loader does not attempt to detect or avoid mods that are already loaded.
+
+In addition, the loader will patch the game and Unity Mod Manager (if used) to make them more
+tolerant to multi-loader mods.
 
 ## Harmony ##
 
 The mod loader comes with Harmony 2.
-It is used by the loader and most mods to temporary change the game, without changing game files.
+It is used to temporary modify the game, without changing game files.
 
 HarmonyX 2 can also be dropped in as a replacement.
 
@@ -60,6 +64,20 @@ If the mod loader doesn't work, or if none of the mod works, there are a few thi
 
 Before you try it, though, make sure Window Explorer is showing file extensions.
 
+## Game Fails to Launch ##
+
+1. Moves the `Mods` folder to Recycle Bin.
+2. If the game can launch now, one of the mods is causing the problem.  Try narrow it down.
+3. If the game still does not launch, move `winhttp.dll` and `version.dll` (if any) to Recycle Bin.  Only one should exists, by the way.
+4. If the game can launch now, that could mean the dll build (32/64bit) is incorrect.
+Get the correct one from Unity Doorstop's release page.
+5. If still not work, do a cold reboot first.  Then put the platform in offline mode and try again, in case it is a sync issue.
+7. If the game still can't launch, Delete all files in the game folder (important), Verify Files, and make sure the unmodded game runs ok.
+
+The last step is because most mod loaders will add things into the game,
+which Verify Files will not remove for you.
+This mod loader is proves that having extra files can affect a program.
+
 ## Check Mod Loader Is Loaded ##
 
 Find `ModLoader.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
@@ -72,9 +90,6 @@ Please check that:
 1. `doorstop_config.ini` and `winhttp.dll` both exists on the game's root folder.
 2. `doorstop_config.ini` contains the line `targetAssembly=Mods/MH_ModLoader.dll`
 3. The `Mods` folder exists under game root, and contains `MH_ModLoader.dll` and `0Harmony.dll`.
-4. Check that game is 64bit.  If it is not, replace winhttp.dll with 32bit doorstop dll.  Otherwise, make sure it is 64bit.
-5. Delete all files in the game folder (important), Verify Files, and make sure the unmodded game runs ok.
-Then reinstall this mod loader, and mods.
 
 If you did it all, and the log is still not created on game launch,
 the trouble is probably beyond the scope of this readme.
@@ -102,11 +117,13 @@ loaded without error.  If a mod is not detected, make sure it is in the right na
 
 Also check game log (Player.log) to see whether the game ran into any errors.
 
-Initilisation errors, if any, can only be fixed by that mod.
+If there are other mod logs, you may also check them for errors.
 
-## Restart PC ##
+## Reset Mod Config ##
 
-A cold boot never hurts, as does Verify Files.
+My mods place their config files (*.ini) in the same folder as mod loader log.
+
+Deleting the ini will reset the config, which may correct configuration issues.
 
 
 # Uninstall #
@@ -120,19 +137,12 @@ The mod loader does not modify game files, so there is no need to Verify Files.
 
 # To Mod Authors #
 
-Historical reason aside, there are three main reasons for this mod loader to exists.
+One of the aim of this loader is that you can write a plain, simple mod
+straight out of Harmony tutorial, not tied to any loaders, and have it loads.
 
-First is I need a place on NexusMods to explain how to setup different mod loaders anyway.
+Of course my mods aren't like that.  But I want to leave the options open.
 
-Second is to provide an option for modders who don't want to tie their mods to
-a specific loader, and the third is to provide an option for those who want to use UMM.
-
-See, if the game does gain official mod support in the future, there is a high chance
-it won't integrate BepInEx or UMM.  If a mod depends on them, it will fail.
-
-My mods do support multiple loaders, but they are not simple.
-Not all modders will be comfortable with them.
-
+Good luck modding!
 
 # License #
 
