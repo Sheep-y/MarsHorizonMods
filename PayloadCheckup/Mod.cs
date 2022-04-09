@@ -5,12 +5,12 @@ using UnityModManagerNet;
 namespace ZyMod.MarsHorizon.PayloadCheckup {
 
    [ BepInPlugin( "Zy.MarsHorizon.PayloadCheckup", "Payload Checkup", "1.0" ) ]
-   public class BIE_Mod : BaseUnityPlugin {
+   internal class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
    }
 
-   public static class UMM_Mod {
+   internal static class UMM_Mod {
       public static void Load ( object entry ) => UMMUtil.Init( entry, typeof( Mod ) );
    }
 
