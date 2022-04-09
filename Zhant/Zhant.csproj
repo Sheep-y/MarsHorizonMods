@@ -110,7 +110,6 @@ mkdir "%25sln_output%25"
 mkdir "%25src%25Shared"
 mkdir "%25src_prj%25Properties"
 
-copy /y "$(TargetPath)" "%25sln_output%25"
 copy /y "$(TargetPath)" "%25output%25"
 copy /y "$(ProjectDir)*.md" "%25output%25"
 copy /y "$(ProjectDir)res\*.otf" "%25output%25"
