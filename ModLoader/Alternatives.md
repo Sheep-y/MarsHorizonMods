@@ -45,7 +45,7 @@ This guide is tested on Unity Mod Manager v0.24.
 		<EntryPoint>[Assembly-CSharp.dll]SplashDelayScene.cctor:Before</EntryPoint>
 		<GameVersionPoint>[UnityEngine.CoreModule.dll]UnityEngine.Application.version</GameVersionPoint>
 		<StartingPoint>[Assembly-CSharp.dll]SplashDelayScene.Start:Before</StartingPoint>
-		<UIStartingPoint>[Assembly-CSharp.dll]Astronautica.View.TitleScreen.AstroInitialise:After</UIStartingPoint>
+		<UIStartingPoint>[Assembly-CSharp.dll]Astronautica.View.Controller.Awake</UIStartingPoint>
 		<MinimalManagerVersion>0.24</MinimalManagerVersion>
 	</GameInfo>
 ```
@@ -66,7 +66,9 @@ e.g. `Mods\Loader\MH_ModLoader.dll` and `Mods\Loader\Info.json`.
 9. Place mods in their own subfolders under the Mods folder, or use the GUI.
 For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
 
-This mod loader is required because Unity Mod Manager does not correctly handle
-`ReflectionTypeLoadException` as of version 0.24.2.
-The Mod Manager will mod UMM to fix the issue, since the XNode library used by the game
-has the same issue.
+Do not switch the mod loader off in Unity Mod Manager.
+Doing so will cause the other mods to fails to load on next launch.
+
+This is because Unity Mod Manager does not correctly handle `ReflectionTypeLoadException`,
+as of version 0.24.2.  The Mod Manager will mod UMM to fix the issue, since the XNode library
+used by the game has the same issue and must be fixed.
