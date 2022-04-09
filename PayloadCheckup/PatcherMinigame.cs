@@ -18,7 +18,8 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
       internal override void Unapply () => RevertReliability();
 
       private static float OriginalPayloadCritChance = float.NaN;
-      private static float LastReliability = float.NaN, LastCritChance;
+      private static float LastReliability = float.NaN, CritChance;
+      private static Data.Rules.MissionGameplayRules Rules => Data.instance.rules.missionGameplayRules;
 
       private static void SetReliabilityBar () { try {
          var mSim = ClientViewer.GetViewElement<MissionGameplayScreen>()?.MissionSim;
@@ -27,24 +28,21 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetReliability ( float payloadReliability ) {
-         if ( float.IsNaN( OriginalPayloadCritChance ) ) 
-            OriginalPayloadCritChance = Data.instance.rules.missionGameplayRules.positiveEventOccurrence;
-         var crit = LastCritChance;
+         if ( float.IsNaN( OriginalPayloadCritChance ) )
+            OriginalPayloadCritChance = Rules.positiveEventOccurrence;
          if ( LastReliability != payloadReliability ) {
-            crit = config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability;
-            if ( crit > payloadReliability ) crit = payloadReliability;
-            Info( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", crit, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
+            CritChance = Math.Min( config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability, payloadReliability );
+            Info( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", CritChance, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
             LastReliability = payloadReliability;
-            LastCritChance = crit;
          } else
-            Fine( "Set crit chance to {0}", crit );
-         Data.instance.rules.missionGameplayRules.positiveEventOccurrence = crit;
+            Fine( "Set crit chance to {0}", CritChance );
+         Rules.positiveEventOccurrence = CritChance;
       }
 
       private static void RevertReliability () { try {
-         if ( float.IsNaN( OriginalPayloadCritChance ) ) return;
+         if ( float.IsNaN( OriginalPayloadCritChance ) || Rules.positiveEventOccurrence == OriginalPayloadCritChance ) return;
          Fine( "Restore crit chance to {0}", OriginalPayloadCritChance );
-         Data.instance.rules.missionGameplayRules.positiveEventOccurrence = OriginalPayloadCritChance;
+         Rules.positiveEventOccurrence = OriginalPayloadCritChance;
       } catch ( Exception x ) { Err( x ); } }
 
    }
