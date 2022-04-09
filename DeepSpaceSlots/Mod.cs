@@ -11,8 +11,8 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       private void OnDestroy() => BepInUtil.Unbind();
    }
 
-   [ EnableReloading ] public static class UMM_Mod {
-      public static void Load ( UnityModManager.ModEntry entry ) => UMMUtil.Init( entry, typeof( Mod ) );
+   public static class UMM_Mod {
+      public static void Load ( object entry ) => UMMUtil.Init( entry, typeof( Mod ) );
    }
 
    public class Mod : MarsHorizonMod {

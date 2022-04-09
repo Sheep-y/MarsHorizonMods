@@ -85,7 +85,7 @@ namespace ZyMod.MarsHorizon {
          if ( config != null ) new BepInUtil().PatchConfig( config );
       }
 
-      internal static void SetLogger ( ManualLogSource logger ) {
+      private static void SetLogger ( ManualLogSource logger ) {
          if ( logger == null ) return;
          Logger = ( TraceLevel lv, object msg, object[] arg ) => {
             object obj = msg is Exception ? msg : ZyLogger.DefaultFormatter( null, msg, arg );
@@ -209,11 +209,13 @@ namespace ZyMod.MarsHorizon {
    }
 
    internal class UMMUtil : ModComponent {
-      internal static void Init ( UnityModManager.ModEntry modEntry, Type modType ) {
-         lock ( sync ) ModDir = modEntry.Path;
+      internal static void Init ( object modEntry, Type modType ) {
+         var mod = modEntry as UnityModManager.ModEntry;
+         if ( mod != null ) lock ( sync ) ModDir = mod.Path;
          modType.Method( "Main" ).RunStatic();
-         modEntry.OnToggle = ( _, on ) => { if ( on ) MarsHorizonMod.Apply(); else MarsHorizonMod.Unapply(); return true; };
-         modEntry.OnUnload = ( _ ) => MarsHorizonMod.Unload();
+         if ( mod == null ) return;
+         mod.OnToggle = ( _, on ) => { if ( on ) MarsHorizonMod.Apply(); else MarsHorizonMod.Unapply(); return true; };
+         mod.OnUnload = ( _ ) => MarsHorizonMod.Unload();
       }
    }
 }
