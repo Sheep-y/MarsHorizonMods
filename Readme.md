@@ -6,13 +6,13 @@ Tested on game version 1.4.1.  Windows (Mono) build only.
 - **[Direct Downloads](https://github.com/Sheep-y/MarsHorizonMods/releases)**
 
 [BepInEx](https://github.com/BepInEx/BepInEx#readme) (v5) is recommended.
-Or use the included Simple Mars Horizon Mod Loader, or [Unity Mod Manager](https://www.nexusmods.com/site/mods/21). <br>
-See [this document](https://github.com/Sheep-y/MarsHorizonMods/blob/main/ModLoader/Alternatives.md) for BepInEx / UMM setup,
-or the simple mod loader's [readme](https://github.com/Sheep-y/MarsHorizonMods/blob/main/ModLoader/Readme.md) for its setup.
+Or you may use the included Simple Mars Horizon Mod Loader, or [Unity Mod Manager](https://www.nexusmods.com/site/mods/21). <br>
+See [this document](https://github.com/Sheep-y/MarsHorizonMods/blob/main/ModLoader/res/Alternatives.md) for BepInEx / UMM setup,
+or the simple mod loader's [readme](https://github.com/Sheep-y/MarsHorizonMods/blob/main/ModLoader/res/Readme.md) for its setup.
 
 Mods list:
 
-* **Click Reduction** - The mod that everyone wants.  Renders mini-game unstable, but should be worth it.
+* **Click Reduction** - The mod that everyone wants.  Makes mini-game unstable, but well worth it.
 * **Deep Space Slots** - Unlockable additional slots for long missions.
 * **Informed** - See launch windows, total base synergies, mission expiry and payload options, and other information.
 * **Mission Control** - Give Earth/Monn mission higher weights and other missions less weights.

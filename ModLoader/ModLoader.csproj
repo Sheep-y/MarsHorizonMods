@@ -66,8 +66,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Alternatives.md" />
-    <None Include="Readme.md" />
+    <None Include="res\Alternatives.md" />
+    <None Include="res\Readme.md" />
     <None Include="res\Info.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -85,12 +85,12 @@ mkdir "%25output%25Mods"
 mkdir "%25src%25Shared"
 mkdir "%25src_prj%25Properties"
 
-copy /y "$(ProjectDir)*.md" "%25output%25"
-copy /y "$(ProjectDir)res\doorstop_config.*" "%25output%25"
-copy /y "$(ProjectDir)res\unity_doorstop.dll" "%25output%25winhttp.dll"
-
 copy /y "$(TargetPath)" "%25output%25Mods\"
 copy /y "$(SolutionDir)packages\Lib.Harmony.2.2.1\lib\net45\0Harmony.dll" "%25output%25Mods\"
+
+copy /y "$(ProjectDir)res\*.md" "%25output%25"
+copy /y "$(ProjectDir)res\doorstop_config.*" "%25output%25"
+copy /y "$(ProjectDir)res\unity_doorstop.dll" "%25output%25winhttp.dll"
 
 copy /y "$(ProjectDir)*.cs*" "%25src_prj%25"
 copy /y "$(ProjectDir)packages.*" "%25src_prj%25"
