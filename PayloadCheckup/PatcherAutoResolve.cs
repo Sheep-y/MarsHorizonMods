@@ -5,6 +5,7 @@ using Astronautica.Model.PayloadVariation;
 using Astronautica.View;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using static Astronautica.Model.PayloadVariation.PayloadVariant.Type;
 
@@ -15,7 +16,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          if ( config.standalone_resolve_rng )
             Patch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), prefix: nameof( StandaloneAutoResolve ), postfix: nameof( LogAutoResolve ) );
          Patch( typeof( Simulation ).Method( "GetAgencyAutoResolveChance" )
-            , postfix: config.special_payload_ar_bonus > 0 ? nameof( AddPayloadBonus ) : nameof( GetPayloadVariant ) );
+            , postfix: config.special_payload_ar_bonus != 0 ? nameof( AddPayloadBonus ) : nameof( GetPayloadVariant ) );
          if ( config.power_payload_ar_crit > 0 )
             Patch( typeof( AutoresolveMission ).Method( "CalculateSuccess" ), postfix: nameof( AddCritBonus ) );
       }
@@ -38,26 +39,24 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          var bonus = GetPayloadBonus( mission, currentVariant );
          if ( bonus == 0 ) return;
          Info( "Adding {0}% to auto-resolve success rate for {1} payload.", bonus, currentVariant );
-         modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, mission.payload.id, EPolarity.Positive, Agency.Type.None ) );
-         if ( __result >= 100 ) return;
-         __result = Math.Min( 99, __result + bonus );
+         modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, mission.payload.id,
+            bonus > 0 ? EPolarity.Positive : EPolarity.Negative, Agency.Type.None ) );
+         __result = Math.Max( 1, Math.Min( modifiers.Sum( e => e.ModifiedValue ), 99 ) );
       } catch ( Exception x ) { Err( x ); } }
 
       private static int GetPayloadBonus ( Mission mission, PayloadVariant.Type type ) {
          Fine( "Mission payload is {0}.", type );
          var result = 0;
          switch ( type ) {
-            case Comms:
-            case Navigation:
-            case Observation:
-               result = Math.Max( 0, (int) config.special_payload_ar_bonus );
-               break;
+            case Comms :
+            case Navigation :
+            case Observation : return config.special_payload_ar_bonus;
+            case Power : return config.power_payload_ar_bonus;
          }
          if ( mission.CrewParticipated ) {
             int crew = mission.participatingAstronauts?.Length ?? 0, min = mission.template.minCrew;
             Fine( "Min crew {0}, assigned {1}.", min, crew );
-            if ( crew > min )
-               return Math.Max( 0, config.extra_crew_ar_bonus * ( crew - min ) );
+            if ( crew > min ) return config.extra_crew_ar_bonus * ( crew - min );
          }
          return result;
       }
@@ -65,7 +64,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
       private static void AddCritBonus ( AutoresolveMission __instance, bool isMarsFinalMission, ref AutoresolveMission.EResult __result ) { try {
          if ( currentVariant != Power || isMarsFinalMission ) return;
          var oldChance = __instance.OutstandingChance;
-         var newChance = Math.Min( 100 - __instance.FailureChance, oldChance + config.power_payload_ar_crit );
+         var newChance = Math.Min( 100 - __instance.FailureChance, Math.Max( oldChance + config.power_payload_ar_crit, 0 ) );
          Info( "Changing payload Outstanding chance from {0}% to {1}%.", oldChance, newChance );
          typeof( AutoresolveMission ).Property( "OutstandingChance" ).SetValue( __instance, newChance );
          if ( __result != AutoresolveMission.EResult.Success ) return;

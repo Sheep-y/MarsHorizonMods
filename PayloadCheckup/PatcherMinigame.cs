@@ -31,7 +31,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          if ( float.IsNaN( OriginalPayloadCritChance ) )
             OriginalPayloadCritChance = Rules.positiveEventOccurrence;
          if ( LastReliability != payloadReliability ) {
-            CritChance = Math.Min( config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability, payloadReliability );
+            CritChance = Math.Min( Math.Max( 0, config.minigame_base_crit + config.minigame_porportion_crit * payloadReliability ), payloadReliability );
             Info( "Crit chance {0:P} = {1:P} + ( Payload {2:P} x {3:P} )", CritChance, config.minigame_base_crit, payloadReliability, config.minigame_porportion_crit );
             LastReliability = payloadReliability;
          } else
