@@ -58,7 +58,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          Info( "Loading default whole text mappings." );
          whole.Clear();
          var list = new string[] {
-            "正在登錄中...", "載入中……",
+            "正在登錄中...", "載入中...",
             "簡體中文",  "中文",
             "在 Discord 上<br>加入我們！",  "加入我們的<br>Discord！",
             "{total} 的 {current}", "{current}/{total}",

@@ -34,13 +34,13 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       [ Config( "\r\n[渲染]" ) ]
       [ Config( "SDF 素材地圖高度。過小會容易溢出導致素材失效，過大則浪費資源。預設 8192。最低 512，最高 16384。" ) ]
-      public uint atlas_height = 8192;
+      public int atlas_height = 8192;
       [ Config( "SDF 素材地圖寬度。同上" ) ]
-      public uint atlas_width = 8192;
+      public int atlas_width = 8192;
       [ Config( "一般字型渲染大小。越大越精緻，但速度越慢，越易溢出導致素材失效。預設 40。" ) ]
-      public uint sample_size_normal = 40;
+      public int sample_size_normal = 40;
       [ Config( "粗體字型渲染大小。同上。預設 80。" ) ]
-      public uint sample_size_other = 80;
+      public int sample_size_other = 80;
       [ Config( "渲染間距比率。過小出現字框，過大浪費素材。預設 0.1 即 10%。" ) ]
       public float padding_ratio = 0.1f;
 
@@ -51,10 +51,12 @@ namespace ZyMod.MarsHorizon.Zhant {
       protected override void OnLoad ( string _ ) {
          atlas_height = Math.Min( Math.Max( 512, atlas_height ), 16384 );
          atlas_width = Math.Min( Math.Max( 512, atlas_width ), 16384 );
-         sample_size_other = Math.Max( 8, sample_size_other );
-         sample_size_normal = Math.Max( 8, sample_size_normal );
+         sample_size_other = Math.Min( Math.Max( 8, sample_size_other ), atlas_height / 16 );
+         sample_size_normal = Math.Min( Math.Max( 8, sample_size_normal ), atlas_width / 16 );
          if ( ! Rational( padding_ratio ) || padding_ratio < 0 )
             padding_ratio = 0.1f;
+         else
+            padding_ratio = Math.Min( padding_ratio, 3 );
       }
    }
 
