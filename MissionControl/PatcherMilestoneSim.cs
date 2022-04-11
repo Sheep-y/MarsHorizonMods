@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using static Astronautica.Model.MilestoneChallenge.MilestoneChallenge;
+using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.MissionControl {
 
@@ -44,9 +45,9 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( agency == null ) return;
          if ( agency.activeMilestoneChallenge == null ) agency.activeMilestoneChallenge = mChallenge;
          if ( config.change_only_player_agency && agency.isAI ) return;
-         var multiplier = config.milestone_challenge_fund_multiplier;
-         if ( mChallenge == null || mChallenge.FundsReward == 0 || multiplier == 1 || multiplier == -1 || multiplier == 0 ) return;
-         var newFund = (int) Math.Round( mChallenge.FundsReward * Math.Abs( config.milestone_challenge_fund_multiplier ) );
+         var multiplier = Math.Abs( config.milestone_challenge_fund_multiplier );
+         if ( mChallenge == null || mChallenge.FundsReward == 0 || ! Rational( multiplier ) || multiplier == 1 || multiplier == 0 ) return;
+         var newFund = (int) Math.Round( mChallenge.FundsReward * multiplier );
          Info( "Fund rewards of {0}: {1} => {2}", mChallenge.Id, mChallenge.FundsReward, newFund );
          mChallenge.FundsReward = newFund;
       } catch ( Exception x ) { Err( x ); } }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.MissionControl {
 
@@ -14,15 +15,18 @@ namespace ZyMod.MarsHorizon.MissionControl {
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateSpaceTouristMissionRequestMessage" ), prefix: nameof( TrackNewMissionBefore ), postfix: nameof( TrackNewMissionAfter ) );
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionType" ), prefix: nameof( SetMissionWeight ), postfix: nameof( LogMissionRemoval ) );
          Patch( typeof( Simulation ).Method( "AgencyTryGenerateRequestMissionContext" ), postfix: nameof( LogMissionRemoval ) );
-         if ( config.joint_mission_chance >= 0 || config.diplomacy_office_bonus_chance >= 0 )
+         if ( NonNeg( config.joint_mission_chance ) || NonNeg( config.diplomacy_office_bonus_chance ) )
             Patch( typeof( Simulation ).Method( "GetAgencyRollJointMission" ), prefix: nameof( SetJointMissionChance ) );
-         if ( config.joint_trait_multiplier >= 0 )
+         if ( NonOne( config.joint_trait_multiplier ) )
             Patch( typeof( Agency ).Method( "GetAgencyTraits" ), postfix: nameof( SetTraitMissionChance ) );
          if ( config.standalone_mission_rng ) {
             Patch( typeof( Simulation ).Method( "AgencyTryGenerateMissionRequestMessage" ), prefix: nameof( TrackPlayerNewMission ) );
             Patch( typeof( LINQExtensions ).Method( "RandomElement" ).MakeGenericMethod( typeof( Data.RequestMissionData ) ), postfix: nameof( RollRandomMission ) );
          }
       }
+
+      private static bool NonNeg ( float val ) => Config.NonNeg( val );
+      private static bool NonOne ( float val ) => Config.NonNeg( val ) && val != 1;
 
       private static float origChance = -1f;
       private static readonly Dictionary< Data.MissionTemplate, int > origWeightM = new Dictionary< Data.MissionTemplate, int >();
@@ -35,31 +39,31 @@ namespace ZyMod.MarsHorizon.MissionControl {
       private static void TrackNewMissionBefore ( Simulation __instance, Agency agency, bool forceGenerate ) { try {
          origWeightM.Clear();
          lastMission = null;
-         if ( config.lucrative_weight_multiplier_opening != 1 ) {
+         if ( NonOne( config.lucrative_weight_multiplier_opening ) ) {
             lucrative_count = agency.missionRequests.Concat( agency.jointMissionRequests ).Count( e =>
                e.templateInstance.template.GetTotalMissionRewards().funds > 0 || e.requestMissionType.type == Data.MissionTemplate.RequestMissionType.EType.Lucrative );
          } else
             lucrative_count = -1;
-         allResearchDone = config.lucrative_weight_multiplier_full_tech != 1 && agency.HasCompletedAllResearch();
+         allResearchDone = NonOne( config.lucrative_weight_multiplier_full_tech ) && agency.HasCompletedAllResearch();
          if ( forceGenerate ) { Info( "{0} is forcing a new mission.", agency.NameLocalised ); return; }
          var rules = __instance.gamedata.rules;
          if ( origChance < 0 ) origChance = rules.requestGenerationChance;
          var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
-         rules.requestGenerationChance = ( chance < 0 || chance > 1 ) ? origChance : chance;
-            Log( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
-               "{0} checking new mission.  Current count {2}/{3} ({5} lucrative), cooldown {4}, chance {1:P0}{6}.", agency.NameLocalised,
-               1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest,
-               lucrative_count, agency.HasCompletedAllResearch() ? ", all research done" : "" );
+         rules.requestGenerationChance = ( chance < 0 || chance > 1 || ! Rational( chance ) ) ? origChance : chance;
+         Log( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
+            "{0} checking new mission.  Current count {2}/{3} ({5} lucrative), cooldown {4}, chance {1:P0}{6}.", agency.NameLocalised,
+            1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest,
+            lucrative_count, agency.HasCompletedAllResearch() ? ", all research done" : "" );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetJointMissionChance ( Simulation __instance, Agency agency, Agency selectedAgency ) { try {
          Fine( "Rolling joint mission between {0} and {1}.", agency.NameLocalised, selectedAgency?.NameLocalised ?? "{Any}" );
          var rules = __instance.gamedata.rules;
-         if ( config.joint_mission_chance >= 0 && config.joint_mission_chance != rules.jointMissionChance ) {
+         if ( NonNeg( config.joint_mission_chance ) && config.joint_mission_chance != rules.jointMissionChance ) {
             Info( "Setting base joint mission chance from {0} to {1}.", rules.jointMissionChance, config.joint_mission_chance );
             rules.jointMissionChance = config.joint_mission_chance;
          }
-         if ( config.diplomacy_office_bonus_chance >= 0 && config.diplomacy_office_bonus_chance != rules.diplomacyOfficeIncrease ) {
+         if ( NonNeg( config.diplomacy_office_bonus_chance ) && config.diplomacy_office_bonus_chance != rules.diplomacyOfficeIncrease ) {
             Info( "Setting Diplomacy Office joint mission bonus chance from {0} to {1}.", rules.diplomacyOfficeIncrease, config.diplomacy_office_bonus_chance );
             rules.diplomacyOfficeIncrease = config.diplomacy_office_bonus_chance;
          }
@@ -69,10 +73,11 @@ namespace ZyMod.MarsHorizon.MissionControl {
          if ( traitType != Data.AgencyTrait.EAgencyTrait.JointMissionSpawnRate || __result == null ) return;
          for ( var i = 0 ; i < __result.Count ; i++ ) {
             var trait = __result[ i ];
-            if ( config.joint_trait_multiplier < 0 || config.joint_trait_multiplier == trait.value ) return;
-            Info( "Setting trait {0} bonus chance from {1} to {2}.", MarsHorizonMod.Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
-            trait.value = config.joint_trait_multiplier;
-            __result[ i ] = trait;
+            if ( NonNeg( config.joint_trait_multiplier ) && config.joint_trait_multiplier == trait.value ) {
+               Info( "Setting trait {0} bonus chance from {1} to {2}.", MarsHorizonMod.Localise( trait.LocalisationTitleTag ), trait.value, config.joint_trait_multiplier );
+               trait.value = config.joint_trait_multiplier;
+               __result[ i ] = trait;
+            }
          }
       } catch ( Exception x ) { Err( x ); } }
 
@@ -95,7 +100,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          var m = lastMission = missionTemplate;
          allowed = true;
          var weight = GetMissionWeight( m );
-         if ( ! ModHelpers.Rational( weight ) || weight < 0 ) weight = m.requestWeighting;
+         if ( ! NonNeg( weight ) ) weight = m.requestWeighting;
          Fine( "Mission {0}, weight {1}{2}.", m.primaryMilestone, m.requestWeighting, weight == m.requestWeighting ? "" : $" => {weight}" );
          if ( weight != m.requestWeighting ) {
             origWeightM[ m ] = m.requestWeighting;
@@ -130,10 +135,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
          foreach ( var t in m.requestMissionTypes ) {
             var tWeight = t.weighting;
             var multiplier = GetVariationWeight( t );
-            if ( ModHelpers.Rational( multiplier ) && multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
+            if ( Rational( multiplier ) && multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
             if ( divider != 1 ) tWeight /= divider;
             Fine( "   > Variation {0}, weight {1}{2}", t.type, t.weighting, t.weighting == tWeight ? "" : $" => {tWeight}" );
-            if ( t.weighting != tWeight ) {
+            if ( t.weighting != tWeight && tWeight ) {
                origWeightT[ t ] = t.weighting;
                t.weighting = tWeight;
             }

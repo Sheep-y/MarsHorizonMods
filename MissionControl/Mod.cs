@@ -107,14 +107,14 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public int config_version = 20220405;
 
       protected override void OnLoad ( string _ ) {
-         if ( ! Positive( challenging_weight_multiplier ) ) challenging_weight_multiplier = 1;
-         if ( ! Positive( experimental_weight_multiplier ) ) experimental_weight_multiplier = 1;
-         if ( ! Positive( lucrative_weight_multiplier ) ) lucrative_weight_multiplier = 1;
-         if ( ! Positive( lucrative_weight_multiplier_opening ) ) lucrative_weight_multiplier_opening = 1;
-         if ( ! Positive( lucrative_weight_multiplier_full_tech ) ) lucrative_weight_multiplier_full_tech = 1;
-         if ( ! Positive( publicised_weight_multiplier ) ) publicised_weight_multiplier = 1;
-         if ( ! Positive( test_weight_multiplier ) ) test_weight_multiplier = 1;
-         if ( ! Positive( variation_weight_divider ) ) variation_weight_divider = 1;
+         if ( ! NonNeg( challenging_weight_multiplier ) ) challenging_weight_multiplier = 1;
+         if ( ! NonNeg( experimental_weight_multiplier ) ) experimental_weight_multiplier = 1;
+         if ( ! NonNeg( lucrative_weight_multiplier ) ) lucrative_weight_multiplier = 1;
+         if ( ! NonNeg( lucrative_weight_multiplier_opening ) ) lucrative_weight_multiplier_opening = 1;
+         if ( ! NonNeg( lucrative_weight_multiplier_full_tech ) ) lucrative_weight_multiplier_full_tech = 1;
+         if ( ! NonNeg( publicised_weight_multiplier ) ) publicised_weight_multiplier = 1;
+         if ( ! NonNeg( test_weight_multiplier ) ) test_weight_multiplier = 1;
+         if ( ! NonNeg( variation_weight_divider ) ) variation_weight_divider = 1;
          if ( config_version < 20220405 ) {
             var def = new Config();
             if ( lucrative_weight_multiplier_opening == 2 ) lucrative_weight_multiplier_opening = def.lucrative_weight_multiplier_opening;
@@ -123,6 +123,6 @@ namespace ZyMod.MarsHorizon.MissionControl {
          }
       }
 
-      private bool Positive ( float val ) => Rational( val ) && val >= 0;
+      internal static bool NonNeg ( float val ) => Rational( val ) && val >= 0;
    }
 }

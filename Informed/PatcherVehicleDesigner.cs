@@ -134,13 +134,13 @@ namespace ZyMod.MarsHorizon.Informed {
          Info( "Current turn {0}, build time {1}.  Calculating launch window for {4} from {2} to {3}", nowTurn, buildTime, fromTurn, toTurn, destination );
          var win = sim.GetAgencyLaunchWindow( agency, destination );
          for ( var i = fromTurn ; i <= toTurn ; i++ ) {
-            Data.Date date = Data.instance?.GetDate( i );
+            Date date = Data.instance?.GetDate( i );
             if ( date == null ) continue;
             var traits = new ConstructionTrait[] { mission.Payload?.ConstructionTrait };
             var prediction = sim.GetAgencyLaunchRecommendation( agency, win, i, null, traits[ 0 ] == null ? new ConstructionTrait[0] : traits );
             string colour = config.invalid_colour, txt = Localise( "Launch_Recommendation_" + prediction );
-            if ( prediction == Data.LaunchRecommendation.SubOptimal ) colour = config.suboptimal_colour;
-            else if ( prediction == Data.LaunchRecommendation.Optimal ) colour = config.optimal_colour;
+            if ( prediction == LaunchRecommendation.SubOptimal ) colour = config.suboptimal_colour;
+            else if ( prediction == LaunchRecommendation.Optimal ) colour = config.optimal_colour;
             else txt = Localise( "Launch_Recommendation_Unavailable" );
             if ( ! string.IsNullOrEmpty( colour ) ) buf.Append( "<color=" ).Append( colour ).Append( ">" );
             buf.Append( date.year ).Append( ' ' ).Append( Localise( $"Month_{date.month}_Short" ) ).Append( " - " ).Append( txt );
