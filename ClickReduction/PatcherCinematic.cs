@@ -28,7 +28,10 @@ namespace ZyMod.MarsHorizon.ClickReduction {
          } catch ( Exception x ) { Err( x ); } } );
       }
 
+      internal override void Unload () => TempSkip.Clear();
+
       private static string lastCinematic;
+      private static readonly HashSet< string > TempSkip = new HashSet< string >();
 
       private static bool ShouldSkip ( string id ) {
          if ( lastCinematic == id ) return false;
@@ -48,8 +51,6 @@ namespace ZyMod.MarsHorizon.ClickReduction {
             Info( "Allowing cinematic {0}", id );
          return false;
       }
-
-      private static readonly HashSet< string > TempSkip = new HashSet< string >();
 
       private static void SkipCinmatic ( ref bool __result, CinematicSceneController __instance, bool ___isSkippable ) { try {
          if ( __result ) return;
@@ -72,7 +73,5 @@ namespace ZyMod.MarsHorizon.ClickReduction {
             , c.nextPlanetaryBody, c.payload?.id, c.phaseIndex, c.taskIndex, c.vehicle?.isShuttle, c.vehicle?.isReusable
             , c.mission.requestMissionContext?.localisationReference, c.mission?.template?.minCrew );
       } catch ( Exception x ) { Err( x ); } }
-
-      internal override void Unload () => TempSkip.Clear();
    }
 }
