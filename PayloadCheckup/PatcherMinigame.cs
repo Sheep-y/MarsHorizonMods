@@ -3,6 +3,7 @@ using Astronautica.View;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace ZyMod.MarsHorizon.PayloadCheckup {
 
@@ -13,6 +14,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
             Patch( typeof( MissionGameplaySimulation ), "GetPayloadActionChances", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
             Patch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
          }
+         UnityEngine.Object.FindObjectOfType< MissionGameplayModuleElement >().?.SetReliabilityBar();
       }
 
       internal override void Unapply () => RevertReliability();
@@ -22,9 +24,8 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
       private static Data.Rules.MissionGameplayRules Rules => Data.instance.rules.missionGameplayRules;
 
       private static void SetReliabilityBar () { try {
-         var mSim = ClientViewer.GetViewElement<MissionGameplayScreen>()?.MissionSim;
-         if ( mSim == null ) return;
-         SetReliability( mSim.GetPayloadReliability() / 100f );
+         var mSim =  UnityEngine.Object.FindObjectOfType< MissionGameplayScreen >()?.MissionSim;
+         if ( mSim != null ) SetReliability( mSim.GetPayloadReliability() / 100f );
       } catch ( Exception x ) { Err( x ); } }
 
       private static void SetReliability ( float payloadReliability ) {
