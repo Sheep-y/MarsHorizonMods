@@ -138,7 +138,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
             if ( Rational( multiplier ) && multiplier != 1 ) tWeight = (int) Math.Round( tWeight * multiplier );
             if ( divider != 1 ) tWeight /= divider;
             Fine( "   > Variation {0}, weight {1}{2}", t.type, t.weighting, t.weighting == tWeight ? "" : $" => {tWeight}" );
-            if ( t.weighting != tWeight && tWeight ) {
+            if ( t.weighting != tWeight && tWeight >= 0 ) {
                origWeightT[ t ] = t.weighting;
                t.weighting = tWeight;
             }
