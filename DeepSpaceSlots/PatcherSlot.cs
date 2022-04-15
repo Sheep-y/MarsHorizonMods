@@ -22,8 +22,6 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
          Patch( typeof( Simulation ).Method( "CanAgencyDestroyBuilding", 4 ), postfix: nameof( PreventDeepSpaceBuildingDestruction ) );
       }
 
-      internal override void Unapply () => deepSpaceMissions.Clear();
-
       private static readonly HashSet< Mission > deepSpaceMissions = new HashSet< Mission >();
       private static int deepSpaceMissionSlot;
 

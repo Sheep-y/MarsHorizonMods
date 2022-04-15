@@ -17,7 +17,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          UnityEngine.Object.FindObjectOfType< MissionGameplayModuleElement >().?.SetReliabilityBar();
       }
 
-      internal override void Unapply () => RevertReliability();
+      internal override void Unapply () { RevertReliability(); base.Unapply(); }
 
       private static float OriginalPayloadCritChance = float.NaN;
       private static float LastReliability = float.NaN, CritChance;

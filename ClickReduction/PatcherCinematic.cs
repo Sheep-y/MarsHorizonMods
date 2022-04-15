@@ -28,8 +28,6 @@ namespace ZyMod.MarsHorizon.ClickReduction {
          } catch ( Exception x ) { Err( x ); } } );
       }
 
-      internal override void Unload () => TempSkip.Clear();
-
       private static string lastCinematic;
       private static readonly HashSet< string > TempSkip = new HashSet< string >();
 

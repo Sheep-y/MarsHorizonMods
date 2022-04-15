@@ -10,13 +10,45 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityModManagerNet;
+using static System.Reflection.BindingFlags;
 
 // Common base mod for Mars Horizon.  Find and initialize the correct class, set log and config path and name.
 namespace ZyMod.MarsHorizon {
 
    internal abstract class MarsHorizonPatcher : Patcher {
+
+      private static Dictionary< Type, Dictionary< FieldInfo, object > > DefaultFieldValues;
+      private IEnumerable< FieldInfo > ResetFields => GetType().GetFields( Static | NonPublic | DeclaredOnly );
+
+      internal MarsHorizonPatcher () {
+         Dictionary< FieldInfo, object > vals = null;
+         foreach ( var e in ResetFields ) {
+            if ( vals == null ) {
+               vals = new Dictionary< FieldInfo, object >();
+               if ( DefaultFieldValues == null ) DefaultFieldValues = new Dictionary< Type, Dictionary< FieldInfo, object > >();
+               DefaultFieldValues[ GetType() ] = vals;
+            }
+            vals[ e ] = e.GetValue( null );
+         }
+      }
+
       internal abstract void Apply();
-      internal virtual void Unapply() { } // May be called multiple times.
+
+      internal virtual void Unapply() { try { // May be called multiple times
+         Dictionary< FieldInfo, object > defVals = null;
+         if ( DefaultFieldValues?.TryGetValue( GetType(), out defVals ) != true ) return;
+         foreach ( var e in ResetFields ) {
+            object curr = e.GetValue( null ), defVal = defVals[ e ];
+            if ( curr != null && defVal != null && curr.GetType().Namespace == "System.Collections.Generic" ) {
+               Fine( "Reset {0}.{1} call Clear().", GetType().Name, e.Name );
+               curr.GetType().Method( "Clear", 0 )?.Run( curr );
+            } else if ( ! e.IsInitOnly && ! Equals( curr, defVal ) ) {
+               e.SetValue( this, defVal );
+               Fine( "Reset {0}.{1} to {2}", GetType().Name, e.Name, defVal ?? "null" );
+            }
+         }
+      } catch ( Exception x ) { Err( x ); } }
+
       internal virtual void Unload() { } // Does not call Unapply. MarsHorizonMod.Unload will call Unapply. 
    }
 

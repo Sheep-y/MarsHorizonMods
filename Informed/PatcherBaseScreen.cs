@@ -16,8 +16,6 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       }
 
-      internal override void Unapply () => ClearBaseBonus();
-
       private static Data.Effect[] links;
       private static BaseHighlightToolTipElement tooltip;
 
