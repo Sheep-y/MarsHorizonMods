@@ -21,8 +21,10 @@ namespace ZyMod.MarsHorizon {
       private IEnumerable< FieldInfo > ResetFields => GetType().GetFields( Static | NonPublic | DeclaredOnly );
 
       internal MarsHorizonPatcher () {
+         if ( DefaultFieldValues?.ContainsKey( GetType() ) == true ) return;
          Dictionary< FieldInfo, object > vals = null;
          foreach ( var e in ResetFields ) {
+            if ( e.IsInitOnly ) continue;
             if ( vals == null ) {
                vals = new Dictionary< FieldInfo, object >();
                if ( DefaultFieldValues == null ) DefaultFieldValues = new Dictionary< Type, Dictionary< FieldInfo, object > >();
