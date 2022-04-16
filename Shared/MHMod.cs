@@ -156,7 +156,7 @@ namespace ZyMod.MarsHorizon {
                e.GetParameters().Length == 4 && e.GetParameters()[ 3 ].ParameterType == typeof( string ) );
             var fields = typeof( BaseConfig ).Method( "_ListFields" ).Run( modConfig, modConfig ) as IEnumerable< FieldInfo >;
             var section = "General";
-            Info( "Creating BepInEx config bindings." );
+            Fine( "Creating BepInEx config bindings." );
             foreach ( var f in fields ) BindConfigField( mod.Config, f, bind, ref section );
             if ( bindings == null ) return false;
             mod.Config.ConfigReloaded += ReloadConfig;
@@ -193,7 +193,7 @@ namespace ZyMod.MarsHorizon {
 
       internal static void ReloadConfig ( object _, object evt ) => LoadConfig( true ); // Listen to Config.ConfigReloaded
       internal static void LoadConfig ( bool reapply ) {
-         Info( "Syncing config from BepInEx from {0}.", mod.Config.ConfigFilePath );
+         Info( "Syncing config through BepInEx from {0}.", mod.Config.ConfigFilePath );
          lock ( sync ) foreach ( var b in bindings ) {
             object bVal = b.Value.BoxedValue, myVal = b.Key.GetValue( modConfig );
             var same = Equals( bVal, myVal );
