@@ -66,8 +66,7 @@ e.g. `Mods\Loader\MH_ModLoader.dll` and `Mods\Loader\Info.json`.
 9. Place mods in their own subfolders under the Mods folder, or use the GUI.
 For example, the "Informed" mod may be placed as `Mods\Informed-1-0-123\MH_Informed.dll`.
 
-Do not switch the mod loader off in Unity Mod Manager.
-Doing so will cause the other mods to fails to load on next launch.
+Do not switch the mod loader off.  Doing so may cause mods to fails to load on next launch.
 
 This is because Unity Mod Manager does not correctly handle `ReflectionTypeLoadException`,
 as of version 0.24.2.  The Mod Manager will mod UMM to fix the issue, since the XNode library
