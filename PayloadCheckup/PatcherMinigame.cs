@@ -14,7 +14,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
             Patch( typeof( MissionGameplaySimulation ), "GetPayloadActionChances", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
             Patch( typeof( MissionGameplayScreen ), "SetupReliabilityBar", prefix: nameof( SetReliabilityBar ), postfix: nameof( RevertReliability ) );
          }
-         UnityEngine.Object.FindObjectOfType< MissionGameplayModuleElement >().?.SetReliabilityBar();
+         UnityEngine.Object.FindObjectOfType< MissionGameplayModuleElement >()?.SetReliabilityBar();
       }
 
       internal override void Unapply () { RevertReliability(); base.Unapply(); }
