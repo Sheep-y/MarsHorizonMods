@@ -10,17 +10,14 @@ GNU Unifont is bundled to support most languages and symbols.
 
 # 安裝 #
 
-你需要先安裝一個外掛加載器（Mod Loader）。
-本補丁支援 BepInEx 5，Simple Mars Horizon Mod Loader，及 Unity Mod Loader。
+需要先安裝外掛加載器（Mod Loader）。安裝方法視乎使用甚麼加載器：
 
-* **BepInEx** : 將內容解壓到 `BepInEx\plugins` 目錄。
-* **Simple Mars Horizon Mod Loader** : 將內容解壓到 `Mods` 目錄。
-* **Unity Mod Manager** : 將封包拖放進去，或使用 Install 按鍵。
+* **BepInEx** : 於 `BepInEx\plugins` 新建子目錄並將內容解壓到其下。
+* **Simple Mars Horizon Mod Loader** : 將於 `Mods` 新建子目錄並將內容解壓到其下。
+* **Unity Mod Manager** : 同上，或使用 UMM 的圖型用戶介面進行安裝。
 
 啓動遊戲後，到遊戲選項將遊戲語言切換到中文即可。
 
-Folder/File locations are relative to game root.
-To unintall this mod, delete the extracted files.
 
 # 相容性 #
 
@@ -49,9 +46,9 @@ If the mod doesn't work, there are a few things you can try:
 
 ## Check Mod Is Loaded
 
-If using BepInEx, read its log to be sure that mod is loaded.
-Otherwise, find `PayloadCheckup.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+If using BepInEx, read `LogOutput.log` to check that this mod is loaded.
 
+Otherwise, find `ClickReduction.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 If the log exists, delete it and re-launch the game.
 
 If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,

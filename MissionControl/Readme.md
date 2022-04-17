@@ -9,11 +9,11 @@ since they have a much reduced chance to be selected for request missions.
 
 # Installation #
 
-A mod loader is required.  The following loaders have been tested:
+A mod loader is required.  The step depends on the loader:
 
 * **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
 * **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
-* **Unity Mod Manager** : Same, or install through the GUI.
+* **Unity Mod Manager** : Same as above, or install through the GUI.
 
 To uninstall this mod, delete the extracted files.
 
@@ -92,9 +92,9 @@ If the mod doesn't work, there are a few things you can try:
 
 ## Check Mod Is Loaded
 
-If using BepInEx, read its log to be sure that mod is loaded.
-Otherwise, find `MissionControl.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+If using BepInEx, read `LogOutput.log` to check that this mod is loaded.
 
+Otherwise, find `ClickReduction.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 If the log exists, delete it and re-launch the game.
 
 If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,

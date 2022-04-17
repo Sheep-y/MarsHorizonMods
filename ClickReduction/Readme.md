@@ -1,23 +1,23 @@
 # Click Reduction #
 
 This is an unofficial mod of Mars Horizon (2020 game).
-It removes most unnecessary clicks and greatly speed up gameplay.
+It removes non-essential clicks and greatly speeds up gameplay.
 
 Given the increased pace, the game *will* break sooner than normal.
 **If the game UI looks or acts wrong, please immediately save, exit, and re-run the game.**
 The corruption may spread to other screens if you keep playing.
 
-The mod skip construction reports by default.
-Please pay attention to event countdowns and the mission list alert icon.
+Among other things, this mod skips construction reports by default.
+Please pay attention to event countdowns and mission list's alert icon.
 
 
 # Installation #
 
-A mod loader is required.  The following loaders have been tested:
+A mod loader is required.  The step depends on the loader:
 
 * **BepInEx** : Extract package into a new subfolder under `BepInEx\plugins`.
 * **Simple Mars Horizon Mod Loader** : Extract package into a new subfolder under `Mods`.
-* **Unity Mod Manager** : Same, or install through the GUI.
+* **Unity Mod Manager** : Same as above, or install through the GUI.
 
 To uninstall this mod, delete the extracted files.
 
@@ -26,11 +26,10 @@ To uninstall this mod, delete the extracted files.
 
 This is my first Mars Horizon mod.
 The animations appeal to my 5yo son, whom I purchased the game for, but he has time to waste,
-esp. when we are still doing covid lockdowns in 2022 in Hong Kong.
+esp. when Hong Kong is still doing covid lockdowns in 2022.
 
 He also didn't pay for the new multi-button trackball after the old one coincidently died
 within the first few hours of this game, which by the way costs a lot more than the game.
-
 Hope this mod can save your pointer device in time.
 
 He hates the mod, though.  That and the absent of James Webb Space Telescope.
@@ -44,13 +43,11 @@ This mod provides the following features by default:
 ## Cinematic Skip ##
 
 * Skip game intro (logos).
-* Skip mission control in/out cinematics, launch cinematics, general earth success/fail cinematics.
-* Other cinematics will be played once per game launch.  Restarting the game will clear the memory.
+* Skip common cinematics.
+* Uncommon cinematics are played once per game play.
 
-The skip list can be configured.  The defaults are the ones I'm already sick of after the first few hours.
-
-You can set the mod to permantely skip seen cinematics, which will add their ids to the skip list,
-but I tried it and don't recommend it.  Occasional cinematics are cool.
+The mod can be set to permantely skip seen cinematics, but I don't recommend it.
+Occasional cinematics are cool.
 
 Crew return, shuttle return, and rocket reuse cinematics are not skipped by default because they are major milestones.
 Allow them to play once per session seems to be a good balance.
@@ -62,12 +59,12 @@ Allow them to play once per session seems to be a good balance.
 * Reduction of selected screen delays.
 * Reduction of selected screen waits.
 
-Because there are too many delays in this game,
-this mod use a carpet bombing approach to remove fades and delays.
+This mod blanket-modify all fades and delays at low level,
+instead of manually pick them out one by one.  Too many.
 
-Unfortunately, a short delay leads to a high chance of mini-game UI corruption,
+However, a short delay leads to a high chance of mini-game UI corruption,
 while a non-trivial delay will be felt across the game.
-The default value is relatively safe while still offering noted improvement.
+The default values try to strike a balance.
 
 ## Specific Animation Speedup ##
 
@@ -113,9 +110,9 @@ If the mod doesn't work, there are a few things you can try:
 
 ## Check Mod Is Loaded
 
-If using BepInEx, read its log to be sure that mod is loaded.
-Otherwise, find `ClickReduction.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
+If using BepInEx, read `LogOutput.log` to check that this mod is loaded.
 
+Otherwise, find `ClickReduction.log` in `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon`.
 If the log exists, delete it and re-launch the game.
 
 If the log does not exists, or is not recreated after relaunch, or the mod is not loaded by BepInEx,
