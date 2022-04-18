@@ -82,7 +82,7 @@ namespace ZyMod.MarsHorizon.ClickReduction {
       [ Config( "Automatically continue uneventful mission actions.  Default True." ) ]
       public bool auto_pass_normal_action = true;
 
-      [ Config( "\r\n" ) ]
+      [ Config( "\r\n[Ɩnternal]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220223;
 
