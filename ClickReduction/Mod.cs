@@ -53,8 +53,8 @@ namespace ZyMod.MarsHorizon.ClickReduction {
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Cap assorted screen and action delays.  Set to -1 to disable." ) ]
-      public float max_delay = 0.4f;
+      [ Config( "Cap assorted screen and action delays.  Default 0.5.  .Set to -1 to not cap." ) ]
+      public float max_delay = 0.5f;
       [ Config( "Max screen fading duration.  Set to -1 to disable." ) ]
       public float max_screen_fade = 0.1f;
       [ Config( "Remove or reduce assorted screen delays.  Default True." ) ]
@@ -84,15 +84,21 @@ namespace ZyMod.MarsHorizon.ClickReduction {
 
       [ Config( "\r\n[Ɩnternal]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20220223;
+      public int config_version = 20220418;
 
       internal readonly HashSet< string > SkipCinematics = new HashSet< string >();
 
       protected override void OnLoad ( string _ ) { try {
+         var updated = false;
          if ( string.Equals( skip_cinematics, "default", StringComparison.InvariantCultureIgnoreCase ) ) {
             skip_cinematics = new Config().skip_cinematics;
-            Task.Run( Save );
+            updated = true;
          }
+         if ( config_version < 20220418 ) {
+            if ( max_delay == 0.4f ) max_delay = 0.5f;
+            config_version = new Config().config_version;
+         }
+         if ( updated ) Task.Run( Save );
          lock ( SkipCinematics ) {
             SkipCinematics.Clear();
             if ( ! string.IsNullOrEmpty( skip_cinematics ) )

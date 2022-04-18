@@ -13,10 +13,10 @@ namespace ZyMod.MarsHorizon.ClickReduction {
          if ( config.max_delay >= 0 ) {
             Patch( typeof( DelayExtension ).Method( "Delay", typeof( MonoBehaviour ), typeof( float ), typeof( Action ) ), prefix: nameof( SkipMonoTimeDelays ) );
             Patch( typeof( LaunchEventsScreen ).Method( "SkipLaunchCo" ).MoveNext(), transpiler: nameof( NoWait_SkipLaunchCo ) );
-            if ( config.max_delay <= 0.5f ) {
-               Patch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCinematicCoroutine ) );
+            Patch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
+            if ( config.max_delay < 0.5f ) {
+               Patch( typeof( ClientViewer ).Method( "CleanupCinematicCoroutine" ).MoveNext(), transpiler: nameof( NoWait_ClientViewer_CleanupCoroutine ) );
                Patch( typeof( TitleScreen ).Method( "ContinueGameCo" ).MoveNext(), transpiler: nameof( NoWait_ContinueGameCo ) );
-               Patch( typeof( AnimatorDelay ), "Start", prefix: nameof( RemoveWait_Animator ) );
             }
          }
          if ( config.remove_delays ) {
@@ -54,8 +54,6 @@ namespace ZyMod.MarsHorizon.ClickReduction {
          Fine( "Removing {0}s delay of {1} on {2} {3}", duration, callback, behaviour?.GetType().Name, behaviour?.name );
          duration = config.max_delay;
       }
-      private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCinematicCoroutine ( IEnumerable< CodeInstruction > codes )
-         => ReplaceFloat( codes, 0.5f, config.max_delay, 2 );
       private static IEnumerable< CodeInstruction > NoWait_ClientViewer_CleanupCoroutine ( IEnumerable< CodeInstruction > codes )
          => ReplaceFloat( codes, 0.5f, config.max_delay, 2 );
       private static IEnumerable< CodeInstruction > NoWait_SkipLaunchCo ( IEnumerable< CodeInstruction > codes ) {
