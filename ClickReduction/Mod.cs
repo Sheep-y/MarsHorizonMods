@@ -49,13 +49,13 @@ namespace ZyMod.MarsHorizon.ClickReduction {
       public bool skip_seen_cinematic = false;
       [ Config( "Skip seen cinematics until game is closed.  Default True." ) ]
       public bool skip_seen_cinematic_until_exit = true;
-      [ Config( "Skip these cinematics, comma seprated.  Set to empty (blank) to disable.  Set to \"default\" (without quotes) to reset.  Default skip mission controls, launches, lands, earth flybys, and general sat failure." ) ]
+      [ Config( "Skip these cinematics, comma seprated string id.  Set to \"default\" (without quotes) to reset.  Default skip mission controls, launches, lands, earth flybys, and general sat failure." ) ]
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Cap assorted screen and action delays.  Default 0.5.  .Set to -1 to not cap." ) ]
+      [ Config( "Cap assorted screen and action delays.  Default 0.5.  .Set to -1 to not mod." ) ]
       public float max_delay = 0.5f;
-      [ Config( "Max screen fading duration.  Set to -1 to disable." ) ]
+      [ Config( "Max screen fading duration.  Set to -1 to not mod." ) ]
       public float max_screen_fade = 0.1f;
       [ Config( "Remove or reduce assorted screen delays.  Default True." ) ]
       public bool remove_delays = true;
@@ -67,7 +67,7 @@ namespace ZyMod.MarsHorizon.ClickReduction {
       public bool fast_mission = true;
       [ Config( "Speed up mini-game report animations.  Default True." ) ]
       public bool fast_mission_result = true;
-      [ Config( "Mini-game resource swoosh speed.  Set to 1, 0, or -1 to disable." ) ]
+      [ Config( "Mini-game resource swoosh speed.  Set to -1 to not mod." ) ]
       public float swoosh_speed = 2f;
 
       [ Config( "\r\n[Bypass]" ) ]

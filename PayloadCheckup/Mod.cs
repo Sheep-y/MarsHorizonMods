@@ -33,14 +33,14 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
 
    internal class Config : IniConfig {
       [ Config( "\r\n[Auto-Resolve]" ) ]
-      [ Config( "Auto-resolve success chance bonus provided by specialized payload (nav, comm etc).  Set to 0 to disable." ) ]
+      [ Config( "Auto-resolve success chance bonus provided by specialized payload (nav, comm etc).  Default 10 for 10%." ) ]
       public short special_payload_ar_bonus = 10;
-      [ Config( "Auto-resolve success chance bonus provided by specialized payload (nav, comm etc).  Set to 0 to disable." ) ]
-      public short power_payload_ar_bonus = 10;
-      [ Config( "Auto-resolve success chance bonus provided by each extra crew member.  Set to 0 to disable." ) ]
-      public short extra_crew_ar_bonus = 10;
-      [ Config( "Auto-resolve outstanding chance bonus provided by power variant payload.  Set to 0 to disable." ) ]
+      [ Config( "Auto-resolve success chance bonus provided by power payload.  Default 0 because of outstanding chance." ) ]
+      public short power_payload_ar_bonus = 0;
+      [ Config( "Auto-resolve outstanding chance bonus provided by power variant payload.  Default 10 for 10%." ) ]
       public short power_payload_ar_crit = 10;
+      [ Config( "Auto-resolve success chance bonus provided by each extra crew member.  Default 10 for 10%." ) ]
+      public short extra_crew_ar_bonus = 10;
       [ Config( "Use a standalone random number generator to auto resolve.  Default True." ) ]
       public bool standalone_resolve_rng = true;
 
