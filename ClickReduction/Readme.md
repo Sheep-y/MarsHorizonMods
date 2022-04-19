@@ -46,7 +46,7 @@ This mod provides the following features by default:
 * Skip common cinematics.
 * Uncommon cinematics are played once per game play.
 
-The mod can be set to permantely skip seen cinematics, but I don't recommend it.
+The mod can be set to permanently skip seen cinematics, but I don't recommend it.
 Occasional cinematics are cool.
 
 Crew return, shuttle return, and rocket reuse cinematics are not skipped by default because they are major milestones.
@@ -75,7 +75,7 @@ The default values try to strike a balance.
 ## Auto Bypass ##
 
 * Auto-skip launch countdown.
-* Auto-skip uneventful launch and max vehicle level.
+* Auto-skip uneventful launch and max vehicle level confirmations.
 * Auto-skip mini-game intro and briefing.
 * Auto-skip uneventful mini-game actions.
 * Auto-skip construction reports and research reports.

@@ -53,7 +53,7 @@ namespace ZyMod.MarsHorizon.ClickReduction {
       public string skip_cinematics = "Earth_Launch_Failure,Earth_Launch_Failure_Large,Earth_Launch_Failure_Medium,Earth_Launch_Failure_Small,Earth_Launch_Intro,Earth_Launch_Intro_Large,Earth_Launch_Intro_Medium,Earth_Launch_Intro_Small,Earth_Launch_Outro,Earth_Launch_Success,Earth_Launch_Success_Large,Earth_Launch_Success_Medium,Earth_Launch_Success_Small,MissionControl_Intro,MissionControl_Success_Generic,MissionControl_Success_Milestone,Space_Generic_Failure";
 
       [ Config( "\r\n[Animation]" ) ]
-      [ Config( "Cap assorted screen and action delays.  Default 0.5.  .Set to -1 to not mod." ) ]
+      [ Config( "Cap assorted screen and action delays.  Default 0.5.  Set to -1 to not mod." ) ]
       public float max_delay = 0.5f;
       [ Config( "Max screen fading duration.  Set to -1 to not mod." ) ]
       public float max_screen_fade = 0.1f;
