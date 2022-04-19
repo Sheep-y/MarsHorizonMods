@@ -31,7 +31,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
    internal class Config : IniConfig {
       [ Config( "[Qualification]" ) ]
-      [ Config( "As the number of mission destination may increase in the future, " ) ]
+      // The number of mission destination may increase in the future, so have to use months as qualification.
       [ Config( "Min. total duration (months) for a mission to be qualifed as deep space." ) ]
       public byte deep_space_require_duration = 30;
       [ Config( "Min. total phases for a mission to be qualified as deep space." ) ]
@@ -48,7 +48,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       public byte deep_space_network_slot = 1;
       [ Config( "How many deep space mission slot does Space Library provide.  Default 1." ) ]
       public byte space_library_slot = 1;
-      [ Config( "How many deep space mission slot does each Missoin Control Expansion provide.  Default 0.  Can be fraction, e.g. 0.34 for 1 slot per 3 expansions." ) ]
+      [ Config( "How many deep space mission slot does each Missoin Control Expansion provide.  Default 0.  Can be fraction, e.g. 0.34 for 1 slot per 3 expansions (rounded down)." ) ]
       public float mission_control_ext_slot = 0;
       [ Config( "How many deep space mission slot does completing Grand Tour phase 2 provide.  Default 1." ) ]
       public byte grand_tour_phase2_slot = 1;

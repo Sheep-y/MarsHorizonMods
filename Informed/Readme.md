@@ -22,8 +22,8 @@ This mod provides the following features by default:
 
 ## Solar System Screen ##
 
-* Show info icon next to Mission when a mission slot is availble.
-* Show info icon next to Crew when new candidates are availble.
+* Show info icon next to Mission when a mission slot is available.
+* Show info icon next to Crew when new candidates are available.
 * Show info icon next to Diplomacy when a joint mission can be proposed.
 * Spacepedia will now never show an icon.
 
@@ -31,29 +31,31 @@ This mod provides the following features by default:
 
 * A "Launch Window" button is added to the bottom of milestone/request mission list.
 * The expiry countdown is displayed on the right when you select a mission.
-* The potential payload(s) is displayed on the right when you select a mission, alongside their build times, weights, and crews.
+* The potential payload(s) is displayed on the right when you select a mission.
 
 For milestone missions, the mission itself must be researched to see the payload list.
 The payload build time already factors in all applicable bonus.
 
 ## Vehicle Design Screen ##
 
-* After you hover out of any vehicle option on the left, the launch window around the point of vehicle completion will be listed.
-* The bonus and penalty of each contractor is displayed under their name for easy comparison.
+* When you hover any option on the left, the launch windows around the completion date will be listed.
+* Add bonus and penalty under each contractor option.
+
+The launch window list does NOT take vehicle traits into account, just unmodified launch windows.
 
 ## Research Screen ##
 
-* Booster research node will now show all possible supplements and the combined capacity of each.
+* Booster mouseover now lists all possible supplements and their capacities.
 
 ## Base Screen ##
 
-* Show total building synergies when the screen is not in build/move/clear mode, and when no building is being hovered.
+* Show total building synergies on base screen.
 
 Only synergies count.  Building effects are not included on the list.
 
 ## Funding Screen ##
 
-* *Next Tier now accurately shows the tier you will be at, instead of current tier + 1.
+* Next Tier now shows the tier you *will* be at.
 
 
 # Configuration #
@@ -64,7 +66,7 @@ On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\In
 You can edit the config file to disable or adjust some features.
 
 BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
-For some screens you may need to close and reopen it to get it up to date.
+A restart may be required to apply some changes.
 
 
 # Compatibility #
@@ -76,7 +78,7 @@ All game languages are supported.
 This mod does not change save games or game files.
 
 Due to the number of screen it mods and the number of information it pulls,
-each non-minor game updates have a considerable chance of breaking something.
+each non-minor game update have a considerable chance of breaking something.
 Good luck!
 
 
