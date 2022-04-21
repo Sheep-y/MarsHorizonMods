@@ -86,7 +86,7 @@ The default values try to strike a balance.
 The mod config file on BepInEx is `BepInEx\configs\Zy.MarsHorizon.ClickReduction.cfg`.
 On other mod loaders it is `%AppData%\..\LocalLow\Auroch Digital\Mars Horizon\ClickReduction.ini`.
 
-You can edit the ini file to disable or adjust various features and timings.
+You can edit the file to disable or adjust various features and timings.
 
 BepInEx also has a configuration manager plugin which can reconfig the mod on the fly.
 
