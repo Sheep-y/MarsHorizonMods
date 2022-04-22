@@ -3,8 +3,7 @@
 This is an unofficial mod of Mars Horizon (2020 game).
 It unlocks additional deep space slots for long duration missions, freeing up slots for more missions to help maintain game pace.
 
-All old saves are compatible.
-New saves made with this mod will still work when mod is disabled.
+All old saves are compatible.  New saves made with this mod would still work without the mod.
 
 
 # Installation #
@@ -61,7 +60,7 @@ All game languages supported.
 
 This mod does not change saves or game files.
 If a game is saved with mission(s) in deep space slot(s), and is later loaded without the mod,
-all missions will still be up and running, but you cannot launch new mission until the number
+all missions will be alive and well, but you cannot launch new mission until the number
 of missions drops to vanilla level.  The same may also happen if mod config is changed mid-game.
 
 
