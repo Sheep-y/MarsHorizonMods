@@ -40,8 +40,9 @@ namespace ZyMod.MarsHorizon {
          Dictionary< FieldInfo, object > defVals = null;
          if ( DefaultFieldValues?.TryGetValue( GetType(), out defVals ) != true ) return;
          foreach ( var e in ResetFields ) {
-            object curr = e.GetValue( null ), defVal = defVals[ e ];
-            if ( curr != null && defVal != null && curr.GetType().Namespace == "System.Collections.Generic" ) {
+            object curr = e.GetValue( null );
+            var hasDef = defVals.TryGetValue( e, out var defVal );
+            if ( curr != null && ! hasDef && curr.GetType().Namespace == "System.Collections.Generic" ) {
                Fine( "Reset {0}.{1} call Clear().", GetType().Name, e.Name );
                curr.GetType().Method( "Clear", 0 )?.Run( curr );
             } else if ( ! e.IsInitOnly && ! Equals( curr, defVal ) ) {
