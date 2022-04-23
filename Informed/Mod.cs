@@ -88,7 +88,7 @@ namespace ZyMod.MarsHorizon.Informed {
       [ Config( "Show the final tier on next funding, instead of current tier + 1.  Default True." ) ]
       public bool show_final_funding_tier = true;
 
-      [ Config( "\r\n[Ɩnternal]" ) ]
+      [ Config( "\r\n[Ω]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220330;
 

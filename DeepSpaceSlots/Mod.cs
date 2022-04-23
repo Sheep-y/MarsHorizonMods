@@ -85,7 +85,7 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       [ Config( "How many deep space mission slot does the custom research provide." ) ]
       public byte custom_tech2_slot = 1;
 
-      [ Config( "\r\n[Ɩnternal]" ) ]
+      [ Config( "\r\n[Ω]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220314;
    }

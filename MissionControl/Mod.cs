@@ -102,7 +102,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "[Weight - Remaining Destinations]" ) ]
       public int other_mission_weight = 1;
 
-      [ Config( "\r\n[Ɩnternal]" ) ]
+      [ Config( "\r\n[Ω]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220405;
 

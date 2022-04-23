@@ -44,7 +44,7 @@ namespace ZyMod.MarsHorizon.Zhant {
       [ Config( "渲染間距比率。過小出現字框，過大浪費素材。預設 0.1 即 10%。" ) ]
       public float padding_ratio = 0.1f;
 
-      [ Config( "\r\n[Ɩnternal]" ) ]
+      [ Config( "\r\n[Ω]" ) ]
       [ Config( "本設定檔的版本號。敬請勿動。" ) ]
       public int config_version = 20220322;
 

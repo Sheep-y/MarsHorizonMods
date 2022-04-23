@@ -50,7 +50,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
       [ Config( "Crit chance as proportional to payload reliability.  Mod default 0.2 for 20%, e.g. 50% payload reliability = 10% crit." ) ]
       public float minigame_porportion_crit = 0.2f;
 
-      [ Config( "\r\n[Ɩnternal]" ) ]
+      [ Config( "\r\n[Ω]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220320;
    }
