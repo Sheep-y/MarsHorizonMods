@@ -44,15 +44,15 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "The game was designed to not give you the same challenge reward type as the completed one, but a bug prevents it.  This option restores the behaviour whenever feasible." ) ]
       public bool milestone_challenge_no_duplicate_reward = true;
 
-      [ Config( "\r\n[Mission]" ) ]
-      [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to -1 to not change (default)." ) ]
-      public float player_request_mission_chance = -1;
-      [ Config( "Chance of new request mission for AI.  Ditto." ) ]
-      public float ai_request_mission_chance = -1;
+      [ Config( "\r\n[Mission Request]" ) ]
+      [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to 0 to not change (default)." ) ]
+      public float player_request_mission_chance = 0;
+      [ Config( "Chance of new request mission for AI.  Game default 0.25 (for 25%).  Set to 0 to not change (default)." ) ]
+      public float ai_request_mission_chance = 0;
       [ Config( "Use a standalone random number generator to decide new player missions.  Default True." ) ]
       public bool standalone_mission_rng = true;
 
-      [ Config( "\r\n[Joint]" ) ]
+      [ Config( "\r\n[Mission Request, Joint]" ) ]
       [ Config( "Section note: join mission happens only to player agency.  Does not affect AI." ) ]
       [ Config( "Base join mission chance.  Game default 0.1 (for 10%).  Set to -1 to not change (default)." ) ]
       public float joint_mission_chance = -1;
@@ -61,7 +61,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "Team Player bonus chance (multiplied).  Game default 1 (for 100% bonus).  Set to -1 to not change (default)." ) ]
       public float joint_trait_multiplier = -1;
 
-      [ Config( "\r\n[Variations]" ) ]
+      [ Config( "\r\n[Weight - Variations]" ) ]
       [ Config( "Multiply challenging variation (all level) chances.  Default 1.  Set to 1 to not change." ) ]
       public float challenging_weight_multiplier = 1;
       [ Config( "Multiply experimental variation chances.  Default 1.  Set to 1 to not change." ) ]
@@ -79,7 +79,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config( "Try divide all variation weight by this amount to save cpu.  Affects multiplier accuracy; set log level to fine to see exact weights.  Default 10.  Set to 1 to not change." ) ]
       public ushort variation_weight_divider = 10;
 
-      [ Config( "\r\n[Earth and Moon]" ) ]
+      [ Config( "\r\n[Weight - Earth and Moon]" ) ]
       [ Config( "Weight of each uncrewed Earth mission.  Set to 0 to eliminate, -1 to not change (100).  Same for all below" ) ]
       [ Config() ] public int earth_uncrewed_mission_weight = 40;
       [ Config() ] public int earth_crewed_mission_weight = 30;
@@ -87,36 +87,32 @@ namespace ZyMod.MarsHorizon.MissionControl {
       [ Config() ] public int moon_crewed_mission_weight = 12;
       [ Config() ] public int space_station_mission_weight = 20;
 
-      [ Config( "[Inner Planets]" ) ]
+      [ Config( "[Weight - Inner Planets]" ) ]
       [ Config() ] public int venus_mission_weight = 6;
       [ Config() ] public int mercury_mission_weight = 4;
       [ Config() ] public int mars_mission_weight = 10;
 
-      [ Config( "[Outter Planets]" ) ]
+      [ Config( "[Weight - Outter Planets]" ) ]
       [ Config() ] public int jupiter_mission_weight = 1;
       [ Config() ] public int saturn_mission_weight = 1;
       [ Config() ] public int uranus_mission_weight = 1;
       [ Config() ] public int neptune_mission_weight = 1;
       [ Config() ] public int pluto_mission_weight = 1;
 
-      [ Config( "[Others Destinations]" ) ]
+      [ Config( "[Weight - Remaining Destinations]" ) ]
       public int other_mission_weight = 1;
 
-      [ Config( "\r\n[|nternal]" ) ]
+      [ Config( "\r\n[Ɩnternal]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
       public int config_version = 20220405;
 
       protected override void OnLoad ( string _ ) {
-         if ( ! NonNeg( challenging_weight_multiplier ) ) challenging_weight_multiplier = 1;
-         if ( ! NonNeg( experimental_weight_multiplier ) ) experimental_weight_multiplier = 1;
-         if ( ! NonNeg( lucrative_weight_multiplier ) ) lucrative_weight_multiplier = 1;
-         if ( ! NonNeg( lucrative_weight_multiplier_opening ) ) lucrative_weight_multiplier_opening = 1;
-         if ( ! NonNeg( lucrative_weight_multiplier_full_tech ) ) lucrative_weight_multiplier_full_tech = 1;
-         if ( ! NonNeg( publicised_weight_multiplier ) ) publicised_weight_multiplier = 1;
-         if ( ! NonNeg( test_weight_multiplier ) ) test_weight_multiplier = 1;
-         if ( ! NonNeg( variation_weight_divider ) ) variation_weight_divider = 1;
+         var def = new Config();
+         foreach ( var f in GetType().GetFields() ) {
+            if ( f.IsStatic || f.IsInitOnly || f.FieldType != typeof( float ) ) continue;
+            if ( ! Rational( (float) f.GetValue( this ) ) ) f.SetValue( this, f.GetValue( def ) );
+         }
          if ( config_version < 20220405 ) {
-            var def = new Config();
             if ( lucrative_weight_multiplier_opening == 2 ) lucrative_weight_multiplier_opening = def.lucrative_weight_multiplier_opening;
             if ( lucrative_weight_multiplier_full_tech == 5 ) lucrative_weight_multiplier_full_tech = def.lucrative_weight_multiplier_full_tech;
             Task.Run( Save );
