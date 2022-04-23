@@ -22,7 +22,7 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          config.Load();
          if ( config.special_payload_ar_bonus != 0 || config.extra_crew_ar_bonus != 0 || config.power_payload_ar_crit != 0 || config.standalone_resolve_rng )
             ActivatePatcher( typeof( PatcherAutoResolve ) );
-         if ( config.minigame_base_crit != 0 || config.minigame_porportion_crit != 0 )
+         if ( config.minigame_base_crit != 0.1f || config.minigame_porportion_crit != 0 )
             ActivatePatcher( typeof( PatcherMinigame ) );
       }
    }
