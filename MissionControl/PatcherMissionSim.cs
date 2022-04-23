@@ -49,7 +49,7 @@ namespace ZyMod.MarsHorizon.MissionControl {
          var rules = __instance.gamedata.rules;
          if ( origChance < 0 ) origChance = rules.requestGenerationChance;
          var chance = agency.isAI ? config.ai_request_mission_chance : config.player_request_mission_chance;
-         rules.requestGenerationChance = ( chance <= 0 || chance > 1 || ! Rational( chance ) ) ? origChance : chance;
+         rules.requestGenerationChance = ( chance < 0 || chance > 1 || ! Rational( chance ) ) ? origChance : chance;
          Log( agency.isAI ? TraceLevel.Verbose : TraceLevel.Info,
             "{0} checking new mission.  Current count {2}/{3} ({5} lucrative), cooldown {4}, chance {1:P0}{6}.", agency.NameLocalised,
             1 - rules.requestGenerationChance, agency.RequestMissionCount, __instance.gamedata.GetEraRequestLimit( agency.era ), agency.turnsUntilNextMissionRequest,

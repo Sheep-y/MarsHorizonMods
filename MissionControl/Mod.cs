@@ -45,10 +45,10 @@ namespace ZyMod.MarsHorizon.MissionControl {
       public bool milestone_challenge_no_duplicate_reward = true;
 
       [ Config( "\r\n[Mission Request]" ) ]
-      [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to 0 to not change (default)." ) ]
-      public float player_request_mission_chance = 0;
-      [ Config( "Chance of new request mission for AI.  Game default 0.25 (for 25%).  Set to 0 to not change (default)." ) ]
-      public float ai_request_mission_chance = 0;
+      [ Config( "Chance of new request mission for player.  Game default 0.25 (for 25%).  Set to -1 to not change (default)." ) ]
+      public float player_request_mission_chance = -1;
+      [ Config( "Chance of new request mission for AI.  Game default 0.25 (for 25%).  Set to -1 to not change (default)." ) ]
+      public float ai_request_mission_chance = -1;
       [ Config( "Use a standalone random number generator to decide new player missions.  Default True." ) ]
       public bool standalone_mission_rng = true;
 
