@@ -2,7 +2,7 @@
   "Id": "ZyDeepSpaceSlots",
   "DisplayName": "Deep Space Slots",
   "Author": "Sheepy",
-  "Version": "1.0",
+  "Version": "1.0.1",
   "ManagerVersion": "0.24",
   "AssemblyName": "MH_DeepSpaceSlots.dll",
   "EntryMethod": "ZyMod.MarsHorizon.DeepSpaceSlots.Mod.Main",

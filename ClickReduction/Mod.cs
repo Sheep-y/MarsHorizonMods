@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.ClickReduction {
-   [ BepInPlugin( "Zy.MarsHorizon.ClickReduction", "Click Reduction", "1.0" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.ClickReduction", "Click Reduction", "1.0.1" ) ]
    internal class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();

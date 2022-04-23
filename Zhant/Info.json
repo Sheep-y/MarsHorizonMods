@@ -2,7 +2,7 @@
   "Id": "ZyZhant",
   "DisplayName": "Traditional Chinese",
   "Author": "Sheepy",
-  "Version": "1.0",
+  "Version": "1.0.1",
   "ManagerVersion": "0.24",
   "AssemblyName": "MH_Zhant.dll",
   "EntryMethod": "ZyMod.MarsHorizon.Zhant.Mod.Main",

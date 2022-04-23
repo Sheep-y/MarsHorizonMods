@@ -5,7 +5,7 @@ using UnityModManagerNet;
 using static ZyMod.ModHelpers;
 
 namespace ZyMod.MarsHorizon.MissionControl {
-   [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "1.0" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.MissionControl", "Mission Control", "1.0.1" ) ]
    internal class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
