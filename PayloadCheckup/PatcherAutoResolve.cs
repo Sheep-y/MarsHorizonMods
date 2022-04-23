@@ -38,10 +38,11 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
          if ( mission.payload == null ) return;
          var bonus = GetPayloadBonus( mission, currentVariant );
          if ( bonus == 0 ) return;
-         Info( "Adding {0}% to auto-resolve success rate for {1} payload.", bonus, currentVariant );
+         var orig = __result;
          modifiers.Add( new ValueModifier( EModifierSource.ConstructionTrait, bonus, mission.payload.id,
             bonus > 0 ? EPolarity.Positive : EPolarity.Negative, Agency.Type.None ) );
-         __result = Math.Max( 1, Math.Min( modifiers.Sum( e => e.ModifiedValue ), 99 ) );
+         __result = Math.Max( 1, Math.Min( __result + modifiers.Sum( e => e.ModifiedValue ), 99 ) );
+         Info( "Added {0}% to auto-resolve success rate for {1} payload, total {2} => {3}.", bonus, currentVariant, orig, __result );
       } catch ( Exception x ) { Err( x ); } }
 
       private static int GetPayloadBonus ( Mission mission, PayloadVariant.Type type ) {
@@ -63,14 +64,16 @@ namespace ZyMod.MarsHorizon.PayloadCheckup {
 
       private static void AddCritBonus ( AutoresolveMission __instance, bool isMarsFinalMission, ref AutoresolveMission.EResult __result ) { try {
          if ( currentVariant != Power || isMarsFinalMission ) return;
-         var oldChance = __instance.OutstandingChance;
-         var newChance = Math.Min( 100 - __instance.FailureChance, Math.Max( oldChance + config.power_payload_ar_crit, 0 ) );
-         Info( "Changing payload Outstanding chance from {0}% to {1}%.", oldChance, newChance );
+         int oldChance = __instance.OutstandingChance, nonFailChance = 100 - __instance.FailureChance;
+         var newChance = Math.Min( nonFailChance, Math.Max( oldChance + config.power_payload_ar_crit, 0 ) );
+         if ( newChance == oldChance ) return;
          typeof( AutoresolveMission ).Property( "OutstandingChance" ).SetValue( __instance, newChance );
+         typeof( AutoresolveMission ).Property( "SuccessChance" ).SetValue( __instance, nonFailChance - newChance );
+         Info( "Changing auto-resolve Outstanding chance from {0}% to {1}% due to payload. Fail {2}%, Success {3}%", oldChance, newChance, __instance.FailureChance, __instance.SuccessChance );
          if ( __result != AutoresolveMission.EResult.Success ) return;
          var reverseRoll = ( 1 - __instance.Roll ) * 100f;
          if ( reverseRoll <= newChance ) {
-            Info( "Upgrading auto-resolve roll ({0:P}) to Outstanding ({1}%) due to power bonus.", __instance.Roll, newChance );
+            Info( "Upgrading auto-resolve roll ({0:P}) to Outstanding ({1}%) due to payload bonus.", __instance.Roll, newChance );
             __result = AutoresolveMission.EResult.OutstandingSuccess;
          }
       } catch ( Exception x ) { Err( x ); } }
