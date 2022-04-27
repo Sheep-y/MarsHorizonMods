@@ -1,8 +1,8 @@
 # Payload Checkup #
 
 This is an unofficial mod of Mars Horizon (2020 game).
-It adjusts auto-resolve success/crit rate by payload variation,
-and manual action crit rate by payload reliability.
+It adjusts auto-resolve success rate by payload variation,
+and adjusts mini-game action outstanding rate by payload reliability.
 
 
 # Installation #
@@ -22,14 +22,14 @@ This mod provides the following features by default:
 
 ## Mission Auto-Resolve ##
 
-* Specialised payloads (Nav, Comm, and Observe ) now enjoys improved auto-resolve success chance.
+* Specialised payloads (Nav, Comm, and Observe) now have improved auto-resolve success chance.
 * Extra crew beyond the min. requirement now improves auto-resolve success chance.
 * Power payload now improves auto-resolve outstanding chance.
 * Make auto-resolve rolls from a standalone RNG.
 
 ## Mission Mini-Game ##
 
-* The base critical success rate is now proportional to payload reliability.
+* The base outstanding rate is now proportional to payload reliability.
 
 
 # Configuration #
