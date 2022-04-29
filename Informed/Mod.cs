@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.Informed {
-   [ BepInPlugin( "Zy.MarsHorizon.Informed", "Informed", "1.0.1" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.Informed", "Informed", "1.0.2" ) ]
    internal class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
@@ -38,8 +38,8 @@ namespace ZyMod.MarsHorizon.Informed {
    internal abstract class ModPatcher : MarsHorizonPatcher {
       internal static readonly Config config = new Config();
       internal static string Localise ( string tag, params string[] vars ) => MarsHorizonMod.Localise( tag, vars );
-      internal static Client activeClient => Controller.Instance?.activeClient;
-      internal static ClientViewer clientViewer => Controller.Instance?.clientViewer;
+      internal static Client activeClient => Controller.Instance.activeClient;
+      internal static ClientViewer clientViewer => Controller.Instance.clientViewer;
       internal static Simulation simulation => activeClient.simulation;
    }
 
