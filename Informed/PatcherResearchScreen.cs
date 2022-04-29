@@ -16,6 +16,7 @@ namespace ZyMod.MarsHorizon.Informed {
          }
       }
 
+      private static Agency agency;
       private static string key_cap;
       private static string[] sups;
       private static int cap;
@@ -23,10 +24,11 @@ namespace ZyMod.MarsHorizon.Informed {
 
       private static VehiclePart FindPart ( string id ) => simulation.gamedata.vehicleParts.FirstOrDefault( ( p ) => p.id == id );
 
-      private static void SetSupplementList ( Research research, ReusableSimplePooler< TutorialTooltipStatItem > ___statItemPooler ) { try {
+      private static void SetSupplementList ( Agency agency, Research research, ReusableSimplePooler< TutorialTooltipStatItem > ___statItemPooler ) { try {
          var part = FindPart( research.id );
          sups = part?.validSupplementaries;
          if ( sups == null ) return;
+         PatcherResearchScreen.agency = agency;
          if ( sups.Length == 0 ) { sups = null; return; }
          statItemPooler = ___statItemPooler;
          cap = part.capacity;
@@ -39,8 +41,12 @@ namespace ZyMod.MarsHorizon.Informed {
       private static void AppendSupplementStats ( string key ) { try {
          if ( sups == null || key != key_cap ) return;
          Info( "Adding {0} boosters to stat list", sups.Length );
-         foreach ( var id in sups )
-            statItemPooler.Reuse().Set( " + " + Localise( $"Name_{id}" ) + " <sprite name=\"WarningScience\"/>", Data.instance.FormatWeight( FindPart( id ).capacity + cap ) );
+         foreach ( var id in sups ) {
+            var researched = agency.HasCompletedResearch( id );
+            statItemPooler.Reuse().Set( " + " + Localise( $"Name_{id}" ) + ( researched ? "" : " <sprite name=\"WarningScience\"/>" ),
+               Data.instance.FormatWeight( FindPart( id ).capacity + cap ) );
+         }
+
          sups = null;
       } catch ( Exception x ) { Err( x ); } }
    }
