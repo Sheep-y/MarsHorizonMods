@@ -173,6 +173,7 @@ namespace ZyMod.MarsHorizon.Zhant {
 
       private static readonly char[] charMap = new char[] {
          '云','雲', '后','後',  '并','並',  '进','進',  '于','於',  '愿','願',  '筑','築',  '范','範',  '涂','塗',  '余','餘',  '么','麼',
+         '巖','岩', '臺','台',
       };
 
       private static string ZhtTweaks ( ref string txt ) {

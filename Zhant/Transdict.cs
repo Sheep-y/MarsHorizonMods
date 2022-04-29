@@ -86,7 +86,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             "運營專家",  "行動專家",
             "未知實體",  "無名小子",
             "水星項目",  "水星計劃",
-            "永不言敗",  "輸不起",
+            "永不言敗",  "只許成功",
             "空間補貼",  "宇航資助",
             "擴展專業知識",  "擴展專家",
             "彈性的工作方式",  "彈性作業",
@@ -179,6 +179,7 @@ namespace ZyMod.MarsHorizon.Zhant {
          Info( "Loading default term mappings." );
          part = new string[] {
             "空間", "太空",
+            "模塊太空", "模組太空",
             "有效載荷", "酬載",
 
             "可靠性獎金", "額外可靠性",
@@ -215,7 +216,7 @@ namespace ZyMod.MarsHorizon.Zhant {
             ">上下文<", ">過去、現在、未來<",
             "試驗飛行員", "試飛員",
             "航天地面指揮中心", "任務控制中心",
-            "模塊空間站的增加，", "模塊空間站的擴充，",
+            "太空站的增加，", "太空站的擴充，",
             "對地軌道以遠", "地球軌道甚至更遠",
             "從此安裝中", "從此設施中",
             "酬載變量", "酬載特化",
@@ -235,6 +236,10 @@ namespace ZyMod.MarsHorizon.Zhant {
             "{total} 中的 {value}", "{value}/{total} ",
             "成本</b>用於{duration}", "需求<b>，尚餘{duration}",
             "{Agency_Default_Name_ {", "{Agency_Default_Name_{",
+
+            "氣體巨人行星", "巨型氣態行星",
+            "氣體巨人", "巨型氣態行星",
+            "冰巨人", "巨型冰質行星",
  
             "剩余", "剩餘",
             "明了", "明瞭",
