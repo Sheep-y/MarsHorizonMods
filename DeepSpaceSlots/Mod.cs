@@ -85,8 +85,19 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
       [ Config( "How many deep space mission slot does the custom research provide." ) ]
       public byte custom_tech2_slot = 1;
 
+      [ Config( "Maximum number of deep space slots.  Default 0 meaning no cap." ) ]
+      public byte max_slot = 0;
+
       [ Config( "\r\n[Ω]" ) ]
       [ Config( "Version of this mod config file.  Do not change." ) ]
-      public int config_version = 20220314;
+      public int config_version = 20220607;
+
+      protected override void OnLoad ( string from ) {
+         base.OnLoad( from );
+         if ( config_version < 20220607 ) { // Added max_slot
+            config_version = 20220607;
+            Save( from );
+         }
+      }
    }
 }

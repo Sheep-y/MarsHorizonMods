@@ -50,8 +50,10 @@ namespace ZyMod.MarsHorizon.DeepSpaceSlots {
 
       private static int GetDeepSpaceMissionSlots ( Agency agency ) { try {
          int b = GetBuildingSlots( agency ), m = GetMissionSlots( agency ), t = GetTechSlots( agency );
-         Fine( "Deep space mission slots: Building {0}, Mission {1}, Research {2}", b, m, t );
-         return b + m + t;
+         int result = b + m + t, cap = config.max_slot;
+         if ( cap > 0 ) result = Math.Min( result, cap );
+         Fine( "Deep space mission slots: Building {0}, Mission {1}, Research {2}, Cap {3}, Final {4}", b, m, t, cap, result );
+         return result;
       } catch ( Exception x ) { return Err( x, 0 ); } }
 
       private static int GetBuildingSlots ( Agency agency ) { try {
