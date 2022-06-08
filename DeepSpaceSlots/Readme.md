@@ -59,9 +59,10 @@ but should be compatible with Steam and Epic on Windows/Wine/Proton.
 All game languages supported.
 
 This mod does not change saves or game files.
-If a game is saved with mission(s) in deep space slot(s), and is later loaded without the mod,
-all missions will be alive and well, but you cannot launch new mission until the number
-of missions drops to vanilla level.  The same may also happen if mod config is changed mid-game.
+If a game is saved with any mission in the deep space slots, and is later loaded without the mod,
+all missions will be alive and well, but you cannot launch new missions until the number
+of missions drops enough to free a vanilla slot.
+The same may also happen if mod config is changed mid-game causing less slots to be available.
 
 
 # Troubleshoot #
@@ -92,6 +93,14 @@ The mod is configurable.  If it is not configured right, the mod may not work as
 
 If you delete the config file, the mod will recreate it with default values.
 
+
+## Changelog
+
+v1.1.0 2022-06-08 Add max_slot config, suggested by Chevayo on Steam.
+
+v1.0.1 2022-04-23 Fix potential exception on mod reload (BepInEx/UMM).
+
+v1.0.0 2022-04-22 Initial release.
 
 # License #
 

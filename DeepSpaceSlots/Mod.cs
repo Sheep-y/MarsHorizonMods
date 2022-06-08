@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityModManagerNet;
 
 namespace ZyMod.MarsHorizon.DeepSpaceSlots {
-   [ BepInPlugin( "Zy.MarsHorizon.DeepSpaceSlots", "Deep Space Slots", "1.0.1" ) ]
+   [ BepInPlugin( "Zy.MarsHorizon.DeepSpaceSlots", "Deep Space Slots", "1.1.0" ) ]
    internal class BIE_Mod : BaseUnityPlugin {
       private void Awake() { BepInUtil.Setup( this, ModPatcher.config ); Mod.Main(); }
       private void OnDestroy() => BepInUtil.Unbind();
